@@ -1,6 +1,6 @@
 import { createFileRoute, Outlet } from "@tanstack/react-router";
 
-import { GitGraph, LayoutDashboardIcon, Play } from "lucide-react";
+import { GitGraph, LayoutDashboardIcon, MessageSquare, Play } from "lucide-react";
 import { Sidebar, SidebarItem } from "../../shared/components/layout/Sidebar";
 
 export const Route = createFileRoute("/_app")({
@@ -19,9 +19,14 @@ const itemsNav = [
     icon: GitGraph,
   },
   {
-    to: "/Simulator",
+    to: "/simulate",
     title: "Simulator",
     icon: Play,
+  },
+  {
+    to: "/chat-builder",
+    title: "Chat Builder",
+    icon: MessageSquare,
   },
 ];
 

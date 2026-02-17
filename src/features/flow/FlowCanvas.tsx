@@ -18,7 +18,6 @@ import { MessageNode } from "./nodes/MessageNode";
 
 import { NodePropertiesPanel } from "./components/NodePropertiesPanel";
 import { NodeToolbar } from "./components/NodeToolbar";
-import { SimulationChat } from "./components/SimulationChat";
 import { EndNode } from "./nodes/EndNode";
 import { StartNode } from "./nodes/StartNode";
 import { useFlowStore } from "./store/flow.store";
@@ -40,10 +39,7 @@ function FlowCanvasContent() {
     onConnect,
     addNode,
     setSelectedNodeId,
-    mode,
   } = useFlowStore();
-
-  const isSimulating = mode === 'simulate'
 
   const { screenToFlowPosition } = useReactFlow();
 
@@ -86,13 +82,16 @@ function FlowCanvasContent() {
   );
 
   return (
-    <div className="h-full w-full bg-linear-to-br from-bg-bg-start to-bg-bg-end" onDrop={isSimulating ? undefined : onDrop}>
+    <div
+      className="h-full w-full bg-linear-to-br from-bg-bg-start to-bg-bg-end"
+      onDrop={onDrop}
+    >
       <ReactFlow
         nodes={nodes}
         edges={edges}
-        nodesDraggable={!isSimulating}
-        nodesConnectable={!isSimulating}
-        elementsSelectable={!isSimulating}
+        nodesDraggable
+        nodesConnectable
+        elementsSelectable
         defaultEdgeOptions={defaultEdgeOptions}
         nodeTypes={nodeTypes}
         onNodesChange={onNodesChange}
@@ -115,9 +114,8 @@ function FlowCanvasContent() {
         />
       </ReactFlow>
 
-      {!isSimulating && <NodePropertiesPanel />}
-      {!isSimulating && <NodeToolbar />}
-      <SimulationChat />
+      <NodePropertiesPanel />
+      <NodeToolbar />
     </div>
   );
 }

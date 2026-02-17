@@ -7,10 +7,11 @@ export function MessageNode({ id, data }: NodeProps) {
 
   return (
     <div
-      className={`bg-panel border border-border-ui p-4 rounded-xl min-w-50 transition-all duration-500 ${isActive
-        ? "ring-4 ring-primary shadow-[0_0_30px_rgba(20,184,166,0.4)] scale-105 z-50"
-        : ""
-        }`}
+      className={`bg-panel border border-border-ui p-4 rounded-xl min-w-50 transition-all duration-500 ${
+        isActive
+          ? "ring-4 ring-primary shadow-[0_0_30px_rgba(20,184,166,0.4)] scale-105 z-50"
+          : ""
+      }`}
     >
       <Handle
         type="target"
@@ -19,10 +20,17 @@ export function MessageNode({ id, data }: NodeProps) {
         className="w-3 h-3 bg-primary"
       />
 
-      <div className="text-xs font-bold text-primary mb-1 uppercase">
+      <div className="text-xs font-bold text-primary mb-1 uppercase tracking-tight">
         {data.isStart ? "Fluxo inicial" : "Mensagem"}
       </div>
-      <div className="text-sm text-text-primary">{data.label as string}</div>
+      <div className="text-sm font-bold text-text-primary mb-1">
+        {data.label as string}
+      </div>
+      {data.content && (
+        <div className="text-[11px] text-text-secondary line-clamp-2 italic leading-tight">
+          "{String(data.content)}"
+        </div>
+      )}
 
       <Handle
         type="source"
