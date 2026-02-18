@@ -13,9 +13,11 @@
     "@tanstack/react-query": "^5.66.0",
     "@tanstack/react-router": "^1.111.4",
     "@xyflow/react": "^12.10.0",
+    "axios": "^1.7.9",
     "lucide-react": "^0.563.0",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
+    "socket.io-client": "^4.8.1",
     "tailwindcss": "^4.0.5",
     "zustand": "^5.0.3"
   },

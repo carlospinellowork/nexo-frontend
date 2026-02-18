@@ -46,10 +46,14 @@ function AppRouter() {
   );
 }
 
+import { SocketProvider } from "./shared/contexts/SocketContext";
+
 createRoot(document.getElementById("root")!).render(
   <StrictMode>
     <QueryClientProvider client={queryClient}>
-      <AppRouter />
+      <SocketProvider>
+        <AppRouter />
+      </SocketProvider>
     </QueryClientProvider>
   </StrictMode>,
 );
