@@ -1,192 +1,198 @@
-import { RefreshCcw, Send, Terminal, User } from "lucide-react";
-import { useEffect, useRef, useState } from "react";
-import { useChatBuilderStore } from "../../chatBuilder/store/chat-builder-store";
-import { useFlowStore } from "../store/flow.store";
+import { ArrowUp, Headset, RotateCcw } from "lucide-react";
+import { AnimatePresence, motion } from "motion/react";
+import { type FormEvent, useEffect, useRef, useState } from "react";
+import type { OutboundMessage } from "../../../api/mutations/useSimulator";
+import type { ChatSettings } from "../../chatBuilder/store/chat-builder-store";
+import type { ChatLine } from "../hooks/useSimulatorSession";
 
 interface SimulationChatProps {
-  embedded?: boolean;
+  lines: ChatLine[];
+  settings: ChatSettings;
+  canSend: boolean;
+  busy: boolean;
+  onSend: (text: string, optionId?: string) => void;
+  onRestart: () => void;
+  /** Versão menor, sem a moldura do iPhone (painel de teste do editor). */
+  compact?: boolean;
 }
 
-export function SimulationChat({ embedded = false }: SimulationChatProps) {
-  const {
-    simulationLogs,
-    mode,
-    waitingForResponse,
-    addSimulationLog,
-    setWaitingForResponse,
-    setMode,
-    selectedChatId,
-  } = useFlowStore();
-
-  const { chats, getActiveSettings } = useChatBuilderStore();
-
-  const chatSettings = chats.find(c => c.id === selectedChatId) || getActiveSettings();
-
-  const {
-    botName,
-    headerBackgroundColor,
-    headerTextColor,
-    userBubbleColor,
-    botBubbleColor,
-    botTextColor,
-    mainColor
-  } = chatSettings;
-
-  const [inputValue, setInputValue] = useState("");
-  const scrollRef = useRef<HTMLDivElement>(null);
-
-  useEffect(() => {
-    if (scrollRef.current) {
-      scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
-    }
-  }, [simulationLogs]);
-
-  const handleSend = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!inputValue.trim()) return;
-
-    addSimulationLog({
-      type: "user",
-      message: inputValue.trim(),
-    });
-
-    setInputValue("");
-    setWaitingForResponse(false);
-  };
-
-  const restartSimulation = () => {
-    setMode("edit");
-    setTimeout(() => setMode("simulate"), 50);
-  };
-
-  if (mode !== "simulate" && !embedded) return null;
-
-  const containerClasses = embedded
-    ? "flex-1 flex flex-col h-full bg-panel/30 border border-border-ui/50 rounded-3xl overflow-hidden shadow-inner"
-    : "absolute right-6 bottom-6 w-96 h-[500px] bg-panel/95 backdrop-blur-2xl border border-border-ui rounded-3xl shadow-2xl z-50 flex flex-col overflow-hidden animate-in fade-in slide-in-from-bottom-6 duration-500";
-
+function TypingDots({ color }: { color: string }) {
   return (
-    <div className={containerClasses}>
-      {!embedded && (
-        <div
-          style={{ backgroundColor: headerBackgroundColor, color: headerTextColor }}
-          className="p-5 border-b border-border-ui flex items-center justify-between shrink-0"
-        >
-          <div className="flex items-center gap-3">
-            <div className="w-2.5 h-2.5 bg-success rounded-full animate-pulse shadow-[0_0_8px_rgba(34,197,94,0.4)]" />
-            <h3 className="text-[11px] font-black uppercase tracking-[0.2em]">
-              {botName} • Simulação
-            </h3>
-          </div>
-          <button
-            onClick={restartSimulation}
-            className="p-2 hover:bg-white/10 rounded-full transition-all"
-          >
-            <RefreshCcw size={14} />
-          </button>
-        </div>
-      )}
-
-      <div
-        ref={scrollRef}
-        className="flex-1 overflow-y-auto p-6 space-y-6 scroll-smooth"
-      >
-        {simulationLogs.map((log) => (
-          <div
-            key={log.id}
-            className={`flex flex-col gap-2 w-full animate-in fade-in slide-in-from-bottom-4 duration-500 ${log.type === "system"
-              ? "items-center"
-              : log.type === "user"
-                ? "items-end"
-                : "items-start"
-              }`}
-          >
-            {log.type === "system" ? (
-              <div className="py-2 w-full flex items-center gap-4">
-                <div className="h-px bg-border-ui flex-1 opacity-20" />
-                <span className="text-[9px] text-text-secondary font-bold uppercase tracking-[0.2em] shrink-0 px-3 py-1 bg-white/5 rounded-full border border-border-ui/50">
-                  {log.message}
-                </span>
-                <div className="h-px bg-border-ui flex-1 opacity-20" />
-              </div>
-            ) : (
-              <div
-                className={`flex gap-3 items-end max-w-[85%] ${log.type === "user" ? "flex-row-reverse" : ""}`}
-              >
-                <div
-                  className={`w-8 h-8 flex items-center justify-center rounded-xl shrink-0 border shadow-sm ${log.type === "user"
-                    ? "bg-white/5 border-white/10 text-text-primary"
-                    : log.type === "action"
-                      ? "bg-info/20 text-info border-info/30"
-                      : "bg-white/5 text-text-primary border-white/10"
-                    }`}
-                >
-                  {log.type === "user" ? (
-                    <User size={14} />
-                  ) : log.type === "action" ? (
-                    <Terminal size={14} />
-                  ) : (
-                    <div
-                      style={{ backgroundColor: mainColor }}
-                      className="w-4 h-4 rounded-full opacity-60"
-                    />
-                  )}
-                </div>
-                <div
-                  style={
-                    log.type === "user"
-                      ? { backgroundColor: userBubbleColor, color: "#fff" }
-                      : log.type === "message"
-                        ? { backgroundColor: botBubbleColor, color: botTextColor }
-                        : {}
-                  }
-                  className={`p-4 rounded-2xl text-[13px] leading-relaxed break-words border border-transparent shadow-sm ${log.type === "user"
-                    ? "rounded-br-none font-medium"
-                    : log.type === "action"
-                      ? "bg-info/10 border-info/10 text-info"
-                      : "rounded-bl-none"
-                    }`}
-                >
-                  {log.message}
-                </div>
-              </div>
-            )}
-          </div>
-        ))}
-        {waitingForResponse && (
-          <div className="flex gap-1.5 items-center px-2 animate-pulse">
-            <div style={{ backgroundColor: mainColor }} className="w-1.5 h-1.5 rounded-full shadow-[0_0_5px_var(--color-primary)] opacity-60" />
-            <div style={{ backgroundColor: mainColor }} className="w-1.5 h-1.5 rounded-full [animation-delay:200ms] shadow-[0_0_5px_var(--color-primary)] opacity-60" />
-            <div style={{ backgroundColor: mainColor }} className="w-1.5 h-1.5 rounded-full [animation-delay:400ms] shadow-[0_0_5px_var(--color-primary)] opacity-60" />
-          </div>
-        )}
-      </div>
-
-      <div
-        className={`p-6 border-t border-border-ui shrink-0 ${embedded ? "bg-black/20" : "bg-white/5"}`}
-      >
-        <form onSubmit={handleSend} className="max-w-xl mx-auto flex gap-3">
-          <input
-            disabled={!waitingForResponse}
-            value={inputValue}
-            onChange={(e) => setInputValue(e.target.value)}
-            placeholder={
-              waitingForResponse
-                ? "Digite uma mensagem..."
-                : "Aguardando resposta do bot..."
-            }
-            className="flex-1 bg-bg-start border border-border-ui rounded-2xl px-5 py-3 text-sm text-text-primary focus:border-primary outline-none transition-all placeholder:text-text-secondary/30 disabled:opacity-50"
-          />
-          <button
-            type="submit"
-            disabled={!waitingForResponse}
-            style={{ backgroundColor: waitingForResponse ? mainColor : undefined }}
-            className="w-12 h-12 text-white rounded-2xl flex items-center justify-center hover:opacity-90 transition-all shadow-lg active:scale-95 disabled:grayscale disabled:opacity-50"
-          >
-            <Send size={20} />
-          </button>
-        </form>
-      </div>
+    <div className="flex w-fit items-center gap-1 rounded-2xl rounded-bl-md px-3.5 py-3" style={{ backgroundColor: color }}>
+      {[0, 1, 2].map((i) => (
+        <motion.span
+          key={i}
+          className="h-2 w-2 rounded-full bg-current opacity-50"
+          animate={{ y: [0, -4, 0], opacity: [0.35, 0.8, 0.35] }}
+          transition={{ duration: 0.9, repeat: Infinity, delay: i * 0.15 }}
+        />
+      ))}
     </div>
   );
+}
+
+const BUBBLE = "whitespace-pre-wrap break-words rounded-[20px] rounded-bl-md px-3.5 py-2.5 text-[15px] leading-snug";
+
+function BotContent({
+  message,
+  settings,
+  interactive,
+  onPick,
+}: {
+  message: OutboundMessage;
+  settings: ChatSettings;
+  interactive: boolean;
+  onPick: (label: string, id: string) => void;
+}) {
+  const bubble = { backgroundColor: settings.botBubbleColor, color: settings.botTextColor };
+
+  if (message.type === "image") {
+    return (
+      <div className="max-w-[80%] overflow-hidden rounded-[20px] rounded-bl-md" style={bubble}>
+        <img src={message.url} alt={message.caption ?? "Imagem"} className="max-h-56 w-full object-cover" />
+        {message.caption && <p className="px-3.5 py-2 text-[14px] leading-snug">{message.caption}</p>}
+      </div>
+    );
+  }
+  if (message.type === "buttons") {
+    return (
+      <div className="flex max-w-[85%] flex-col gap-1.5">
+        <div className={BUBBLE} style={bubble}>
+          {message.text}
+        </div>
+        <div className="flex flex-wrap gap-1.5">
+          {message.options.map((o) => (
+            <motion.button
+              key={o.id}
+              whileTap={interactive ? { scale: 0.95 } : undefined}
+              disabled={!interactive}
+              onClick={() => onPick(o.label, o.id)}
+              className="rounded-full border-[1.5px] bg-white px-3.5 py-1.5 text-[14px] font-semibold transition-opacity disabled:opacity-50"
+              style={{ borderColor: settings.mainColor, color: settings.mainColor }}
+            >
+              {o.label}
+            </motion.button>
+          ))}
+        </div>
+      </div>
+    );
+  }
+  return (
+    <div className={`max-w-[80%] ${BUBBLE}`} style={bubble}>
+      {message.text}
+    </div>
+  );
+}
+
+// A conversa imita o widget do cliente, que é sempre claro; por isso as cores fixas aqui.
+const SYSTEM_TONES = {
+  info: "bg-black/5 text-[#4A5468]",
+  warning: "bg-[#FFB020]/18 text-[#8A5A00]",
+  danger: "bg-[#FF3B30]/12 text-[#B42318]",
+};
+
+/** Conversa de teste com as cores configuradas na Aparência. */
+export function SimulationChat({ lines, settings, canSend, busy, onSend, onRestart, compact }: SimulationChatProps) {
+  const [value, setValue] = useState("");
+  const scrollRef = useRef<HTMLDivElement>(null);
+  const lastBotIndex = lines.reduce((last, l, i) => (l.from === "bot" ? i : last), -1);
+  const handoff = lines.some((l) => l.from === "system" && l.tone === "warning");
+
+  useEffect(() => {
+    scrollRef.current?.scrollTo({ top: scrollRef.current.scrollHeight, behavior: "smooth" });
+  }, [lines, busy]);
+
+  const submit = (e: FormEvent) => {
+    e.preventDefault();
+    if (!value.trim() || !canSend) return;
+    onSend(value.trim());
+    setValue("");
+  };
+
+  const screen = (
+    <div className={`flex min-h-0 flex-1 flex-col overflow-hidden bg-[#F7F8FA] ${compact ? "rounded-[22px]" : "rounded-[38px]"}`}>
+      <div
+        className={`flex items-center gap-3 px-5 pb-3 ${compact ? "pt-3" : "pt-5"}`}
+        style={{ backgroundColor: settings.headerBackgroundColor, color: settings.headerTextColor }}
+      >
+        <span className="flex h-9 w-9 items-center justify-center rounded-full bg-white/25 text-[13px] font-bold">{settings.botName.slice(0, 2).toUpperCase()}</span>
+        <div className="flex flex-1 flex-col">
+          <span className="text-[15px] font-semibold">{settings.botName}</span>
+          <span className="text-[12px] opacity-80">{busy ? "digitando..." : handoff ? "com um atendente" : "online"}</span>
+        </div>
+        <motion.button whileTap={{ rotate: -180 }} onClick={onRestart} className="rounded-full p-2 hover:bg-white/15" title="Reiniciar conversa" aria-label="Reiniciar conversa">
+          <RotateCcw size={16} />
+        </motion.button>
+      </div>
+
+      <div ref={scrollRef} className="flex flex-1 flex-col gap-2 overflow-y-auto px-4 py-4">
+        <AnimatePresence initial={false}>
+          {lines.map((line, index) =>
+            line.from === "system" ? (
+              <motion.div
+                key={line.id}
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                className={`mx-auto my-1 flex items-center gap-1.5 rounded-full px-3 py-1 text-center text-[12px] font-medium ${SYSTEM_TONES[line.tone ?? "info"]}`}
+              >
+                {line.tone === "warning" && <Headset size={13} />}
+                {line.text}
+              </motion.div>
+            ) : (
+              <motion.div
+                key={line.id}
+                layout
+                initial={{ opacity: 0, y: 12, scale: 0.92 }}
+                animate={{ opacity: 1, y: 0, scale: 1 }}
+                transition={{ type: "spring", stiffness: 420, damping: 30 }}
+                style={{ originX: line.from === "user" ? 1 : 0 }}
+                className={`flex ${line.from === "user" ? "justify-end" : "justify-start"}`}
+              >
+                {line.from === "user" ? (
+                  <div
+                    className="max-w-[80%] whitespace-pre-wrap break-words rounded-[20px] rounded-br-md px-3.5 py-2.5 text-[15px] leading-snug"
+                    style={{ backgroundColor: settings.userBubbleColor, color: "#fff" }}
+                  >
+                    {line.message.type === "text" ? line.message.text : ""}
+                  </div>
+                ) : (
+                  <BotContent
+                    message={line.message}
+                    settings={settings}
+                    interactive={canSend && !busy && index === lastBotIndex}
+                    onPick={(label, id) => onSend(label, id)}
+                  />
+                )}
+              </motion.div>
+            ),
+          )}
+        </AnimatePresence>
+        {busy && <TypingDots color={settings.botBubbleColor} />}
+      </div>
+
+      <form onSubmit={submit} className="flex items-center gap-2 border-t border-black/5 bg-white px-3 py-3">
+        <input
+          disabled={!canSend || busy}
+          value={value}
+          onChange={(e) => setValue(e.target.value)}
+          placeholder={canSend ? "Responda como cliente..." : handoff ? "Com um atendente" : "Conversa encerrada"}
+          aria-label="Mensagem de teste"
+          className="h-10 min-w-0 flex-1 rounded-full border border-black/10 bg-[#F2F4F8] px-4 text-[15px] text-[#0B1220] outline-none placeholder:text-[#4A5468]/70 focus:border-black/20 disabled:opacity-60"
+        />
+        <motion.button
+          whileTap={{ scale: 0.9 }}
+          type="submit"
+          disabled={!canSend || busy || !value.trim()}
+          style={{ backgroundColor: settings.mainColor }}
+          className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full text-white transition-opacity disabled:opacity-40"
+          aria-label="Enviar"
+        >
+          <ArrowUp size={18} strokeWidth={2.6} />
+        </motion.button>
+      </form>
+    </div>
+  );
+
+  if (compact) return <div className="flex h-full min-h-0 flex-col">{screen}</div>;
+  return <div className="mx-auto flex h-full max-h-[760px] w-full max-w-[400px] flex-col rounded-[48px] bg-[#0B1220] p-3 shadow-[0_30px_80px_rgb(11_18_32/0.35)]">{screen}</div>;
 }

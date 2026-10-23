@@ -4,6 +4,7 @@ import { api } from "../instance";
 export interface Workspace {
   id: string;
   name: string;
+  role: "OWNER" | "ADMIN" | "MEMBER";
 }
 
 export const useGetWorkspaces = () => {

@@ -1,126 +1,117 @@
-import { createFileRoute } from '@tanstack/react-router'
-import { Loader2, MessageSquareOff, Plus } from 'lucide-react'
-import { useEffect } from 'react'
-import { usePostChat } from '../../api/mutations/usePostChat'
-import { useGetChats } from '../../api/queries/useGetChats'
-import { SettingsPanel } from '../../features/chatBuilder/components/SettingsPanel'
-import { WidgetPreview } from '../../features/chatBuilder/components/WidgetPreview'
-import { useChatBuilderStore } from '../../features/chatBuilder/store/chat-builder-store'
-import { useWorkspaceStore } from '../../features/workspaces/store/workspace-store'
-import { Header } from '../../shared/components/layout/Header'
+import { createFileRoute } from "@tanstack/react-router";
+import { CheckCircle2, Loader2, MessageSquarePlus, Plus, Save } from "lucide-react";
+import { useEffect, useState } from "react";
+import { apiErrorMessage } from "../../api/instance";
+import { usePatchChatSettings } from "../../api/mutations/usePatchChatSettings";
+import { usePostChat } from "../../api/mutations/usePostChat";
+import { EmbedCode } from "../../features/chatBuilder/components/EmbedCode";
+import { SettingsPanel } from "../../features/chatBuilder/components/SettingsPanel";
+import { WidgetPreview } from "../../features/chatBuilder/components/WidgetPreview";
+import { useChatBuilderStore } from "../../features/chatBuilder/store/chat-builder-store";
+import { Header } from "../../shared/components/layout/Header";
+import { Badge } from "../../shared/components/ui/Badge";
+import { Button } from "../../shared/components/ui/Button";
+import { ChatSelect } from "../../shared/components/ui/ChatSelect";
+import { EmptyState } from "../../shared/components/ui/EmptyState";
+import { PromptDialog } from "../../shared/components/ui/PromptDialog";
+import { toast } from "../../shared/components/ui/toast-store";
+import { useActiveChat } from "../../shared/hooks/useActiveChat";
 
-export const Route = createFileRoute('/_app/chat-builder')({
-  component: RouteComponent,
-})
+export const Route = createFileRoute("/_app/chat-builder")({
+  component: ChatBuilderPage,
+});
 
-function RouteComponent() {
-  const { activeWorkspaceId } = useWorkspaceStore()
-  const { data: chats, isLoading } = useGetChats(activeWorkspaceId || undefined)
-  const { mutate: createChat, isPending: isCreating } = usePostChat()
-  const { activeChatId, setActiveChat, setFullSettings } = useChatBuilderStore()
+function ChatBuilderPage() {
+  const { chats, chat, chatId, setChatId, isLoading } = useActiveChat();
+  const { mutateAsync: createChat, isPending: isCreating } = usePostChat();
+  const { mutateAsync: saveChat, isPending: isSaving } = usePatchChatSettings();
+  const { activeChatId, name, draft, dirty, load, markSaved } = useChatBuilderStore();
+  const [creating, setCreating] = useState(false);
 
+  // Carrega o rascunho a partir do servidor quando o chat muda (ou acaba de ser salvo).
   useEffect(() => {
-    if (chats && chats.length > 0) {
-      if (!activeChatId || !chats.find(c => c.id === activeChatId)) {
-        setActiveChat(chats[0].id)
-      }
+    if (chat && (chat.id !== activeChatId || !dirty)) load(chat);
+  }, [chat, activeChatId, dirty, load]);
 
-      const activeChat = chats.find(c => c.id === activeChatId)
-      if (activeChat) {
-        // Merge model fields into store
-        setFullSettings(activeChat.id, {
-          ...activeChat.settings,
-          id: activeChat.id,
-          name: activeChat.name
-        })
-      }
+  const handleCreate = async (chatName: string) => {
+    try {
+      const created = await createChat(chatName);
+      setChatId(created.id);
+      setCreating(false);
+      toast.success(`Chat "${created.name}" criado com um fluxo de exemplo.`);
+    } catch (err) {
+      toast.error(apiErrorMessage(err));
     }
-  }, [chats, activeChatId, setActiveChat, setFullSettings])
+  };
 
-  const handleCreateChat = () => {
-    const name = prompt("Nome do novo chat:")
-    if (name && activeWorkspaceId) {
-      createChat({ name, workspaceId: activeWorkspaceId }, {
-        onSuccess: (newChat) => {
-          setActiveChat(newChat.id)
-        }
-      })
+  const handleSave = async () => {
+    if (!chatId) return;
+    try {
+      await saveChat({ id: chatId, name: name.trim() || undefined, settings: draft });
+      markSaved();
+      toast.success("Aparência salva.");
+    } catch (err) {
+      toast.error(apiErrorMessage(err));
     }
-  }
+  };
 
-  if (!activeWorkspaceId) {
+  const dialog = (
+    <PromptDialog
+      open={creating}
+      title="Novo assistente"
+      label="Nome do assistente"
+      placeholder="Ex.: Atendimento do site"
+      loading={isCreating}
+      onConfirm={handleCreate}
+      onClose={() => setCreating(false)}
+    />
+  );
+
+  if (!isLoading && chats?.length === 0) {
     return (
-      <div className="flex flex-col h-full items-center justify-center gap-4 text-text-secondary">
-        <MessageSquareOff size={48} />
-        <p className="font-bold">Selecione um Workspace para gerenciar chats</p>
-      </div>
-    )
+      <>
+        <EmptyState icon={MessageSquarePlus} title="Crie seu primeiro assistente" description="Ele já vem com uma conversa de exemplo funcionando. Depois é só personalizar.">
+          <Button icon={Plus} size="lg" onClick={() => setCreating(true)}>
+            Criar assistente
+          </Button>
+        </EmptyState>
+        {dialog}
+      </>
+    );
   }
 
   return (
-    <div className='flex flex-col h-full'>
+    <div className="flex flex-col h-full">
       <Header
-        title="Chat Builder"
-        subtitle="Configure a aparência do seu widget de chat"
+        title="Aparência"
+        subtitle="Como o assistente aparece no seu site"
+        badge={dirty ? <Badge tone="warning">Não salvo</Badge> : <Badge tone="success" icon={CheckCircle2}>Salvo</Badge>}
         actions={
           <div className="flex items-center gap-3">
-            <div className="flex items-center bg-panel border border-border-ui rounded-lg overflow-hidden h-9">
-              <div className="px-3 border-r border-border-ui h-full flex items-center bg-white/5">
-                <span className="text-[10px] font-bold text-text-secondary uppercase tracking-tighter">
-                  Chat Ativo:
-                </span>
-              </div>
-              <select
-                value={activeChatId}
-                onChange={(e) => setActiveChat(e.target.value)}
-                className="bg-transparent border-none outline-none text-xs font-medium px-2 py-1 pr-8 text-text-primary appearance-none cursor-pointer hover:bg-white/5 transition-colors h-full min-w-40"
-                style={{
-                  backgroundImage:
-                    "url(\"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%2364748b'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M19 9l-7 7-7-7'/%3E%3C/svg%3E\")",
-                  backgroundRepeat: "no-repeat",
-                  backgroundPosition: "right 8px center",
-                  backgroundSize: "12px",
-                }}
-              >
-                {chats?.map((chat: any) => (
-                  <option key={chat.id} value={chat.id}>
-                    {chat.name}
-                  </option>
-                ))}
-              </select>
-            </div>
-
-            <button
-              onClick={handleCreateChat}
-              disabled={isCreating}
-              className="flex items-center gap-2 px-4 py-2 bg-primary text-white text-sm font-bold border border-primary/20 rounded-lg hover:brightness-110 shadow-lg shadow-primary/20 transition-all h-9"
-            >
-              {isCreating ? <Loader2 size={16} className="animate-spin" /> : <Plus size={16} />}
-              Novo Chat
-            </button>
+            <ChatSelect label="Chat" chats={chats} value={chatId} onChange={setChatId} />
+            <Button variant="outline" icon={Save} onClick={handleSave} disabled={!dirty} loading={isSaving}>
+              Salvar
+            </Button>
+            <Button icon={Plus} onClick={() => setCreating(true)}>
+              Novo assistente
+            </Button>
           </div>
         }
       />
-      <div className='flex-1 flex overflow-hidden'>
-        {isLoading ? (
-          <div className="flex-1 flex items-center justify-center">
-            <Loader2 size={32} className="animate-spin text-primary" />
-          </div>
-        ) : chats && chats.length > 0 ? (
-          <>
-            <SettingsPanel />
+      {isLoading || !chat ? (
+        <div className="flex-1 flex items-center justify-center">
+          <Loader2 size={32} className="animate-spin text-primary" />
+        </div>
+      ) : (
+        <div className="flex-1 flex overflow-hidden">
+          <SettingsPanel />
+          <div className="flex min-w-0 flex-1 flex-col overflow-hidden">
             <WidgetPreview />
-          </>
-        ) : (
-          <div className="flex-1 flex flex-col items-center justify-center gap-4 text-text-secondary">
-            <MessageSquareOff size={48} />
-            <p className="font-bold">Crie seu primeiro chat para começar</p>
-            <button onClick={handleCreateChat} className="text-primary font-bold hover:underline">
-              + Criar Chat
-            </button>
+            <EmbedCode chatId={chat.id} />
           </div>
-        )}
-      </div>
+        </div>
+      )}
+      {dialog}
     </div>
-  )
+  );
 }

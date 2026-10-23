@@ -1,106 +1,76 @@
-import { ArrowRight, Mail, MessageCircle, Sparkles } from "lucide-react"
-import { useChatBuilderStore } from "../store/chat-builder-store"
+import { ArrowUp, Mail, MessageCircle, Sparkles, X } from "lucide-react";
+import { AnimatePresence, motion } from "motion/react";
+import { useState } from "react";
+import { useChatBuilderStore } from "../store/chat-builder-store";
 
+const RADIUS = { none: "10px", medium: "20px", full: "9999px" } as const;
+const ICONS = { default: MessageCircle, sparkles: Sparkles, message: Mail } as const;
+
+/** Prévia fiel ao widget real (nexo-backend/src/public/nexo-chat.js). Clique no botão para abrir/fechar. */
 export function WidgetPreview() {
-  const { getActiveSettings } = useChatBuilderStore()
-  const {
-    mainColor,
-    position,
-    botName,
-    borderRadius,
-    buttonIcon,
-    welcomeMessage,
-    headerBackgroundColor,
-    headerTextColor,
-    userBubbleColor,
-    botBubbleColor,
-    botTextColor
-  } = getActiveSettings()
-
-  const radiusClasses = {
-    none: "rounded-none",
-    medium: "rounded-2xl",
-    full: "rounded-full"
-  } as const
-
-  const icons = {
-    default: MessageCircle,
-    sparkles: Sparkles,
-    message: Mail
-  } as const
-
-  const Icon = icons[buttonIcon as keyof typeof icons] || MessageCircle
+  const s = useChatBuilderStore((st) => st.draft);
+  const [open, setOpen] = useState(true);
+  const Icon = ICONS[s.buttonIcon] ?? MessageCircle;
+  const side = s.position === "left" ? "left-8 items-start" : "right-8 items-end";
 
   return (
-    <div className="flex-1 bg-bg-end/50 relative overflow-hidden flex items-center justify-center">
-      <div className="absolute inset-0 opacity-5" style={{ backgroundImage: 'radial-gradient(#fff 1px, transparent 0)', backgroundSize: '24px 24px' }} />
-
-      <div className="text-center z-0">
-        <span className="text-text-secondary/10 font-black text-6xl uppercase tracking-[0.3em] select-none block">
-          Preview
-        </span>
-        <span className="text-text-secondary/5 font-bold text-xl uppercase tracking-[0.2em] select-none mt-2 block">
-          Ambiente do Site
-        </span>
+    <div className="relative flex-1 overflow-hidden bg-[radial-gradient(var(--nx-dots)_1.2px,transparent_1.2px)] [background-size:22px_22px]">
+      <div className="pointer-events-none absolute inset-0 flex flex-col items-center justify-center gap-2 text-text-secondary/40">
+        <span className="text-[44px] font-extrabold tracking-tight">Site do seu cliente</span>
+        <span className="text-[15px] font-medium">Prévia ao vivo do botão de atendimento</span>
       </div>
 
-      <div className={`absolute bottom-10 ${position === 'right' ? 'right-10' : 'left-10'} flex flex-col items-end gap-5 w-full max-w-[320px]`}>
-
-        <div className={`bg-panel border border-border-ui shadow-2xl animate-in fade-in slide-in-from-bottom-4 duration-700 w-full overflow-hidden transition-all ${radiusClasses[(borderRadius === 'full' ? 'medium' : borderRadius) as keyof typeof radiusClasses]}`}>
-          <div
-            style={{ backgroundColor: headerBackgroundColor, color: headerTextColor }}
-            className="p-4 flex items-center gap-3"
-          >
-            <div className="w-8 h-8 rounded-full bg-white/20 flex items-center justify-center">
-              <div className="w-2 h-2 rounded-full bg-success shadow-[0_0_8px_rgba(34,197,94,0.4)]" />
-            </div>
-            <div>
-              <p className="text-xs font-black uppercase tracking-wider">{botName}</p>
-              <p className="text-[10px] opacity-70">Online agora</p>
-            </div>
-          </div>
-
-          <div className="p-4 space-y-3 bg-bg-start/50">
-            <div className="flex flex-col items-start gap-1">
-              <div
-                style={{ backgroundColor: botBubbleColor, color: botTextColor }}
-                className={`p-3 text-xs shadow-sm max-w-[85%] ${radiusClasses.medium} rounded-bl-none`}
-              >
-                {welcomeMessage || "Olá! Como posso ajudar você hoje?"}
-              </div>
-            </div>
-
-            <div className="flex flex-col items-end gap-1">
-              <div
-                style={{ backgroundColor: userBubbleColor, color: '#fff' }}
-                className={`p-3 text-xs shadow-sm max-w-[85%] ${radiusClasses.medium} rounded-br-none`}
-              >
-                Gostaria de saber mais sobre o plano Pro.
-              </div>
-            </div>
-          </div>
-
-          <div className="p-3 border-t border-border-ui flex gap-2 bg-white/5">
-            <div className="flex-1 h-8 bg-bg-start border border-border-ui rounded-full px-3 flex items-center">
-              <span className="text-[10px] text-text-secondary/50 font-medium">Digite uma mensagem...</span>
-            </div>
-            <div
-              style={{ backgroundColor: mainColor }}
-              className="w-8 h-8 rounded-full flex items-center justify-center text-white"
+      <div className={`absolute bottom-8 flex w-[340px] flex-col gap-4 ${side}`}>
+        <AnimatePresence>
+          {open && (
+            <motion.div
+              initial={{ opacity: 0, y: 16, scale: 0.95 }}
+              animate={{ opacity: 1, y: 0, scale: 1 }}
+              exit={{ opacity: 0, y: 12, scale: 0.96 }}
+              transition={{ type: "spring", stiffness: 380, damping: 30 }}
+              style={{ borderRadius: s.borderRadius === "none" ? 10 : 22, originY: 1 }}
+              className="w-full overflow-hidden bg-white shadow-[0_24px_60px_rgb(11_18_32/0.22)]"
             >
-              <ArrowRight size={14} />
-            </div>
-          </div>
-        </div>
+              <div className="flex items-center gap-3 p-4" style={{ backgroundColor: s.headerBackgroundColor, color: s.headerTextColor }}>
+                <span className="flex h-9 w-9 items-center justify-center rounded-full bg-white/25 text-[13px] font-bold">{s.botName.slice(0, 2).toUpperCase()}</span>
+                <div className="flex flex-col">
+                  <span className="text-[15px] font-semibold">{s.botName}</span>
+                  <span className="text-[12px] opacity-80">Online agora</span>
+                </div>
+              </div>
+              <div className="flex flex-col gap-2 bg-[#FAFAFA] p-4">
+                <div className="max-w-[85%] rounded-[18px] rounded-bl-md px-3.5 py-2.5 text-[14px]" style={{ backgroundColor: s.botBubbleColor, color: s.botTextColor }}>
+                  Olá! Qual é o seu nome?
+                </div>
+                <div className="ml-auto max-w-[85%] rounded-[18px] rounded-br-md px-3.5 py-2.5 text-[14px] text-white" style={{ backgroundColor: s.userBubbleColor }}>
+                  Maria
+                </div>
+              </div>
+              <div className="flex gap-2 border-t border-black/5 p-3">
+                <div className="flex h-10 flex-1 items-center rounded-full border border-black/10 px-4 text-[13px] text-[#4A5468]/70">Digite sua mensagem...</div>
+                <div className="flex h-10 w-10 items-center justify-center rounded-full text-white" style={{ backgroundColor: s.mainColor }}>
+                  <ArrowUp size={18} strokeWidth={2.6} />
+                </div>
+              </div>
+            </motion.div>
+          )}
+        </AnimatePresence>
 
-        <button
-          style={{ backgroundColor: mainColor }}
-          className={`w-16 h-16 flex items-center justify-center shadow-xl hover:scale-110 active:scale-95 transition-all text-white group relative ${radiusClasses[borderRadius as keyof typeof radiusClasses]}`}
+        <motion.button
+          whileHover={{ scale: 1.06 }}
+          whileTap={{ scale: 0.94 }}
+          onClick={() => setOpen((o) => !o)}
+          aria-label={open ? "Fechar prévia do chat" : "Abrir prévia do chat"}
+          className="flex h-16 w-16 items-center justify-center text-white shadow-[0_12px_30px_rgb(11_18_32/0.28)]"
+          style={{ backgroundColor: s.mainColor, borderRadius: RADIUS[s.borderRadius] }}
         >
-          <div className="absolute inset-0 bg-white/20 opacity-0 group-hover:opacity-100 transition-opacity rounded-inherit" />
-          <Icon size={28} className="drop-shadow-md" />
-        </button>
+          <AnimatePresence mode="wait" initial={false}>
+            <motion.span key={open ? "x" : "icon"} initial={{ rotate: -90, opacity: 0 }} animate={{ rotate: 0, opacity: 1 }} exit={{ rotate: 90, opacity: 0 }} transition={{ duration: 0.18 }}>
+              {open ? <X size={26} /> : <Icon size={28} />}
+            </motion.span>
+          </AnimatePresence>
+        </motion.button>
       </div>
     </div>
-  )
+  );
 }

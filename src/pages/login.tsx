@@ -1,214 +1,183 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
-import { ArrowRight, Loader2, Lock, Mail, User, Zap } from "lucide-react";
-import { useEffect, useState } from "react";
+import { ArrowRight, Lock, Mail, User } from "lucide-react";
+import { AnimatePresence, motion, useAnimationControls } from "motion/react";
+import { type FormEvent, useEffect, useState } from "react";
+import { LoginHero } from "../features/auth/components/LoginHero";
 import { authClient } from "../lib/auth-client";
+import { Button } from "../shared/components/ui/Button";
+import { LogoMark } from "../shared/components/ui/Logo";
+import { Segmented } from "../shared/components/ui/Segmented";
+import { ThemeToggleButton } from "../shared/components/ui/ThemeToggle";
 
 export const Route = createFileRoute("/login")({
   component: LoginPage,
 });
 
+type Mode = "signin" | "signup";
+
+function IconInput({ id, label, icon: Icon, ...props }: React.InputHTMLAttributes<HTMLInputElement> & { id: string; label: string; icon: typeof Mail }) {
+  return (
+    <label htmlFor={id} className="flex flex-col gap-2">
+      <span className="text-[13px] font-semibold text-text-secondary">{label}</span>
+      <span className="group flex h-[52px] items-center gap-3 rounded-2xl border border-border-ui bg-panel-2 px-4 text-text-secondary transition-[border-color,box-shadow] focus-within:border-primary focus-within:ring-4 focus-within:ring-primary/15">
+        <Icon size={18} className="transition-colors group-focus-within:text-primary" />
+        <input id={id} className="h-full flex-1 bg-transparent text-[16px] text-text-primary outline-none placeholder:text-text-secondary/60" {...props} />
+      </span>
+    </label>
+  );
+}
+
 function LoginPage() {
   const { data: session } = authClient.useSession();
+  const navigate = useNavigate();
+  const shake = useAnimationControls();
+  const [mode, setMode] = useState<Mode>("signin");
+  const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [name, setName] = useState("");
-  const [isSignUp, setIsSignUp] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
-  const navigate = useNavigate();
 
   useEffect(() => {
-    if (session) {
-      navigate({ to: "/" });
-    }
+    if (session) navigate({ to: "/" });
   }, [session, navigate]);
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const fail = (message: string) => {
+    setError(message);
+    void shake.start({ x: [0, -10, 10, -6, 6, 0], transition: { duration: 0.4 } });
+  };
+
+  const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
     setLoading(true);
     setError("");
-
+    const callbacks = {
+      onSuccess: () => navigate({ to: "/" }),
+      onError: (ctx: { error: { message?: string; status?: number } }) =>
+        fail(
+          ctx.error.status === 401 || ctx.error.status === 400
+            ? mode === "signin"
+              ? "E-mail ou senha incorretos."
+              : ctx.error.message || "Não foi possível criar a conta."
+            : ctx.error.message || "Algo deu errado. Tente novamente.",
+        ),
+    };
     try {
-      if (isSignUp) {
-        await authClient.signUp.email({
-          email,
-          password,
-          name,
-          callbackURL: "/",
-        }, {
-          onSuccess: () => {
-            navigate({ to: "/" });
-          },
-          onError: (ctx) => {
-            setError(ctx.error.message || "Erro ao criar conta");
-          }
-        });
-      } else {
-        await authClient.signIn.email({
-          email,
-          password,
-          callbackURL: "/",
-        }, {
-          onSuccess: () => {
-            navigate({ to: "/" });
-          },
-          onError: (ctx) => {
-            setError(ctx.error.message || "Credenciais inválidas");
-          }
-        });
-      }
-    } catch (err: any) {
-      setError("Erro inesperado. Tente novamente.");
+      if (mode === "signup") await authClient.signUp.email({ email, password, name }, callbacks);
+      else await authClient.signIn.email({ email, password }, callbacks);
+    } catch {
+      fail("Não foi possível conectar ao servidor.");
     } finally {
       setLoading(false);
     }
   };
 
+  const signup = mode === "signup";
+
   return (
-    <div className="flex h-screen w-full bg-bg-start overflow-hidden">
-      {/* Lado Esquerdo - Design/Logo */}
-      <div className="hidden lg:flex flex-col w-1/2 bg-gradient-to-br from-bg-start via-bg-end to-primary/20 relative items-center justify-center p-12 border-r border-border-ui">
-        <div className="absolute inset-0 bg-[radial-gradient(circle_at_30%_50%,rgba(20,184,166,0.1),transparent_50%)]" />
+    <div className="flex h-screen w-full overflow-hidden bg-panel">
+      <LoginHero />
 
-        <div className="relative z-10 flex flex-col items-center text-center">
-          <div className="w-20 h-20 bg-primary/20 rounded-2xl flex items-center justify-center mb-8 border border-primary/50 shadow-[0_0_30px_rgba(20,184,166,0.3)]">
-            <Zap className="w-10 h-10 text-primary" strokeWidth={2.5} />
+      <section className="relative flex flex-1 items-center justify-center p-8">
+        <ThemeToggleButton className="absolute right-8 top-8" />
+
+        <motion.form
+          onSubmit={handleSubmit}
+          animate={shake}
+          initial={{ opacity: 0, y: 24 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.6, ease: [0.2, 0.8, 0.2, 1] }}
+          className="flex w-full max-w-[400px] flex-col gap-6"
+        >
+          <div className="lg:hidden">
+            <LogoMark size={48} />
           </div>
-          <h1 className="text-5xl font-bold text-text-primary tracking-tight mb-6">
-            Nexo <span className="text-primary italic">AI</span>
-          </h1>
-          <p className="text-xl text-text-secondary max-w-md leading-relaxed">
-            A revolução na automação de atendimentos e fluxos inteligentes para o seu negócio.
-          </p>
-        </div>
 
-        <div className="absolute bottom-12 left-12 right-12 flex justify-between items-center text-text-secondary/50 text-sm">
-          <span>© 2024 Nexo platform.</span>
-          <div className="flex gap-4">
-            <span className="hover:text-primary cursor-pointer transition-colors">Termos</span>
-            <span className="hover:text-primary cursor-pointer transition-colors">Privacidade</span>
-          </div>
-        </div>
-      </div>
-
-      {/* Lado Direito - Login Form */}
-      <div className="flex-1 flex flex-col items-center justify-center p-6 bg-bg-start relative">
-        <div className="absolute top-8 left-8 lg:hidden flex items-center gap-2">
-          <Zap className="w-6 h-6 text-primary" />
-          <span className="font-bold text-lg">Nexo</span>
-        </div>
-
-        <div className="w-full max-w-md space-y-8">
-          <div className="text-center space-y-2">
-            <h2 className="text-3xl font-bold tracking-tight text-text-primary">
-              {isSignUp ? "Criar conta" : "Bem-vindo de volta"}
-            </h2>
-            <p className="text-text-secondary">
-              {isSignUp
-                ? "Preencha os dados abaixo para começar"
-                : "Entre com suas credenciais para acessar o painel"}
+          <div className="flex flex-col gap-2">
+            <AnimatePresence mode="wait" initial={false}>
+              <motion.h2
+                key={mode}
+                initial={{ opacity: 0, y: 8 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -8 }}
+                transition={{ duration: 0.2 }}
+                className="text-[34px] font-extrabold tracking-[-0.02em] text-text-primary"
+              >
+                {signup ? "Crie sua conta" : "Bem-vindo de volta"}
+              </motion.h2>
+            </AnimatePresence>
+            <p className="text-[16px] text-text-secondary">
+              {signup ? "Grátis para começar. Sem cartão de crédito." : "Entre para continuar de onde parou."}
             </p>
           </div>
 
-          <form onSubmit={handleSubmit} className="space-y-6">
+          <Segmented
+            label="Entrar ou criar conta"
+            fullWidth
+            value={mode}
+            onChange={(m) => {
+              setMode(m);
+              setError("");
+            }}
+            options={[
+              { value: "signin", label: "Entrar" },
+              { value: "signup", label: "Criar conta" },
+            ]}
+          />
+
+          <div className="flex flex-col gap-4">
+            <AnimatePresence initial={false}>
+              {signup && (
+                <motion.div
+                  initial={{ opacity: 0, height: 0 }}
+                  animate={{ opacity: 1, height: "auto" }}
+                  exit={{ opacity: 0, height: 0 }}
+                  transition={{ duration: 0.25, ease: [0.2, 0.8, 0.2, 1] }}
+                  className="overflow-hidden"
+                >
+                  <IconInput id="name" label="Seu nome" icon={User} required value={name} onChange={(e) => setName(e.target.value)} placeholder="Como podemos te chamar?" autoComplete="name" />
+                </motion.div>
+              )}
+            </AnimatePresence>
+            <IconInput id="email" label="E-mail" icon={Mail} type="email" required value={email} onChange={(e) => setEmail(e.target.value)} placeholder="voce@empresa.com.br" autoComplete="email" />
+            <IconInput
+              id="password"
+              label="Senha"
+              icon={Lock}
+              type="password"
+              required
+              minLength={8}
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              placeholder={signup ? "Mínimo de 8 caracteres" : "Sua senha"}
+              autoComplete={signup ? "new-password" : "current-password"}
+            />
+          </div>
+
+          <AnimatePresence>
             {error && (
-              <div className="p-3 bg-danger/10 border border-danger/20 rounded-lg text-danger text-sm text-center">
+              <motion.p
+                role="alert"
+                initial={{ opacity: 0, y: -6 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0 }}
+                className="rounded-2xl bg-danger/12 px-4 py-3 text-[14px] font-medium text-danger-strong"
+              >
                 {error}
-              </div>
+              </motion.p>
             )}
+          </AnimatePresence>
 
-            <div className="space-y-4">
-              {isSignUp && (
-                <div className="space-y-2">
-                  <label className="text-sm font-medium text-text-secondary ml-1" htmlFor="name">
-                    Nome Completo
-                  </label>
-                  <div className="relative group">
-                    <User className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-text-secondary group-focus-within:text-primary transition-colors" />
-                    <input
-                      id="name"
-                      type="text"
-                      required
-                      value={name}
-                      onChange={(e) => setName(e.target.value)}
-                      className="w-full bg-panel border border-border-ui rounded-xl py-3 pl-11 pr-4 outline-none focus:border-primary/50 focus:ring-4 focus:ring-primary/10 transition-all text-text-primary"
-                      placeholder="Seu nome"
-                    />
-                  </div>
-                </div>
-              )}
+          <Button type="submit" size="lg" loading={loading} className="w-full bg-gradient-to-r from-primary to-accent">
+            {signup ? "Criar conta grátis" : "Entrar"}
+            {!loading && <ArrowRight size={18} />}
+          </Button>
 
-              <div className="space-y-2">
-                <label className="text-sm font-medium text-text-secondary ml-1" htmlFor="email">
-                  Endereço de E-mail
-                </label>
-                <div className="relative group">
-                  <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-text-secondary group-focus-within:text-primary transition-colors" />
-                  <input
-                    id="email"
-                    type="email"
-                    required
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
-                    className="w-full bg-panel border border-border-ui rounded-xl py-3 pl-11 pr-4 outline-none focus:border-primary/50 focus:ring-4 focus:ring-primary/10 transition-all text-text-primary"
-                    placeholder="email@exemplo.com"
-                  />
-                </div>
-              </div>
-
-              <div className="space-y-2">
-                <div className="flex justify-between items-center ml-1">
-                  <label className="text-sm font-medium text-text-secondary" htmlFor="password">
-                    Senha
-                  </label>
-                  {!isSignUp && (
-                    <button type="button" className="text-xs text-primary hover:underline">
-                      Esqueceu a senha?
-                    </button>
-                  )}
-                </div>
-                <div className="relative group">
-                  <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-text-secondary group-focus-within:text-primary transition-colors" />
-                  <input
-                    id="password"
-                    type="password"
-                    required
-                    value={password}
-                    onChange={(e) => setPassword(e.target.value)}
-                    className="w-full bg-panel border border-border-ui rounded-xl py-3 pl-11 pr-4 outline-none focus:border-primary/50 focus:ring-4 focus:ring-primary/10 transition-all text-text-primary"
-                    placeholder="••••••••"
-                  />
-                </div>
-              </div>
-            </div>
-
-            <button
-              type="submit"
-              disabled={loading}
-              className="w-full bg-primary hover:bg-primary/90 text-white font-semibold py-3.5 rounded-xl flex items-center justify-center gap-2 transition-all active:scale-[0.98] disabled:opacity-70 disabled:active:scale-100 shadow-lg shadow-primary/20"
-            >
-              {loading ? (
-                <Loader2 className="w-5 h-5 animate-spin" />
-              ) : (
-                <>
-                  {isSignUp ? "Criar Conta" : "Acessar Sistema"}
-                  <ArrowRight className="w-5 h-5" />
-                </>
-              )}
-            </button>
-          </form>
-
-          <p className="text-center text-text-secondary text-sm">
-            {isSignUp ? "Já tem uma conta?" : "Não tem uma conta?"}{" "}
-            <button
-              onClick={() => setIsSignUp(!isSignUp)}
-              className="text-primary font-semibold hover:underline"
-            >
-              {isSignUp ? "Faça login" : "Cadastre-se grátis"}
-            </button>
+          <p className="text-center text-[13px] text-text-secondary">
+            Ao continuar, você concorda com os Termos de Uso e a Política de Privacidade.
           </p>
-        </div>
-      </div>
+        </motion.form>
+      </section>
     </div>
   );
 }

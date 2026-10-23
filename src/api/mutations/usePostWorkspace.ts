@@ -1,4 +1,5 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
+import type { Workspace } from "../queries/useGetWorkspaces";
 import { api } from "../instance";
 
 export const usePostWorkspace = () => {
@@ -6,11 +7,11 @@ export const usePostWorkspace = () => {
 
   return useMutation({
     mutationFn: async (name: string) => {
-      const { data } = await api.post("/workspaces", { name });
+      const { data } = await api.post<Workspace>("/workspaces", { name });
       return data;
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["workspaces"] });
+      return queryClient.invalidateQueries({ queryKey: ["workspaces"] });
     },
   });
 };

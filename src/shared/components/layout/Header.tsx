@@ -3,31 +3,22 @@ import type { ReactNode } from "react";
 interface HeaderProps {
   title: ReactNode;
   subtitle?: ReactNode;
+  /** selo ao lado do título (ex.: Rascunho/Salvo) */
+  badge?: ReactNode;
   actions?: ReactNode;
-  tools?: ReactNode;
 }
 
-export function Header({ title, subtitle, actions, tools }: HeaderProps) {
+export function Header({ title, subtitle, badge, actions }: HeaderProps) {
   return (
-    <header className="h-14 border-b border-border-ui bg-bg-start flex items-center justify-between px-6 sticky top-0 z-10 w-full">
-      <div className="flex items-center gap-4">
-        <h2 className="text-base font-bold text-text-primary tracking-tight">
-          {title}
-        </h2>
-        {subtitle && (
-          <div className="flex items-center px-2 py-0.5 rounded bg-panel border border-border-ui">
-            <span className="text-[10px] font-semibold text-text-secondary/80 uppercase tracking-widest">
-              {subtitle}
-            </span>
-          </div>
-        )}
+    <header className="sticky top-0 z-20 flex min-h-[72px] w-full flex-wrap items-center justify-between gap-3 border-b border-border-ui bg-[var(--nx-glass)] px-7 py-3 backdrop-blur-2xl">
+      <div className="flex min-w-0 items-center gap-3">
+        <div className="flex min-w-0 flex-col">
+          <h1 className="truncate text-[20px] font-bold tracking-tight text-text-primary">{title}</h1>
+          {subtitle && <span className="truncate text-[13px] text-text-secondary">{subtitle}</span>}
+        </div>
+        {badge}
       </div>
-
-      <div className="absolute left-1/2 -translate-x-1/2 flex items-center justify-center">
-        {tools}
-      </div>
-
-      <div className="flex items-center gap-3">{actions}</div>
+      <div className="flex flex-wrap items-center gap-2.5">{actions}</div>
     </header>
   );
 }

@@ -1,175 +1,145 @@
-import { GitGraph, Loader2, Play, Save } from "lucide-react";
-import { useEffect, useState } from "react";
-
-import { createFileRoute } from "@tanstack/react-router";
-
-import { useNavigate } from "@tanstack/react-router";
+import { createFileRoute, useNavigate } from "@tanstack/react-router";
+import { CheckCircle2, FlaskConical, GitGraph, Loader2, Plus, Redo2, Rocket, Save, Undo2 } from "lucide-react";
+import { useCallback, useEffect, useRef } from "react";
+import { apiErrorMessage } from "../../api/instance";
+import { usePublishFlow } from "../../api/mutations/usePublishFlow";
 import { usePutFlow } from "../../api/mutations/usePutFlow";
-import { useGetChats } from "../../api/queries/useGetChats";
 import { useGetFlow } from "../../api/queries/useGetFlow";
+import { withDefaults } from "../../features/chatBuilder/store/chat-builder-store";
+import { TestPanel } from "../../features/flow/components/TestPanel";
 import { FlowCanvas } from "../../features/flow/FlowCanvas";
 import { useFlowStore } from "../../features/flow/store/flow.store";
-import { useWorkspaceStore } from "../../features/workspaces/store/workspace-store";
 import { Header } from "../../shared/components/layout/Header";
+import { Badge } from "../../shared/components/ui/Badge";
+import { Button, IconButton } from "../../shared/components/ui/Button";
+import { ChatSelect } from "../../shared/components/ui/ChatSelect";
+import { EmptyState } from "../../shared/components/ui/EmptyState";
+import { toast } from "../../shared/components/ui/toast-store";
+import { useActiveChat } from "../../shared/hooks/useActiveChat";
 
 export const Route = createFileRoute("/_app/flow-builder")({
-  component: RouteComponent,
+  component: FlowBuilderPage,
 });
 
-function RouteComponent() {
+function FlowBuilderPage() {
   const navigate = useNavigate();
-  const { activeWorkspaceId } = useWorkspaceStore()
-  const { data: chats } = useGetChats(activeWorkspaceId || undefined)
+  const { chats, chat, chatId, setChatId, isLoading: loadingChats } = useActiveChat();
+  const { dirty, load, markSaved, setHighlighted, testOpen, setTestOpen, undo, redo } = useFlowStore();
+  const canUndo = useFlowStore((s) => s.past.length > 0);
+  const canRedo = useFlowStore((s) => s.future.length > 0);
+  const { data: remoteFlow, isLoading: loadingFlow } = useGetFlow(chatId);
+  const { mutateAsync: saveFlow, isPending: isSaving } = usePutFlow();
+  const { mutateAsync: publishFlow, isPending: isPublishing } = usePublishFlow();
 
-  const {
-    flowName,
-    flowSuffix,
-    setFlowName,
-    setFlowSuffix,
-    nodes,
-    edges,
-    setNodes,
-    setEdges,
-    setActiveNodeId,
-    selectedChatId,
-    setSelectedChatId,
-  } = useFlowStore();
-
-  const { data: remoteFlow, isLoading: loadingFlow } = useGetFlow(selectedChatId || "");
-  const { mutate: saveFlow, isPending: isSaving } = usePutFlow();
-
-  // Sync with remote flow when loaded
+  // Carrega a versão do servidor ao abrir/trocar de chat. Depois disso a tela é a fonte do
+  // rascunho: o refetch que segue um "Salvar" não apaga o histórico de desfazer.
+  const loadedFor = useRef<string | null>(null);
   useEffect(() => {
-    if (remoteFlow && selectedChatId) {
-      setNodes(remoteFlow.nodes || []);
-      setEdges(remoteFlow.edges || []);
+    if (remoteFlow && remoteFlow.chatId === chatId && loadedFor.current !== chatId) {
+      loadedFor.current = chatId;
+      load(remoteFlow.nodes ?? [], remoteFlow.edges ?? []);
+      setHighlighted([]);
     }
-  }, [remoteFlow, selectedChatId, setNodes, setEdges]);
+  }, [remoteFlow, chatId, load, setHighlighted]);
 
-  const [isEditingName, setIsEditingName] = useState(false);
-  const [isEditingSuffix, setIsEditingSuffix] = useState(false);
-  const [startAtNodeId, setStartAtNodeId] = useState<string>("");
+  // O painel de teste fecha ao trocar de chat ou sair da página.
+  useEffect(() => () => setTestOpen(false), [chatId, setTestOpen]);
 
-  const handleStartSimulation = () => {
-    if (startAtNodeId) {
-      setActiveNodeId(startAtNodeId);
+  // Avisa antes de fechar a aba com alterações não salvas.
+  useEffect(() => {
+    if (!dirty) return;
+    const handler = (e: BeforeUnloadEvent) => e.preventDefault();
+    window.addEventListener("beforeunload", handler);
+    return () => window.removeEventListener("beforeunload", handler);
+  }, [dirty]);
+
+  /** Salva o rascunho (se houver alterações). Lê o estado na hora, para não salvar uma versão velha. */
+  const ensureSaved = useCallback(
+    async (notify = false) => {
+      const { nodes, edges, dirty: pending } = useFlowStore.getState();
+      if (!chatId) return false;
+      if (!pending) return true;
+      try {
+        await saveFlow({ chatId, nodes, edges });
+        markSaved();
+        if (notify) toast.success("Rascunho salvo. Publique quando quiser que os clientes vejam.");
+        return true;
+      } catch (err) {
+        toast.error(apiErrorMessage(err, "Não foi possível salvar o fluxo."));
+        return false;
+      }
+    },
+    [chatId, saveFlow, markSaved],
+  );
+  const ensureSavedQuietly = useCallback(() => ensureSaved(false), [ensureSaved]);
+
+  const publish = async () => {
+    if (!chatId || !(await ensureSaved())) return;
+    try {
+      await publishFlow(chatId);
+      toast.success("Publicado! O fluxo já vale no site e em todos os canais.");
+    } catch (err) {
+      toast.error(apiErrorMessage(err, "Não foi possível publicar o fluxo."));
     }
-    navigate({ to: "/simulate" });
   };
 
-  const handleSave = () => {
-    if (selectedChatId) {
-      saveFlow({ chatId: selectedChatId, nodes, edges });
-    }
+  const changeChat = (id: string) => {
+    if (dirty && !window.confirm("Há alterações não salvas neste fluxo. Descartar e trocar de chat?")) return;
+    setChatId(id);
   };
 
-  if (!activeWorkspaceId) {
+  if (!loadingChats && chats?.length === 0) {
     return (
-      <div className="flex flex-col h-full items-center justify-center gap-4 text-text-secondary">
-        <GitGraph size={48} />
-        <p className="font-bold">Selecione um Workspace para gerenciar fluxos</p>
-      </div>
-    )
+      <EmptyState icon={GitGraph} title="Nenhum assistente ainda" description="Crie um assistente para montar a conversa dele aqui.">
+        <Button icon={Plus} onClick={() => navigate({ to: "/chat-builder" })}>
+          Criar assistente
+        </Button>
+      </EmptyState>
+    );
   }
 
+  const status = dirty ? (
+    <Badge tone="warning">Não salvo</Badge>
+  ) : remoteFlow?.hasUnpublishedChanges ? (
+    <Badge tone="accent">Rascunho não publicado</Badge>
+  ) : (
+    <Badge tone="success" icon={CheckCircle2}>
+      Publicado
+    </Badge>
+  );
+
   return (
-    <div className="flex flex-col h-full">
+    <div className="flex h-full flex-col">
       <Header
-        title={
-          isEditingName ? (
-            <input
-              autoFocus
-              className="bg-transparent border-none outline-none font-bold text-base text-text-primary focus:ring-0 p-0 w-auto min-w-25"
-              value={flowName}
-              onChange={(e) => setFlowName(e.target.value)}
-              onBlur={() => setIsEditingName(false)}
-              onKeyDown={(e) => e.key === "Enter" && setIsEditingName(false)}
-            />
-          ) : (
-            <span
-              onClick={() => setIsEditingName(true)}
-              className="cursor-pointer hover:text-primary transition-colors"
-            >
-              {flowName}
-            </span>
-          )
-        }
-        subtitle={
-          isEditingSuffix ? (
-            <input
-              autoFocus
-              className="bg-transparent border-none outline-none font-semibold text-[10px] text-text-secondary uppercase tracking-widest focus:ring-0 p-0 w-auto"
-              value={flowSuffix}
-              onChange={(e) => setFlowSuffix(e.target.value)}
-              onBlur={() => setIsEditingSuffix(false)}
-              onKeyDown={(e) => e.key === "Enter" && setIsEditingSuffix(false)}
-            />
-          ) : (
-            <span
-              onClick={() => setIsEditingSuffix(true)}
-              className="cursor-pointer hover:text-primary transition-colors uppercase"
-            >
-              {flowSuffix}
-            </span>
-          )
-        }
-        tools={<></>}
+        title={chat?.name ?? "Fluxos"}
+        subtitle="Monte a conversa do seu assistente"
+        badge={status}
         actions={
-          <div className="flex items-center gap-3">
-            <div className="flex items-center bg-panel border border-border-ui rounded-lg overflow-hidden h-9">
-              <div className="px-3 border-r border-border-ui h-full flex items-center bg-white/5">
-                <span className="text-[10px] font-bold text-text-secondary uppercase tracking-tighter">
-                  Vincular ao Chat:
-                </span>
-              </div>
-              <select
-                value={selectedChatId || ""}
-                onChange={(e) => setSelectedChatId(e.target.value)}
-                className="bg-transparent border-none outline-none text-xs font-medium px-2 py-1 pr-8 text-text-primary appearance-none cursor-pointer hover:bg-white/5 transition-colors h-full min-w-30"
-                style={{
-                  backgroundImage:
-                    "url(\"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%2364748b'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M19 9l-7 7-7-7'/%3E%3C/svg%3E\")",
-                  backgroundRepeat: "no-repeat",
-                  backgroundPosition: "right 8px center",
-                  backgroundSize: "12px",
-                }}
-              >
-                <option value="">Selecione um chat...</option>
-                {chats?.map((chat) => (
-                  <option key={chat.id} value={chat.id}>
-                    {chat.name}
-                  </option>
-                ))}
-              </select>
+          <div className="flex items-center gap-2">
+            <ChatSelect label="Chat" chats={chats} value={chatId} onChange={changeChat} />
+            <div className="ml-1 flex items-center">
+              <IconButton icon={Undo2} label="Desfazer (Ctrl+Z)" title="Desfazer (Ctrl+Z)" onClick={undo} disabled={!canUndo} className="disabled:opacity-35" />
+              <IconButton icon={Redo2} label="Refazer (Ctrl+Shift+Z)" title="Refazer (Ctrl+Shift+Z)" onClick={redo} disabled={!canRedo} className="disabled:opacity-35" />
             </div>
-
-            <button
-              onClick={handleSave}
-              disabled={isSaving || !selectedChatId}
-              className="flex items-center gap-2 px-4 py-2 bg-panel border border-border-ui text-text-primary text-sm font-bold rounded-lg hover:bg-panel-hover transition-all h-9 disabled:opacity-50"
-            >
-              {isSaving ? <Loader2 size={16} className="animate-spin" /> : <Save size={16} />}
+            <Button variant="outline" icon={Save} onClick={() => void ensureSaved(true)} loading={isSaving && !isPublishing} disabled={!chatId || !dirty}>
               Salvar
-            </button>
-
-            <button
-              onClick={handleStartSimulation}
-              disabled={!selectedChatId}
-              className="flex items-center gap-2 px-4 py-2 bg-primary text-white text-sm font-bold border border-primary/20 rounded-lg hover:brightness-110 shadow-lg shadow-primary/20 transition-all h-9 disabled:opacity-50"
-            >
-              <Play size={16} fill="currentColor" />
-              Simular
-            </button>
+            </Button>
+            <Button variant={testOpen ? "secondary" : "outline"} icon={FlaskConical} onClick={() => setTestOpen(!testOpen)} disabled={!chatId}>
+              Testar
+            </Button>
+            <Button icon={Rocket} onClick={() => void publish()} loading={isPublishing} disabled={!chatId || (!dirty && !remoteFlow?.hasUnpublishedChanges)}>
+              Publicar
+            </Button>
           </div>
         }
       />
-      <div className="flex-1 relative">
-        {loadingFlow ? (
-          <div className="absolute inset-0 flex items-center justify-center bg-bg-start/50 z-50">
+      <div className="relative flex-1 overflow-hidden">
+        {(loadingFlow || loadingChats) && (
+          <div className="absolute inset-0 z-[60] flex items-center justify-center bg-bg-start/60 backdrop-blur-sm">
             <Loader2 size={32} className="animate-spin text-primary" />
           </div>
-        ) : null}
-        <FlowCanvas />
+        )}
+        <FlowCanvas chatId={chatId}>{testOpen && chatId && <TestPanel key={chatId} chatId={chatId} settings={withDefaults(chat?.settings)} ensureSaved={ensureSavedQuietly} />}</FlowCanvas>
       </div>
     </div>
   );

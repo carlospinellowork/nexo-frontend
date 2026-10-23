@@ -1,36 +1,18 @@
 import { create } from "zustand"
 import { persist } from "zustand/middleware"
 
-interface Workspace {
-  id: string
-  name: string
-}
-
+// Só a preferência de qual workspace está ativo; a lista vem do servidor (useGetWorkspaces).
 interface WorkspaceState {
-  workspaces: Workspace[]
   activeWorkspaceId: string | null
-  setWorkspaces: (workspaces: Workspace[]) => void
-  setActiveWorkspaceId: (id: string) => void
-  getActiveWorkspace: () => Workspace | null
+  setActiveWorkspaceId: (id: string | null) => void
 }
 
 export const useWorkspaceStore = create<WorkspaceState>()(
   persist(
-    (set, get) => ({
-      workspaces: [],
+    (set) => ({
       activeWorkspaceId: null,
-
-      setWorkspaces: (workspaces) => set({ workspaces }),
-      
       setActiveWorkspaceId: (id) => set({ activeWorkspaceId: id }),
-
-      getActiveWorkspace: () => {
-        const { workspaces, activeWorkspaceId } = get()
-        return workspaces.find(w => w.id === activeWorkspaceId) || null
-      }
     }),
-    {
-      name: "nexo-workspace-storage",
-    }
-  )
+    { name: "nexo-workspace" },
+  ),
 )

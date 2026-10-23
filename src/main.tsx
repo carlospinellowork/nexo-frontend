@@ -4,15 +4,12 @@ import { StrictMode } from "react";
 import { createRoot } from "react-dom/client";
 import "./index.css";
 import { routeTree } from "./routeTree.gen";
+import { useThemeStore, watchSystemTheme } from "./features/theme/theme-store";
+import { Toaster } from "./shared/components/ui/Toast";
 
-declare module "@tanstack/react-router" {
-  interface Register {
-    router: typeof router;
-  }
-  interface RouterContext {
-    queryClient: QueryClient;
-  }
-}
+// Aplica o tema salvo (ou o do sistema) e acompanha mudanças do sistema.
+useThemeStore.getState().setPreference(useThemeStore.getState().preference);
+watchSystemTheme();
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -23,37 +20,25 @@ const queryClient = new QueryClient({
   },
 });
 
-
 const router = createRouter({
   routeTree,
-  context: {
-    queryClient,
-  },
+  context: { queryClient },
   defaultPreload: "intent",
   defaultPreloadStaleTime: 0,
   scrollRestoration: true,
 });
 
-function AppRouter() {
-  return (
-    <RouterProvider
-      router={router}
-      defaultPreload="intent"
-      context={{
-        queryClient,
-      }}
-    />
-  );
+declare module "@tanstack/react-router" {
+  interface Register {
+    router: typeof router;
+  }
 }
-
-import { SocketProvider } from "./shared/contexts/SocketContext";
 
 createRoot(document.getElementById("root")!).render(
   <StrictMode>
     <QueryClientProvider client={queryClient}>
-      <SocketProvider>
-        <AppRouter />
-      </SocketProvider>
+      <RouterProvider router={router} />
+      <Toaster />
     </QueryClientProvider>
   </StrictMode>,
 );

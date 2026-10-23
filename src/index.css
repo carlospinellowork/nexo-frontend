@@ -1,38 +1,119 @@
 @import "tailwindcss";
+@import "@fontsource-variable/inter";
 
-@theme {
-  --color-bg-start: #0b1220;
-  --color-bg-end: #0e1a2f;
-  --color-background: #0b1220;
+/* Tema escuro: classe .dark no <html> (ver features/theme). */
+@custom-variant dark (&:where(.dark, .dark *));
 
-  --color-panel: #111c2d;
-  --color-border-ui: #1e293b;
+/*
+ * Tokens do Nexo — mesma paleta do design (docs/VISAO.md): Azul #0A6CFF + Roxo #7C5CFF.
+ * Os nomes são semânticos; os valores mudam entre claro e escuro.
+ */
+:root {
+  --nx-bg: #f2f4f8;
+  --nx-surface: #ffffff;
+  --nx-surface-2: #f7f9fc;
+  --nx-surface-hover: #eef2f8;
+  --nx-border: #e3e7ef;
+  --nx-text: #0b1220;
+  --nx-text-2: #4a5468;
+  --nx-primary: #0a6cff;
+  --nx-primary-strong: #0052cc;
+  --nx-accent: #7c5cff;
+  --nx-accent-strong: #5b3fd1;
+  --nx-success: #12a150;
+  --nx-success-strong: #087f5b;
+  --nx-warning: #f59e0b;
+  --nx-warning-strong: #8a5300;
+  --nx-danger: #e5484d;
+  --nx-danger-strong: #b42318;
+  --nx-shadow: 0 1px 2px rgb(11 18 32 / 0.04), 0 8px 24px rgb(11 18 32 / 0.06);
+  --nx-shadow-lg: 0 16px 40px rgb(11 18 32 / 0.14);
+  --nx-glass: rgb(255 255 255 / 0.72);
+  --nx-dots: #d5dbe6;
+  color-scheme: light;
+}
 
-  --color-primary: #14b8a6;
-  --color-info: #2563eb;
-  --color-warning: #f59e0b;
-  --color-danger: #f43f5e;
+.dark {
+  --nx-bg: #080b14;
+  --nx-surface: #111827;
+  --nx-surface-2: #172033;
+  --nx-surface-hover: #1b263b;
+  --nx-border: #243049;
+  --nx-text: #f1f4f9;
+  --nx-text-2: #9aa6bc;
+  --nx-primary: #3d8bff;
+  --nx-primary-strong: #8fb8ff;
+  --nx-accent: #9b7bff;
+  --nx-accent-strong: #c4b1ff;
+  --nx-success: #30d158;
+  --nx-success-strong: #4ade80;
+  --nx-warning: #fbbf24;
+  --nx-warning-strong: #fcd34d;
+  --nx-danger: #ff6369;
+  --nx-danger-strong: #ff8f93;
+  --nx-shadow: 0 1px 2px rgb(0 0 0 / 0.3), 0 8px 24px rgb(0 0 0 / 0.25);
+  --nx-shadow-lg: 0 16px 40px rgb(0 0 0 / 0.45);
+  --nx-glass: rgb(17 24 39 / 0.72);
+  --nx-dots: #1f2a40;
+  color-scheme: dark;
+}
 
-  --color-text-primary: #e2e8f0;
-  --color-text-secondary: #94a3b8;
+@theme inline {
+  --font-sans: "Inter Variable", -apple-system, "SF Pro Text", system-ui, sans-serif;
 
+  --color-bg-start: var(--nx-bg);
+  --color-bg-end: var(--nx-bg);
+  --color-panel: var(--nx-surface);
+  --color-panel-2: var(--nx-surface-2);
+  --color-panel-hover: var(--nx-surface-hover);
+  --color-border-ui: var(--nx-border);
+  --color-text-primary: var(--nx-text);
+  --color-text-secondary: var(--nx-text-2);
+
+  --color-primary: var(--nx-primary);
+  --color-primary-strong: var(--nx-primary-strong);
+  --color-accent: var(--nx-accent);
+  --color-accent-strong: var(--nx-accent-strong);
+  --color-info: var(--nx-primary);
+  --color-success: var(--nx-success);
+  --color-success-strong: var(--nx-success-strong);
+  --color-warning: var(--nx-warning);
+  --color-warning-strong: var(--nx-warning-strong);
+  --color-danger: var(--nx-danger);
+  --color-danger-strong: var(--nx-danger-strong);
+
+  --shadow-card: var(--nx-shadow);
+  --shadow-float: var(--nx-shadow-lg);
   --radius-md: 12px;
 }
 
-:root {
-  --bg-start: #0b1220;
-  --bg-end: #0e1a2f;
+html,
+body {
+  background: var(--nx-bg);
+  color: var(--nx-text);
+  font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
 
-  --panel: #111c2d;
-  --border: #1e293b;
+::selection {
+  background: color-mix(in srgb, var(--nx-primary) 25%, transparent);
+}
 
-  --primary: #14b8a6;
-  --info: #2563eb;
-  --warning: #f59e0b;
-  --danger: #f43f5e;
-
-  --text-primary: #e2e8f0;
-  --text-secondary: #94a3b8;
-
-  --radius-md: 12px;
+/* React Flow acompanha o tema (o seletor .dark empata a especificidade do tema escuro dele) */
+.react-flow,
+.react-flow.dark {
+  --xy-background-color: transparent;
+  --xy-background-pattern-dots-color-default: var(--nx-dots);
+  --xy-controls-button-background-color-default: var(--nx-surface);
+  --xy-controls-button-background-color-hover-default: var(--nx-surface-hover);
+  --xy-controls-button-color-default: var(--nx-text);
+  --xy-controls-button-border-color-default: var(--nx-border);
+  --xy-minimap-background-color-default: var(--nx-surface);
+  --xy-edge-stroke-default: #9aa6bc;
+}
+.react-flow__controls {
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: var(--nx-shadow);
 }

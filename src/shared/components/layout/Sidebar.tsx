@@ -1,109 +1,87 @@
-import { Link, useNavigate } from "@tanstack/react-router";
-import { Flame, LogOut, Settings } from "lucide-react";
-import type { ElementType, ReactNode } from "react";
+import { Link, useNavigate, useRouterState } from "@tanstack/react-router";
+import { LogOut, type LucideIcon } from "lucide-react";
+import { motion } from "motion/react";
 import { WorkspaceSelector } from "../../../features/workspaces/components/WorkspaceSelector";
 import { authClient } from "../../../lib/auth-client";
+import { Logo } from "../ui/Logo";
+import { ThemeSegmented } from "../ui/ThemeToggle";
 
-export function Sidebar({ children }: { children: ReactNode }) {
+export interface NavItem {
+  to: string;
+  title: string;
+  icon: LucideIcon;
+}
+
+function initials(name?: string | null) {
+  return (name ?? "?")
+    .split(" ")
+    .filter(Boolean)
+    .slice(0, 2)
+    .map((p) => p[0]?.toUpperCase())
+    .join("");
+}
+
+export function Sidebar({ items }: { items: NavItem[] }) {
   const { data: session } = authClient.useSession();
   const navigate = useNavigate();
+  const pathname = useRouterState({ select: (s) => s.location.pathname });
 
   const handleLogout = async () => {
-    await authClient.signOut({
-      fetchOptions: {
-        onSuccess: () => {
-          navigate({ to: "/login" });
-        }
-      }
-    });
+    await authClient.signOut({ fetchOptions: { onSuccess: () => navigate({ to: "/login" }) } });
   };
 
   return (
-    <aside className="w-72 shrink-0 border-r border-border-ui bg-bg-start flex flex-col">
-      <div className="h-16 flex items-center gap-3 px-4 mb-2">
-        <div className="flex items-center justify-center w-8 h-8 rounded-lg bg-primary shadow-lg shadow-primary/20">
-          <Flame
-            size={18}
-            className="text-bg-start fill-bg-start"
-            strokeWidth={2.5}
-          />
-        </div>
-
-        <span className="text-lg font-bold tracking-tight text-text-primary">
-          Nexo<span className="text-primary">.</span>
-        </span>
+    <aside className="flex w-[264px] shrink-0 flex-col gap-7 border-r border-border-ui bg-[var(--nx-glass)] px-4 py-6 backdrop-blur-2xl">
+      <div className="px-2">
+        <Logo size={36} />
       </div>
 
-      <nav className="flex flex-col flex-1 p-4 gap-2 overflow-y-auto">
-        {children}
+      <nav aria-label="Menu principal" className="flex flex-col gap-1">
+        {items.map(({ to, title, icon: Icon }) => {
+          const active = to === "/" ? pathname === "/" : pathname.startsWith(to);
+          return (
+            <Link
+              key={to}
+              to={to}
+              className={`relative flex h-11 items-center gap-3 rounded-xl px-3 text-[15px] transition-colors ${
+                active ? "font-semibold text-primary-strong" : "font-medium text-text-primary hover:bg-panel-hover"
+              }`}
+            >
+              {active && (
+                <motion.span
+                  layoutId="sidebar-active"
+                  transition={{ type: "spring", stiffness: 500, damping: 40 }}
+                  className="absolute inset-0 rounded-xl bg-primary/12"
+                />
+              )}
+              <Icon size={20} strokeWidth={2} className="relative" />
+              <span className="relative">{title}</span>
+            </Link>
+          );
+        })}
       </nav>
 
-      <div className="mt-auto p-4 flex flex-col gap-4 border-t border-border-ui/30">
+      <div className="mt-auto flex flex-col gap-3">
         <WorkspaceSelector />
-
-        <div className="flex items-center justify-between px-2">
-          <div className="flex items-center gap-3">
-            <div className="w-8 h-8 rounded-full bg-panel border border-border-ui flex items-center justify-center text-xs font-bold text-text-secondary overflow-hidden">
-              <img
-                src={`https://api.dicebear.com/7.x/avataaars/svg?seed=${session?.user?.name || "Guest"}`}
-                alt="User"
-                className="w-full h-full object-cover"
-              />
-            </div>
-            <div className="flex flex-col">
-              <span className="text-sm font-bold text-text-primary truncate max-w-[120px]">
-                {session?.user?.name || "Usuário"}
-              </span>
-            </div>
+        <ThemeSegmented />
+        <div className="flex items-center gap-3 rounded-2xl border border-border-ui bg-panel p-3">
+          <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-accent/14 text-[13px] font-bold text-accent-strong">
+            {initials(session?.user.name)}
+          </span>
+          <div className="flex min-w-0 flex-1 flex-col">
+            <span className="truncate text-[14px] font-semibold text-text-primary">{session?.user.name ?? "Usuário"}</span>
+            <span className="truncate text-[12px] text-text-secondary">{session?.user.email}</span>
           </div>
-          <div className="flex gap-2">
-            <button className="text-text-secondary hover:text-text-primary hover:rotate-90 transition-all duration-300 cursor-pointer">
-              <Settings size={18} />
-            </button>
-            <button
-              onClick={handleLogout}
-              className="text-text-secondary hover:text-danger hover:scale-110 transition-all duration-300 cursor-pointer"
-              title="Sair"
-            >
-              <LogOut size={18} />
-            </button>
-          </div>
+          <button
+            onClick={handleLogout}
+            className="rounded-lg p-1.5 text-text-secondary transition-colors hover:bg-danger/12 hover:text-danger"
+            title="Sair"
+            aria-label="Sair"
+          >
+            <LogOut size={18} />
+          </button>
         </div>
       </div>
     </aside>
-  );
-}
-
-export function SidebarItem({
-  to,
-  title,
-  Icon,
-}: {
-  to: string;
-  title: string;
-  Icon?: ElementType;
-}) {
-  return (
-    <Link
-      to={to}
-      activeProps={{
-        className:
-          "bg-primary/10 text-primary border-r-2 border-primary rounded-r-none",
-      }}
-      inactiveProps={{
-        className:
-          "text-text-secondary hover:text-text-primary hover:bg-panel/50",
-      }}
-      className="flex items-center gap-3 px-4 py-3 rounded-lg transition-all duration-200 group"
-    >
-      {Icon && (
-        <Icon
-          size={20}
-          className="group-hover:scale-110 transition-transform"
-        />
-      )}
-
-      <span className="text-sm font-medium">{title}</span>
-    </Link>
   );
 }
