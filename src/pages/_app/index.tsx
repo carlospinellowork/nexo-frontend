@@ -6,6 +6,9 @@ import { useGetIntegrations } from "../../api/queries/useGetIntegrations";
 import { authClient } from "../../lib/auth-client";
 import { Badge } from "../../shared/components/ui/Badge";
 import { useActiveChat } from "../../shared/hooks/useActiveChat";
+import { HelpButton } from "../../features/tour/HelpButton";
+import { startTour } from "../../features/tour/driver-service";
+import { useEffect } from "react";
 
 export const Route = createFileRoute("/_app/")({
   component: HomePage,
@@ -41,6 +44,13 @@ function HomePage() {
   const date = new Date().toLocaleDateString("pt-BR", { weekday: "long", day: "numeric", month: "long" });
   const today = date.charAt(0).toUpperCase() + date.slice(1);
 
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      startTour("home");
+    }, 700);
+    return () => clearTimeout(timer);
+  }, []);
+
   const pillars: Pillar[] = [
     {
       title: "Conversas",
@@ -50,7 +60,7 @@ function HomePage() {
       to: "/flow-builder",
       status: chatCount ? `${chatCount} ${chatCount === 1 ? "bot criado" : "bots criados"}` : "Criar primeiro bot",
     },
-    { title: "Páginas", description: "Landing pages criadas conversando com a IA", icon: LayoutTemplate, tint: "bg-accent/14 text-accent", status: "Em breve", soon: true },
+    { title: "Páginas", description: "Landing pages criadas conversando com a IA", icon: LayoutTemplate, tint: "bg-accent/14 text-accent", to: "/landing-pages", status: "Criar página" },
     { title: "Contatos", description: "Todo lead dos bots e páginas num só lugar", icon: Users, tint: "bg-success/14 text-success-strong", status: "Em breve", soon: true },
     { title: "Resultados", description: "Conversas, leads e onde as pessoas desistem", icon: ChartLine, tint: "bg-warning/16 text-warning-strong", status: "Em breve", soon: true },
   ];
@@ -71,15 +81,18 @@ function HomePage() {
   return (
     <div className="h-full overflow-y-auto">
       <motion.div variants={container} initial="hidden" animate="show" className="mx-auto flex w-full max-w-6xl flex-col gap-8 px-10 py-10">
-        <motion.div variants={item} className="flex flex-col gap-1">
-          <span className="text-[15px] text-text-secondary">{today}</span>
-          <h1 className="text-[34px] font-extrabold tracking-[-0.02em] text-text-primary">
-            {greeting()}
-            {firstName ? `, ${firstName}` : ""}
-          </h1>
+        <motion.div variants={item} className="flex items-center justify-between gap-4">
+          <div className="flex flex-col gap-1">
+            <span className="text-[15px] text-text-secondary">{today}</span>
+            <h1 className="text-[34px] font-extrabold tracking-[-0.02em] text-text-primary">
+              {greeting()}
+              {firstName ? `, ${firstName}` : ""}
+            </h1>
+          </div>
+          <HelpButton tourKey="home" screenTitle="Início" />
         </motion.div>
 
-        <motion.div variants={item} className="grid grid-cols-1 gap-5 sm:grid-cols-2 xl:grid-cols-4">
+        <motion.div id="tour-home-stats" variants={item} className="grid grid-cols-1 gap-5 sm:grid-cols-2 xl:grid-cols-4">
           {pillars.map((p) => {
             const content = (
               <>

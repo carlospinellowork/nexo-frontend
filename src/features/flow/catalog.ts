@@ -59,7 +59,7 @@ export function blockSummary(type: NodeType, raw: Record<string, unknown>): stri
     case "question": {
       const q = d as NodeDataMap["question"];
       const v = q.validation && q.validation !== "none" ? ` · ${QUESTION_VALIDATIONS[q.validation]}` : "";
-      return `${q.content || "Sem pergunta"}  →  {{${q.variable || "?"}}}${v}`;
+      return `${q.content || "Sem pergunta"} (salva em {{${q.variable || "?"}}}${v})`;
     }
     case "buttons":
       return (d as NodeDataMap["buttons"]).content || "Sem pergunta";

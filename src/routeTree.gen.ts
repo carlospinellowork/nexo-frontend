@@ -15,7 +15,10 @@ import { Route as AppIndexRouteImport } from './pages/_app/index'
 import { Route as AppChatBuilderRouteImport } from './pages/_app/chat-builder'
 import { Route as AppFlowBuilderRouteImport } from './pages/_app/flow-builder'
 import { Route as AppIntegrationsRouteImport } from './pages/_app/integrations'
+import { Route as AppLandingBuilderRouteImport } from './pages/_app/landing-builder'
+import { Route as AppLandingPagesRouteImport } from './pages/_app/landing-pages'
 import { Route as AppSimulateRouteImport } from './pages/_app/simulate'
+import { Route as PSlugRouteImport } from './pages/p/$slug'
 
 const AppLayoutRoute = AppLayoutRouteImport.update({
   id: '/_app',
@@ -46,10 +49,25 @@ const AppIntegrationsRoute = AppIntegrationsRouteImport.update({
   path: '/integrations',
   getParentRoute: () => AppLayoutRoute,
 } as any)
+const AppLandingBuilderRoute = AppLandingBuilderRouteImport.update({
+  id: '/landing-builder',
+  path: '/landing-builder',
+  getParentRoute: () => AppLayoutRoute,
+} as any)
+const AppLandingPagesRoute = AppLandingPagesRouteImport.update({
+  id: '/landing-pages',
+  path: '/landing-pages',
+  getParentRoute: () => AppLayoutRoute,
+} as any)
 const AppSimulateRoute = AppSimulateRouteImport.update({
   id: '/simulate',
   path: '/simulate',
   getParentRoute: () => AppLayoutRoute,
+} as any)
+const PSlugRoute = PSlugRouteImport.update({
+  id: '/p/$slug',
+  path: '/p/$slug',
+  getParentRoute: () => rootRouteImport,
 } as any)
 
 export interface FileRoutesByFullPath {
@@ -58,14 +76,20 @@ export interface FileRoutesByFullPath {
   '/chat-builder': typeof AppChatBuilderRoute
   '/flow-builder': typeof AppFlowBuilderRoute
   '/integrations': typeof AppIntegrationsRoute
+  '/landing-builder': typeof AppLandingBuilderRoute
+  '/landing-pages': typeof AppLandingPagesRoute
   '/simulate': typeof AppSimulateRoute
+  '/p/$slug': typeof PSlugRoute
 }
 export interface FileRoutesByTo {
   '/login': typeof LoginRoute
   '/chat-builder': typeof AppChatBuilderRoute
   '/flow-builder': typeof AppFlowBuilderRoute
   '/integrations': typeof AppIntegrationsRoute
+  '/landing-builder': typeof AppLandingBuilderRoute
+  '/landing-pages': typeof AppLandingPagesRoute
   '/simulate': typeof AppSimulateRoute
+  '/p/$slug': typeof PSlugRoute
   '/': typeof AppIndexRoute
 }
 export interface FileRoutesById {
@@ -75,7 +99,10 @@ export interface FileRoutesById {
   '/_app/chat-builder': typeof AppChatBuilderRoute
   '/_app/flow-builder': typeof AppFlowBuilderRoute
   '/_app/integrations': typeof AppIntegrationsRoute
+  '/_app/landing-builder': typeof AppLandingBuilderRoute
+  '/_app/landing-pages': typeof AppLandingPagesRoute
   '/_app/simulate': typeof AppSimulateRoute
+  '/p/$slug': typeof PSlugRoute
   '/_app/': typeof AppIndexRoute
 }
 export interface FileRouteTypes {
@@ -86,14 +113,20 @@ export interface FileRouteTypes {
     | '/chat-builder'
     | '/flow-builder'
     | '/integrations'
+    | '/landing-builder'
+    | '/landing-pages'
     | '/simulate'
+    | '/p/$slug'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/login'
     | '/chat-builder'
     | '/flow-builder'
     | '/integrations'
+    | '/landing-builder'
+    | '/landing-pages'
     | '/simulate'
+    | '/p/$slug'
     | '/'
   id:
     | '__root__'
@@ -102,13 +135,17 @@ export interface FileRouteTypes {
     | '/_app/chat-builder'
     | '/_app/flow-builder'
     | '/_app/integrations'
+    | '/_app/landing-builder'
+    | '/_app/landing-pages'
     | '/_app/simulate'
+    | '/p/$slug'
     | '/_app/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   AppLayoutRoute: typeof AppLayoutRouteWithChildren
   LoginRoute: typeof LoginRoute
+  PSlugRoute: typeof PSlugRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -155,12 +192,33 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppIntegrationsRouteImport
       parentRoute: typeof AppLayoutRoute
     }
+    '/_app/landing-builder': {
+      id: '/_app/landing-builder'
+      path: '/landing-builder'
+      fullPath: '/landing-builder'
+      preLoaderRoute: typeof AppLandingBuilderRouteImport
+      parentRoute: typeof AppLayoutRoute
+    }
+    '/_app/landing-pages': {
+      id: '/_app/landing-pages'
+      path: '/landing-pages'
+      fullPath: '/landing-pages'
+      preLoaderRoute: typeof AppLandingPagesRouteImport
+      parentRoute: typeof AppLayoutRoute
+    }
     '/_app/simulate': {
       id: '/_app/simulate'
       path: '/simulate'
       fullPath: '/simulate'
       preLoaderRoute: typeof AppSimulateRouteImport
       parentRoute: typeof AppLayoutRoute
+    }
+    '/p/$slug': {
+      id: '/p/$slug'
+      path: '/p/$slug'
+      fullPath: '/p/$slug'
+      preLoaderRoute: typeof PSlugRouteImport
+      parentRoute: typeof rootRouteImport
     }
   }
 }
@@ -169,6 +227,8 @@ interface AppLayoutRouteChildren {
   AppChatBuilderRoute: typeof AppChatBuilderRoute
   AppFlowBuilderRoute: typeof AppFlowBuilderRoute
   AppIntegrationsRoute: typeof AppIntegrationsRoute
+  AppLandingBuilderRoute: typeof AppLandingBuilderRoute
+  AppLandingPagesRoute: typeof AppLandingPagesRoute
   AppSimulateRoute: typeof AppSimulateRoute
   AppIndexRoute: typeof AppIndexRoute
 }
@@ -177,6 +237,8 @@ const AppLayoutRouteChildren: AppLayoutRouteChildren = {
   AppChatBuilderRoute: AppChatBuilderRoute,
   AppFlowBuilderRoute: AppFlowBuilderRoute,
   AppIntegrationsRoute: AppIntegrationsRoute,
+  AppLandingBuilderRoute: AppLandingBuilderRoute,
+  AppLandingPagesRoute: AppLandingPagesRoute,
   AppSimulateRoute: AppSimulateRoute,
   AppIndexRoute: AppIndexRoute,
 }
@@ -188,6 +250,7 @@ const AppLayoutRouteWithChildren = AppLayoutRoute._addFileChildren(
 const rootRouteChildren: RootRouteChildren = {
   AppLayoutRoute: AppLayoutRouteWithChildren,
   LoginRoute: LoginRoute,
+  PSlugRoute: PSlugRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

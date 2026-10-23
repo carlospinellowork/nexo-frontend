@@ -16,6 +16,8 @@ import { ChatSelect } from "../../shared/components/ui/ChatSelect";
 import { EmptyState } from "../../shared/components/ui/EmptyState";
 import { toast } from "../../shared/components/ui/toast-store";
 import { useActiveChat } from "../../shared/hooks/useActiveChat";
+import { HelpButton } from "../../features/tour/HelpButton";
+import { startTour } from "../../features/tour/driver-service";
 
 export const Route = createFileRoute("/_app/flow-builder")({
   component: FlowBuilderPage,
@@ -28,6 +30,13 @@ function FlowBuilderPage() {
   const canUndo = useFlowStore((s) => s.past.length > 0);
   const canRedo = useFlowStore((s) => s.future.length > 0);
   const { data: remoteFlow, isLoading: loadingFlow } = useGetFlow(chatId);
+
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      startTour("flows");
+    }, 700);
+    return () => clearTimeout(timer);
+  }, []);
   const { mutateAsync: saveFlow, isPending: isSaving } = usePutFlow();
   const { mutateAsync: publishFlow, isPending: isPublishing } = usePublishFlow();
 
@@ -115,7 +124,7 @@ function FlowBuilderPage() {
         subtitle="Monte a conversa do seu assistente"
         badge={status}
         actions={
-          <div className="flex items-center gap-2">
+          <div id="tour-flow-actions" className="flex items-center gap-2">
             <ChatSelect label="Chat" chats={chats} value={chatId} onChange={changeChat} />
             <div className="ml-1 flex items-center">
               <IconButton icon={Undo2} label="Desfazer (Ctrl+Z)" title="Desfazer (Ctrl+Z)" onClick={undo} disabled={!canUndo} className="disabled:opacity-35" />
@@ -124,16 +133,19 @@ function FlowBuilderPage() {
             <Button variant="outline" icon={Save} onClick={() => void ensureSaved(true)} loading={isSaving && !isPublishing} disabled={!chatId || !dirty}>
               Salvar
             </Button>
-            <Button variant={testOpen ? "secondary" : "outline"} icon={FlaskConical} onClick={() => setTestOpen(!testOpen)} disabled={!chatId}>
-              Testar
-            </Button>
+            <span id="tour-flow-test">
+              <Button variant={testOpen ? "secondary" : "outline"} icon={FlaskConical} onClick={() => setTestOpen(!testOpen)} disabled={!chatId}>
+                Testar
+              </Button>
+            </span>
             <Button icon={Rocket} onClick={() => void publish()} loading={isPublishing} disabled={!chatId || (!dirty && !remoteFlow?.hasUnpublishedChanges)}>
               Publicar
             </Button>
+            <HelpButton tourKey="flows" screenTitle="Fluxos" />
           </div>
         }
       />
-      <div className="relative flex-1 overflow-hidden">
+      <div id="tour-flow-canvas" className="relative flex-1 overflow-hidden">
         {(loadingFlow || loadingChats) && (
           <div className="absolute inset-0 z-[60] flex items-center justify-center bg-bg-start/60 backdrop-blur-sm">
             <Loader2 size={32} className="animate-spin text-primary" />

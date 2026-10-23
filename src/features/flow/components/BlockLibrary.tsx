@@ -17,7 +17,7 @@ export function BlockLibrary() {
   };
 
   return (
-    <aside className="absolute bottom-4 left-4 top-4 z-40 flex w-[232px] flex-col overflow-hidden rounded-3xl border border-border-ui bg-panel/92 shadow-float backdrop-blur-xl">
+    <aside id="tour-flow-blocks" className="absolute bottom-4 left-4 top-4 z-40 flex w-[232px] flex-col overflow-hidden rounded-3xl border border-border-ui bg-panel/92 shadow-float backdrop-blur-xl">
       <div className="px-4 pb-2 pt-4">
         <h3 className="text-[15px] font-bold tracking-tight text-text-primary">Blocos</h3>
         <p className="text-[12px] leading-snug text-text-secondary">Clique ou arraste para o fluxo</p>

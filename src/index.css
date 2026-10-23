@@ -117,3 +117,80 @@ body {
   overflow: hidden;
   box-shadow: var(--nx-shadow);
 }
+
+/* Customização do Driver.js para o Design System do Nexo */
+.driver-popover {
+  background-color: var(--nx-surface) !important;
+  color: var(--nx-text) !important;
+  border: 1px solid var(--nx-border) !important;
+  border-radius: 20px !important;
+  box-shadow: var(--nx-shadow-lg) !important;
+  padding: 18px 20px !important;
+  max-width: 340px !important;
+  font-family: var(--font-sans) !important;
+}
+
+.driver-popover-title {
+  font-size: 15px !important;
+  font-weight: 700 !important;
+  color: var(--nx-text) !important;
+  margin-bottom: 6px !important;
+}
+
+.nx-tour-title {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.nx-tour-title svg {
+  flex-shrink: 0;
+  color: var(--nx-primary);
+}
+
+.driver-popover-description {
+  font-size: 13px !important;
+  line-height: 1.5 !important;
+  color: var(--nx-text-2) !important;
+  margin-bottom: 16px !important;
+}
+
+.driver-popover-progress-text {
+  font-size: 11px !important;
+  color: var(--nx-text-2) !important;
+}
+
+.driver-popover-btn {
+  border-radius: 12px !important;
+  padding: 6px 14px !important;
+  font-size: 12px !important;
+  font-weight: 600 !important;
+  transition: all 0.15s ease !important;
+}
+
+.driver-popover-next-btn {
+  background-color: var(--nx-primary) !important;
+  color: #ffffff !important;
+  border: none !important;
+  text-shadow: none !important;
+}
+
+.driver-popover-next-btn:hover {
+  background-color: var(--nx-primary-strong) !important;
+}
+
+.driver-popover-prev-btn {
+  background-color: var(--nx-surface-2) !important;
+  color: var(--nx-text) !important;
+  border: 1px solid var(--nx-border) !important;
+  text-shadow: none !important;
+}
+
+.driver-popover-close-btn {
+  color: var(--nx-text-2) !important;
+}
+
+.driver-popover-arrow {
+  border-color: var(--nx-surface) !important;
+}
+

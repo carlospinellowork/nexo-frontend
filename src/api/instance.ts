@@ -29,7 +29,7 @@ export function apiErrorMessage(error: unknown, fallback = "Algo deu errado. Ten
   if (isAxiosError<ApiErrorBody>(error)) {
     const body = error.response?.data;
     const issues = body?.details?.issues ?? body?.issues;
-    if (issues?.length) return [body?.message, ...issues.map((i) => `• ${i.message}`)].filter(Boolean).join("\n");
+    if (issues?.length) return [body?.message, ...issues.map((i) => i.message)].filter(Boolean).join("\n");
     if (body?.message) return body.message;
     if (!error.response) return "Não foi possível conectar ao servidor. O backend está rodando?";
   }

@@ -32,7 +32,7 @@ export function AiBar({ chatId }: { chatId: string }) {
   };
 
   return (
-    <div className="pointer-events-none absolute inset-x-0 bottom-5 z-40 flex justify-center px-[260px]">
+    <div id="tour-flow-ai" className="pointer-events-none absolute inset-x-0 bottom-5 z-40 flex justify-center px-[260px]">
       <div className="pointer-events-auto flex w-full max-w-[620px] flex-col items-center gap-2">
         {focused && !disabled && !instruction && (
           <motion.div initial={{ opacity: 0, y: 6 }} animate={{ opacity: 1, y: 0 }} className="flex flex-wrap justify-center gap-1.5">

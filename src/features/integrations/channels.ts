@@ -45,8 +45,8 @@ export const CHANNELS: ChannelDefinition[] = [
     ],
     steps: [
       "Acesse developers.facebook.com, crie (ou abra) um app do tipo Empresa e adicione o produto WhatsApp.",
-      "Em WhatsApp → Configuração da API, copie o Phone Number ID e o WhatsApp Business Account ID.",
-      "Em Configurações do negócio → Usuários do sistema, gere um token permanente com as permissões whatsapp_business_messaging e whatsapp_business_management.",
+      "No menu WhatsApp, abra Configuração da API e copie o Phone Number ID e o WhatsApp Business Account ID.",
+      "Em Configurações do negócio, abra Usuários do sistema e gere um token permanente com as permissões whatsapp_business_messaging e whatsapp_business_management.",
       "Cole os dados abaixo e clique em Conectar. Para testar, use o número de teste gratuito que a Meta oferece.",
     ],
     describe: (c) => [c.verifiedName, c.displayPhoneNumber].filter(Boolean).join(" · "),
@@ -69,9 +69,9 @@ export const CHANNELS: ChannelDefinition[] = [
     ],
     steps: [
       "A conta do Instagram precisa ser Profissional (Empresa ou Criador de conteúdo).",
-      "No app Meta do Nexo, adicione o produto Instagram → API com Login do Instagram.",
+      "No app Meta do Nexo, adicione o produto Instagram e escolha API com Login do Instagram.",
       "Gere um token para a conta com as permissões instagram_business_basic e instagram_business_manage_messages.",
-      "No app do Instagram, ative Configurações → Mensagens → Permitir acesso às mensagens.",
+      "No app do Instagram, abra Configurações, depois Mensagens, e ative Permitir acesso às mensagens.",
     ],
     describe: (c) => (c.username ? `@${c.username}` : ""),
   },

@@ -25,6 +25,8 @@ src/api/queries|mutations  um hook por arquivo; queryKey sempre inclui o workspa
 src/features/flow/         contract.ts (espelho do backend), nodes/, components/, store
 src/features/chatBuilder/  aparência do widget e código de instalação
 src/features/integrations/ definição dos canais (channels.ts) e ChannelCard
+src/features/landing/      contract.ts (tipos e limites), LandingRenderer, SectionEditor, ThemePicker, icons.ts
+src/features/tour/         tour guiado (driver.js) e HelpButton; títulos com ícone Lucide
 src/features/workspaces/   seletor e store (só o id ativo)
 src/shared/                layout, ui (PromptDialog, Toaster/toast, ChatSelect, EmptyState), hooks/useActiveChat
 ```
@@ -44,6 +46,9 @@ src/shared/                layout, ui (PromptDialog, Toaster/toast, ChatSelect, 
 - Editor: `BlockLibrary` (esquerda), `NodePropertiesPanel` e `TestPanel` (direita), `AiBar` (rodapé).
   Toda mudança no fluxo passa pelo `flow.store` para entrar no histórico de desfazer.
 - Conversas de teste usam `useSimulatorSession` (página do simulador e painel do editor).
+- Landing pages: `LandingRenderer` usa container queries (`@2xl:`, `@5xl:`), não `sm:`/`lg:`, para a
+  prévia de celular funcionar. A página pública (`/p/$slug`) busca com `fetch` sem credenciais e
+  instala o widget real; botões de conversa chamam `window.NexoChat.open()`.
 
 ## Design system (premium, estilo iOS — ver `../docs/VISAO.md`)
 
@@ -58,7 +63,7 @@ src/shared/                layout, ui (PromptDialog, Toaster/toast, ChatSelect, 
   `index.html` aplica a classe `.dark` antes do primeiro paint.
 - **Componentes base** em `src/shared/components/ui/`: `Button`/`IconButton`, `Segmented`,
   `Badge`, `Logo`/`LogoMark`, `ThemeToggleButton`/`ThemeSegmented`, `PromptDialog`, `Toaster`,
-  `ChatSelect`, `EmptyState`, e as classes de campo em `styles.ts` (`inputClass`, `selectClass`,
+  `ChatSelect`, `EmptyState`, `Switch`, e as classes de campo em `styles.ts` (`inputClass`, `selectClass`,
   `textareaClass`). Reutilize-os antes de criar estilos novos.
 - **Ícones: sempre Lucide** (`lucide-react`). Nunca use emoji como ícone, nem na UI nem nos textos padrão.
 - **Animações: Framer Motion** (`motion/react`). Molas curtas (`stiffness ~400, damping ~30`),
