@@ -17,6 +17,8 @@ import { Route as AppFlowBuilderRouteImport } from './pages/_app/flow-builder'
 import { Route as AppIntegrationsRouteImport } from './pages/_app/integrations'
 import { Route as AppLandingBuilderRouteImport } from './pages/_app/landing-builder'
 import { Route as AppLandingPagesRouteImport } from './pages/_app/landing-pages'
+import { Route as AppLeadsRouteImport } from './pages/_app/leads'
+import { Route as AppResultsRouteImport } from './pages/_app/results'
 import { Route as AppSimulateRouteImport } from './pages/_app/simulate'
 import { Route as PSlugRouteImport } from './pages/p/$slug'
 
@@ -59,6 +61,16 @@ const AppLandingPagesRoute = AppLandingPagesRouteImport.update({
   path: '/landing-pages',
   getParentRoute: () => AppLayoutRoute,
 } as any)
+const AppLeadsRoute = AppLeadsRouteImport.update({
+  id: '/leads',
+  path: '/leads',
+  getParentRoute: () => AppLayoutRoute,
+} as any)
+const AppResultsRoute = AppResultsRouteImport.update({
+  id: '/results',
+  path: '/results',
+  getParentRoute: () => AppLayoutRoute,
+} as any)
 const AppSimulateRoute = AppSimulateRouteImport.update({
   id: '/simulate',
   path: '/simulate',
@@ -78,6 +90,8 @@ export interface FileRoutesByFullPath {
   '/integrations': typeof AppIntegrationsRoute
   '/landing-builder': typeof AppLandingBuilderRoute
   '/landing-pages': typeof AppLandingPagesRoute
+  '/leads': typeof AppLeadsRoute
+  '/results': typeof AppResultsRoute
   '/simulate': typeof AppSimulateRoute
   '/p/$slug': typeof PSlugRoute
 }
@@ -88,6 +102,8 @@ export interface FileRoutesByTo {
   '/integrations': typeof AppIntegrationsRoute
   '/landing-builder': typeof AppLandingBuilderRoute
   '/landing-pages': typeof AppLandingPagesRoute
+  '/leads': typeof AppLeadsRoute
+  '/results': typeof AppResultsRoute
   '/simulate': typeof AppSimulateRoute
   '/p/$slug': typeof PSlugRoute
   '/': typeof AppIndexRoute
@@ -101,6 +117,8 @@ export interface FileRoutesById {
   '/_app/integrations': typeof AppIntegrationsRoute
   '/_app/landing-builder': typeof AppLandingBuilderRoute
   '/_app/landing-pages': typeof AppLandingPagesRoute
+  '/_app/leads': typeof AppLeadsRoute
+  '/_app/results': typeof AppResultsRoute
   '/_app/simulate': typeof AppSimulateRoute
   '/p/$slug': typeof PSlugRoute
   '/_app/': typeof AppIndexRoute
@@ -115,6 +133,8 @@ export interface FileRouteTypes {
     | '/integrations'
     | '/landing-builder'
     | '/landing-pages'
+    | '/leads'
+    | '/results'
     | '/simulate'
     | '/p/$slug'
   fileRoutesByTo: FileRoutesByTo
@@ -125,6 +145,8 @@ export interface FileRouteTypes {
     | '/integrations'
     | '/landing-builder'
     | '/landing-pages'
+    | '/leads'
+    | '/results'
     | '/simulate'
     | '/p/$slug'
     | '/'
@@ -137,6 +159,8 @@ export interface FileRouteTypes {
     | '/_app/integrations'
     | '/_app/landing-builder'
     | '/_app/landing-pages'
+    | '/_app/leads'
+    | '/_app/results'
     | '/_app/simulate'
     | '/p/$slug'
     | '/_app/'
@@ -206,6 +230,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppLandingPagesRouteImport
       parentRoute: typeof AppLayoutRoute
     }
+    '/_app/leads': {
+      id: '/_app/leads'
+      path: '/leads'
+      fullPath: '/leads'
+      preLoaderRoute: typeof AppLeadsRouteImport
+      parentRoute: typeof AppLayoutRoute
+    }
+    '/_app/results': {
+      id: '/_app/results'
+      path: '/results'
+      fullPath: '/results'
+      preLoaderRoute: typeof AppResultsRouteImport
+      parentRoute: typeof AppLayoutRoute
+    }
     '/_app/simulate': {
       id: '/_app/simulate'
       path: '/simulate'
@@ -229,6 +267,8 @@ interface AppLayoutRouteChildren {
   AppIntegrationsRoute: typeof AppIntegrationsRoute
   AppLandingBuilderRoute: typeof AppLandingBuilderRoute
   AppLandingPagesRoute: typeof AppLandingPagesRoute
+  AppLeadsRoute: typeof AppLeadsRoute
+  AppResultsRoute: typeof AppResultsRoute
   AppSimulateRoute: typeof AppSimulateRoute
   AppIndexRoute: typeof AppIndexRoute
 }
@@ -239,6 +279,8 @@ const AppLayoutRouteChildren: AppLayoutRouteChildren = {
   AppIntegrationsRoute: AppIntegrationsRoute,
   AppLandingBuilderRoute: AppLandingBuilderRoute,
   AppLandingPagesRoute: AppLandingPagesRoute,
+  AppLeadsRoute: AppLeadsRoute,
+  AppResultsRoute: AppResultsRoute,
   AppSimulateRoute: AppSimulateRoute,
   AppIndexRoute: AppIndexRoute,
 }

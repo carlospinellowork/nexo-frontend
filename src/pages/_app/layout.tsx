@@ -1,5 +1,5 @@
 import { createFileRoute, Outlet, useNavigate, useRouterState } from "@tanstack/react-router";
-import { GitGraph, Globe, House, Paintbrush, Play, Send } from "lucide-react";
+import { ChartLine, GitGraph, Globe, House, Paintbrush, Play, Send, Users } from "lucide-react";
 import { motion } from "motion/react";
 import { useEffect } from "react";
 import { authClient } from "../../lib/auth-client";
@@ -14,6 +14,8 @@ const NAV: NavItem[] = [
   { to: "/", title: "Início", icon: House },
   { to: "/flow-builder", title: "Fluxos", icon: GitGraph },
   { to: "/landing-pages", title: "Páginas", icon: Globe },
+  { to: "/leads", title: "Leads", icon: Users },
+  { to: "/results", title: "Resultados", icon: ChartLine },
   { to: "/simulate", title: "Simulador", icon: Play },
   { to: "/chat-builder", title: "Aparência", icon: Paintbrush },
   { to: "/integrations", title: "Canais", icon: Send },

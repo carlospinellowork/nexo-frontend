@@ -6,6 +6,7 @@ import { useGetIntegrations } from "../../api/queries/useGetIntegrations";
 import { authClient } from "../../lib/auth-client";
 import { Badge } from "../../shared/components/ui/Badge";
 import { useActiveChat } from "../../shared/hooks/useActiveChat";
+import { ExampleCompanies } from "../../features/examples/ExampleCompanies";
 import { HelpButton } from "../../features/tour/HelpButton";
 import { startTour } from "../../features/tour/driver-service";
 import { useEffect } from "react";
@@ -61,8 +62,8 @@ function HomePage() {
       status: chatCount ? `${chatCount} ${chatCount === 1 ? "bot criado" : "bots criados"}` : "Criar primeiro bot",
     },
     { title: "Páginas", description: "Landing pages criadas conversando com a IA", icon: LayoutTemplate, tint: "bg-accent/14 text-accent", to: "/landing-pages", status: "Criar página" },
-    { title: "Contatos", description: "Todo lead dos bots e páginas num só lugar", icon: Users, tint: "bg-success/14 text-success-strong", status: "Em breve", soon: true },
-    { title: "Resultados", description: "Conversas, leads e onde as pessoas desistem", icon: ChartLine, tint: "bg-warning/16 text-warning-strong", status: "Em breve", soon: true },
+    { title: "Leads", description: "Quem deixou contato e quem espera atendimento", icon: Users, tint: "bg-success/14 text-success-strong", to: "/leads", status: "Ver leads" },
+    { title: "Resultados", description: "Conversas, leads e onde as pessoas desistem", icon: ChartLine, tint: "bg-warning/16 text-warning-strong", to: "/results", status: "Ver resultados" },
   ];
 
   const steps = [
@@ -152,6 +153,10 @@ function HomePage() {
               <ArrowRight size={18} />
             </Link>
           </div>
+        </motion.div>
+
+        <motion.div variants={item}>
+          <ExampleCompanies />
         </motion.div>
       </motion.div>
     </div>
