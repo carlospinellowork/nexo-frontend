@@ -1,4 +1,4 @@
-import { ArrowUp, Headset, RotateCcw } from "lucide-react";
+import { ArrowUp, Headset, MessageCircle, RotateCcw } from "lucide-react";
 import { AnimatePresence, motion } from "motion/react";
 import { type FormEvent, useEffect, useRef, useState } from "react";
 import type { OutboundMessage } from "../../../api/mutations/useSimulator";
@@ -51,6 +51,26 @@ function BotContent({
       <div className="max-w-[80%] overflow-hidden rounded-[20px] rounded-bl-md" style={bubble}>
         <img src={message.url} alt={message.caption ?? "Imagem"} className="max-h-56 w-full object-cover" />
         {message.caption && <p className="px-3.5 py-2 text-[14px] leading-snug">{message.caption}</p>}
+      </div>
+    );
+  }
+  if (message.type === "link") {
+    return (
+      <div className="flex max-w-[85%] flex-col gap-1.5">
+        {message.text && (
+          <div className={BUBBLE} style={bubble}>
+            {message.text}
+          </div>
+        )}
+        <a
+          href={message.url}
+          target="_blank"
+          rel="noreferrer"
+          className="inline-flex w-fit items-center gap-2 rounded-2xl bg-[#25D366] px-4 py-2.5 text-[14px] font-bold text-white shadow-[0_6px_16px_rgb(37_211_102/0.35)]"
+        >
+          <MessageCircle size={16} />
+          {message.label}
+        </a>
       </div>
     );
   }

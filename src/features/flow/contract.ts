@@ -15,6 +15,7 @@ export const NODE_TYPES = [
   "intent",
   "action",
   "handoff",
+  "whatsapp",
   "end",
 ] as const;
 export type NodeType = (typeof NODE_TYPES)[number];
@@ -59,6 +60,8 @@ export interface NodeDataMap {
   intent: { label?: string; variable: string; intents: (ChoiceOption & { description?: string })[] };
   action: { label?: string; url: string; method: "GET" | "POST" | "PUT"; body?: string; saveResponseTo?: string };
   handoff: { label?: string; content: string };
+  /** Termina com um botão que abre o WhatsApp da empresa com a mensagem pronta (wa.me). */
+  whatsapp: { label?: string; content: string; phone: string; message: string; buttonText: string };
   end: { label?: string };
 }
 
@@ -102,6 +105,13 @@ export function defaultNodeData<T extends NodeType>(type: T): NodeDataMap[T] {
     },
     action: { label: "Webhook", url: "https://", method: "GET" },
     handoff: { label: "Atendente", content: "Vou te transferir para um atendente. Aguarde só um instante." },
+    whatsapp: {
+      label: "WhatsApp",
+      content: "Pronto! Toque no botão para enviar o seu pedido no nosso WhatsApp.",
+      phone: "",
+      message: "Olá! Sou {{nome}} e vim pelo site.",
+      buttonText: "Continuar no WhatsApp",
+    },
     end: { label: "Fim" },
   };
   return structuredClone(defaults[type]);
@@ -145,6 +155,7 @@ export function nodeOutputs(type: NodeType, data: Record<string, unknown>, color
         { id: "other", label: "Outro", color: "var(--nx-text-2)" },
       ];
     case "handoff":
+    case "whatsapp":
     case "end":
       return [];
     default:

@@ -7,6 +7,7 @@ import {
   Image,
   ListChecks,
   type LucideIcon,
+  MessageCircle,
   MessageSquare,
   Play,
   Sparkles,
@@ -40,6 +41,7 @@ export const BLOCKS: Record<NodeType, BlockDefinition> = {
   hours: { type: "hours", name: "Horário de atendimento", description: "Aberto ou fechado agora", icon: Clock, color: "var(--nx-warning)", group: "Lógica" },
   action: { type: "action", name: "Webhook / API", description: "Consulta ou envia para um sistema", icon: Zap, color: "var(--nx-success)", group: "Ações" },
   handoff: { type: "handoff", name: "Falar com humano", description: "Passa a conversa para a equipe", icon: Headset, color: "var(--nx-success)", group: "Ações" },
+  whatsapp: { type: "whatsapp", name: "Continuar no WhatsApp", description: "Envia o pedido pronto ao seu WhatsApp", icon: MessageCircle, color: "var(--nx-success)", group: "Ações" },
   end: { type: "end", name: "Fim", description: "Encerra a conversa", icon: Square, color: "var(--nx-danger)", group: "Ações" },
 };
 
@@ -86,6 +88,10 @@ export function blockSummary(type: NodeType, raw: Record<string, unknown>): stri
     }
     case "handoff":
       return (d as NodeDataMap["handoff"]).content || "Transfere para a equipe";
+    case "whatsapp": {
+      const w = d as NodeDataMap["whatsapp"];
+      return w.phone ? `Botão "${w.buttonText || "Continuar no WhatsApp"}"` : "Informe o WhatsApp da empresa";
+    }
     case "end":
       return "Encerra a conversa.";
   }

@@ -5,7 +5,8 @@ import { api } from "../instance";
 export type OutboundMessage =
   | { type: "text"; text: string }
   | { type: "image"; url: string; caption?: string }
-  | { type: "buttons"; text: string; options: { id: string; label: string }[] };
+  | { type: "buttons"; text: string; options: { id: string; label: string }[] }
+  | { type: "link"; text: string; label: string; url: string };
 
 export type SessionStatus = "WAITING" | "COMPLETED" | "ERROR" | "HANDOFF";
 

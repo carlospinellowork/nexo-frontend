@@ -111,9 +111,10 @@ export function NodePropertiesPanel() {
             <Field label="Mensagem antes de transferir" hint={VARIABLE_HINT}>
               <textarea className={`${textareaClass} h-24`} value={String(node.data.content ?? "")} onChange={(e) => set({ content: e.target.value })} />
             </Field>
-            <Note>Depois deste bloco o assistente para de responder e a conversa fica marcada como “transferida”. A caixa de entrada da equipe chega em uma próxima versão.</Note>
+            <Note>Depois deste bloco o assistente para de responder. A conversa aparece em Leads, em “Esperando atendimento”, com o botão para responder no WhatsApp.</Note>
           </>
         )}
+        {type === "whatsapp" && <WhatsappFields data={node.data as NodeDataMap["whatsapp"]} set={set} />}
       </div>
 
       {type !== "start" && (
@@ -412,6 +413,28 @@ function IntentFields({ nodeId, data, set, variables }: { nodeId: string; data: 
         />
         <span className="text-[12px] leading-snug text-text-secondary">Cada intenção vira uma saída. Quando nenhuma combina, segue por “Outro”.</span>
       </div>
+    </>
+  );
+}
+
+function WhatsappFields({ data, set }: { data: NodeDataMap["whatsapp"]; set: SetData }) {
+  const digits = (data.phone ?? "").replace(/\D/g, "");
+  const phoneError = digits && (digits.length < 10 || digits.length > 13) ? "Use o número com DDD, por exemplo 11 91234-5678" : undefined;
+  return (
+    <>
+      <Field label="WhatsApp da empresa" error={phoneError} hint="Com DDD. É para esse número que o pedido vai.">
+        <input className={inputClass} inputMode="tel" value={data.phone ?? ""} onChange={(e) => set({ phone: e.target.value })} placeholder="11 91234-5678" />
+      </Field>
+      <Field label="Texto antes do botão" hint={VARIABLE_HINT}>
+        <textarea className={`${textareaClass} h-20`} value={data.content ?? ""} onChange={(e) => set({ content: e.target.value })} />
+      </Field>
+      <Field label="Mensagem que o cliente vai enviar" hint={<>Já chega escrita no WhatsApp; o cliente só toca em enviar. Use {"{{nome}}"}, {"{{servico}}"}...</>}>
+        <textarea className={`${textareaClass} h-24`} maxLength={1000} value={data.message ?? ""} onChange={(e) => set({ message: e.target.value })} />
+      </Field>
+      <Field label="Texto do botão">
+        <input className={inputClass} maxLength={30} value={data.buttonText ?? ""} onChange={(e) => set({ buttonText: e.target.value })} />
+      </Field>
+      <Note>Funciona no site e na landing page sem nenhuma integração: usa o link oficial do WhatsApp. Se a conversa já estiver no WhatsApp, o cliente recebe só o texto.</Note>
     </>
   );
 }
