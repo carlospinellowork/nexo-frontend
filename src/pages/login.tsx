@@ -168,7 +168,7 @@ function LoginPage() {
             )}
           </AnimatePresence>
 
-          <Button type="submit" size="lg" loading={loading} className="w-full bg-gradient-to-r from-primary to-accent">
+          <Button type="submit" size="lg" loading={loading} className="w-full">
             {signup ? "Criar conta grátis" : "Entrar"}
             {!loading && <ArrowRight size={18} />}
           </Button>

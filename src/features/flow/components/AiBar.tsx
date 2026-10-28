@@ -55,7 +55,7 @@ export function AiBar({ chatId }: { chatId: string }) {
             focused ? "border-accent" : "border-border-ui"
           } ${disabled ? "opacity-60" : ""}`}
         >
-          {isPending ? <Loader2 size={18} className="shrink-0 animate-spin text-accent" /> : <Sparkles size={18} className="shrink-0 text-accent" />}
+          {isPending ? <Loader2 size={18} className="shrink-0 animate-spin text-accent-strong" /> : <Sparkles size={18} className="shrink-0 text-accent-strong" />}
           <input
             value={instruction}
             onChange={(e) => setInstruction(e.target.value)}
@@ -71,7 +71,7 @@ export function AiBar({ chatId }: { chatId: string }) {
             whileTap={{ scale: 0.9 }}
             type="submit"
             disabled={disabled || isPending || instruction.trim().length < 3}
-            className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-accent text-white transition-opacity disabled:opacity-35"
+            className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-accent text-on-accent transition-opacity disabled:opacity-35"
             aria-label="Enviar pedido à IA"
           >
             <ArrowUp size={18} strokeWidth={2.6} />

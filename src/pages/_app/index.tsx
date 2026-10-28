@@ -61,7 +61,7 @@ function HomePage() {
       to: "/flow-builder",
       status: chatCount ? `${chatCount} ${chatCount === 1 ? "bot criado" : "bots criados"}` : "Criar primeiro bot",
     },
-    { title: "Páginas", description: "Landing pages criadas conversando com a IA", icon: LayoutTemplate, tint: "bg-accent/14 text-accent", to: "/landing-pages", status: "Criar página" },
+    { title: "Páginas", description: "Landing pages criadas conversando com a IA", icon: LayoutTemplate, tint: "bg-accent/14 text-accent-strong", to: "/landing-pages", status: "Criar página" },
     { title: "Leads", description: "Quem deixou contato e quem espera atendimento", icon: Users, tint: "bg-success/14 text-success-strong", to: "/leads", status: "Ver leads" },
     { title: "Resultados", description: "Conversas, leads e onde as pessoas desistem", icon: ChartLine, tint: "bg-warning/16 text-warning-strong", to: "/results", status: "Ver resultados" },
   ];
@@ -142,8 +142,8 @@ function HomePage() {
           </div>
 
           <div className="relative flex flex-col gap-4 overflow-hidden rounded-3xl bg-[#0B1220] p-6 text-white">
-            <div className="pointer-events-none absolute -right-16 -top-16 h-48 w-48 rounded-full bg-[#7C5CFF] opacity-40 blur-3xl" />
-            <span className="relative text-[13px] font-bold uppercase tracking-wider text-[#C4B1FF]">Próximo passo</span>
+            <div className="pointer-events-none absolute -right-16 -top-16 h-48 w-48 rounded-full bg-[#FFC400] opacity-30 blur-3xl" />
+            <span className="relative text-[13px] font-bold uppercase tracking-wider text-[#FFC400]">Próximo passo</span>
             <p className="relative text-[20px] font-bold leading-snug">{next.title}</p>
             <Link
               to={next.to}

@@ -5,7 +5,7 @@
 @custom-variant dark (&:where(.dark, .dark *));
 
 /*
- * Tokens do Nexo — mesma paleta do design (docs/VISAO.md): Azul #0A6CFF + Roxo #7C5CFF.
+ * Tokens do Nexo — mesma paleta do design (docs/VISAO.md): Roxo #6D4AFF + Amarelo #FFC400.
  * Os nomes são semânticos; os valores mudam entre claro e escuro.
  */
 :root {
@@ -16,14 +16,15 @@
   --nx-border: #e3e7ef;
   --nx-text: #0b1220;
   --nx-text-2: #4a5468;
-  --nx-primary: #0a6cff;
-  --nx-primary-strong: #0052cc;
-  --nx-accent: #7c5cff;
-  --nx-accent-strong: #5b3fd1;
+  --nx-primary: #6d4aff;
+  --nx-primary-strong: #5236d6;
+  --nx-accent: #ffc400;
+  --nx-accent-strong: #8a6400;
+  --nx-on-accent: #1a1400;
   --nx-success: #12a150;
   --nx-success-strong: #087f5b;
-  --nx-warning: #f59e0b;
-  --nx-warning-strong: #8a5300;
+  --nx-warning: #f97316;
+  --nx-warning-strong: #9a3412;
   --nx-danger: #e5484d;
   --nx-danger-strong: #b42318;
   --nx-shadow: 0 1px 2px rgb(11 18 32 / 0.04), 0 8px 24px rgb(11 18 32 / 0.06);
@@ -41,14 +42,15 @@
   --nx-border: #243049;
   --nx-text: #f1f4f9;
   --nx-text-2: #9aa6bc;
-  --nx-primary: #3d8bff;
-  --nx-primary-strong: #8fb8ff;
-  --nx-accent: #9b7bff;
-  --nx-accent-strong: #c4b1ff;
+  --nx-primary: #7050ff;
+  --nx-primary-strong: #b9a6ff;
+  --nx-accent: #ffd233;
+  --nx-accent-strong: #ffd54a;
+  --nx-on-accent: #1a1400;
   --nx-success: #30d158;
   --nx-success-strong: #4ade80;
-  --nx-warning: #fbbf24;
-  --nx-warning-strong: #fcd34d;
+  --nx-warning: #fb923c;
+  --nx-warning-strong: #fdba74;
   --nx-danger: #ff6369;
   --nx-danger-strong: #ff8f93;
   --nx-shadow: 0 1px 2px rgb(0 0 0 / 0.3), 0 8px 24px rgb(0 0 0 / 0.25);
@@ -74,6 +76,7 @@
   --color-primary-strong: var(--nx-primary-strong);
   --color-accent: var(--nx-accent);
   --color-accent-strong: var(--nx-accent-strong);
+  --color-on-accent: var(--nx-on-accent);
   --color-info: var(--nx-primary);
   --color-success: var(--nx-success);
   --color-success-strong: var(--nx-success-strong);

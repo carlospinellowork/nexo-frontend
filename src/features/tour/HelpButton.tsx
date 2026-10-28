@@ -143,7 +143,7 @@ export function HelpButton({ tourKey, screenTitle }: HelpButtonProps) {
                     }}
                     className="flex w-full items-center gap-2.5 rounded-xl px-3 py-2 text-left text-xs font-semibold text-text-primary hover:bg-primary/10 hover:text-primary transition-colors"
                   >
-                    <BookOpen size={14} className="text-accent" />
+                    <BookOpen size={14} className="text-accent-strong" />
                     <span>Dicas & Como montar seu bot</span>
                   </button>
                 </div>

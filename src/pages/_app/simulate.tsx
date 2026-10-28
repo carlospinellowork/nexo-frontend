@@ -82,7 +82,7 @@ function SimulatorPage() {
 
         <div className="hidden w-72 shrink-0 flex-col rounded-3xl bg-panel p-5 shadow-card xl:flex">
           <h3 className="mb-4 flex items-center gap-2 text-[15px] font-bold text-text-primary">
-            <Variable size={18} className="text-accent" />
+            <Variable size={18} className="text-accent-strong" />
             Variáveis da conversa
           </h3>
           <div className="flex flex-1 flex-col gap-2 overflow-y-auto">

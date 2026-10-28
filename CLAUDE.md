@@ -56,7 +56,7 @@ src/shared/                layout, ui (PromptDialog, Toaster/toast, ChatSelect, 
   Tailwind via `@theme inline`. Use só tokens semânticos, nunca hex solto nem `bg-white/5`:
   `bg-bg-start` (fundo), `bg-panel` (card), `bg-panel-2` (campo), `bg-panel-hover`,
   `border-border-ui`, `text-text-primary`, `text-text-secondary`, `primary`/`primary-strong`
-  (azul), `accent`/`accent-strong` (roxo), `success|warning|danger` (+ `-strong` para texto
+  (roxo #6D4AFF), `accent` (amarelo #FFC400, para fundos e destaques, com `text-on-accent` por cima; nunca texto branco sobre amarelo) e `accent-strong` (amarelo escuro, para texto e ícone sobre fundo claro), `success|warning|danger` (+ `-strong` para texto
   sobre fundo tingido, ex.: `bg-success/14 text-success-strong`), `shadow-card`, `shadow-float`.
   As exceções são as cores do cliente (vindas de `settings`) e a prévia do widget/simulador.
 - Preferência de tema: `features/theme/theme-store.ts` (sistema/claro/escuro, persistida).

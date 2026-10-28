@@ -67,14 +67,14 @@ export function LoginHero() {
         <motion.div
           animate={reduce ? undefined : { x: [0, 80, 0], y: [0, 60, 0], scale: [1, 1.15, 1] }}
           transition={loop(16)}
-          className="h-[560px] w-[560px] rounded-full bg-[#3D8BFF] opacity-50 blur-[90px] dark:bg-[#1F5BFF]"
+          className="h-[560px] w-[560px] rounded-full bg-[#8B6CFF] opacity-50 blur-[90px] dark:bg-[#5B3FD1]"
         />
       </motion.div>
       <motion.div style={{ x: orbBx, y: orbBy }} className="pointer-events-none absolute -bottom-40 -right-40">
         <motion.div
           animate={reduce ? undefined : { x: [0, -70, 0], y: [0, -50, 0], scale: [1.1, 0.95, 1.1] }}
           transition={loop(19)}
-          className="h-[540px] w-[540px] rounded-full bg-[#9B7BFF] opacity-50 blur-[90px] dark:bg-[#7C3AED]"
+          className="h-[540px] w-[540px] rounded-full bg-[#FFC400] opacity-40 blur-[90px] dark:bg-[#E0A800]"
         />
       </motion.div>
 
@@ -96,8 +96,8 @@ export function LoginHero() {
               className="flex w-[340px] items-center gap-3.5 rounded-[22px] border border-white/80 bg-white/70 p-4 shadow-[0_20px_50px_rgb(11_18_32/0.12)] backdrop-blur-xl dark:border-white/10 dark:bg-white/8"
             >
               <span
-                className={`flex h-11 w-11 shrink-0 items-center justify-center rounded-[14px] text-white ${
-                  ev.tone === "primary" ? "bg-[#0A6CFF]" : "bg-[#7C5CFF]"
+                className={`flex h-11 w-11 shrink-0 items-center justify-center rounded-[14px] ${
+                  ev.tone === "primary" ? "bg-[#6D4AFF] text-white" : "bg-[#FFC400] text-[#1A1400]"
                 }`}
               >
                 <ev.icon size={20} />

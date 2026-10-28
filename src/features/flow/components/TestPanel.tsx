@@ -46,7 +46,7 @@ export function TestPanel({ chatId, settings, ensureSaved }: TestPanelProps) {
       className="absolute bottom-4 right-4 top-4 z-50 flex w-[360px] flex-col gap-3 rounded-3xl border border-border-ui bg-panel p-3 shadow-float"
     >
       <div className="flex items-center gap-2 px-2 pt-1">
-        <FlaskConical size={17} className="text-accent" />
+        <FlaskConical size={17} className="text-accent-strong" />
         <h3 className="flex-1 text-[15px] font-bold tracking-tight text-text-primary">Teste ao vivo</h3>
         <button onClick={() => setTestOpen(false)} className="rounded-lg p-1.5 text-text-secondary hover:bg-panel-hover" aria-label="Fechar teste">
           <X size={18} />
