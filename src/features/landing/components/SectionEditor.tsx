@@ -8,6 +8,9 @@ import {
   type FooterData,
   type HeroData,
   LANDING_ICONS,
+  LINK_KINDS,
+  type LinkItem,
+  type LinkKind,
   type LandingIcon,
   type LandingSection,
   MAX,
@@ -306,6 +309,19 @@ export function SectionEditor({ section, onChange }: { section: LandingSection; 
         </>
       );
     }
+    case "links": {
+      const s = set<typeof section.data>;
+      return (
+        <ItemList<LinkItem>
+          noun="Link"
+          items={section.data.items}
+          max={MAX.links}
+          onChange={(items) => s({ items })}
+          create={() => ({ id: newId("lnk"), kind: "site", label: "Meu site", url: "https://" })}
+          render={(item, update) => <LinkFields item={item} update={update} />}
+        />
+      );
+    }
     case "footer": {
       const d = section.data;
       const s = set<FooterData>;
@@ -318,4 +334,69 @@ export function SectionEditor({ section, onChange }: { section: LandingSection; 
       );
     }
   }
+}
+
+const LINK_KIND_LABELS: Record<LinkKind, string> = {
+  chat: "Conversar com o bot",
+  whatsapp: "WhatsApp",
+  instagram: "Instagram",
+  tiktok: "TikTok",
+  google: "Avaliar no Google",
+  site: "Site",
+  link: "Outro link",
+};
+
+const LINK_HINTS: Partial<Record<LinkKind, string>> = {
+  instagram: "https://instagram.com/seuperfil",
+  tiktok: "https://tiktok.com/@seuperfil",
+  google: "Link de \"Pedir avaliações\" do Perfil da Empresa no Google",
+  site: "https://",
+  link: "https://",
+};
+
+/** Um botão do link na bio. WhatsApp pede só o número e vira o link oficial wa.me. */
+function LinkFields({ item, update }: { item: LinkItem; update: (patch: Partial<LinkItem>) => void }) {
+  const id = useId();
+  const phone = item.kind === "whatsapp" ? (item.url ?? "").replace(/^https:\/\/wa\.me\/(55)?/, "") : "";
+  return (
+    <>
+      <div className="flex flex-col gap-1">
+        <label htmlFor={id} className="text-[13px] font-semibold text-text-secondary">
+          Tipo
+        </label>
+        <select
+          id={id}
+          className={`${selectClass} h-10 text-[14px]`}
+          value={item.kind}
+          onChange={(e) => {
+            const kind = e.target.value as LinkKind;
+            update({ kind, label: LINK_KIND_LABELS[kind], url: kind === "chat" ? undefined : kind === "whatsapp" ? "" : "https://" });
+          }}
+        >
+          {LINK_KINDS.map((k) => (
+            <option key={k} value={k}>
+              {LINK_KIND_LABELS[k]}
+            </option>
+          ))}
+        </select>
+      </div>
+      <Field label="Texto do botão" required value={item.label} max={MAX.linkLabel} onChange={(label) => update({ label })} />
+      {item.kind === "whatsapp" && (
+        <Field
+          label="WhatsApp com DDD"
+          value={phone}
+          max={20}
+          placeholder="11 91234-5678"
+          onChange={(v) => {
+            const d = v.replace(/\D/g, "");
+            update({ url: d ? `https://wa.me/${d.length <= 11 ? `55${d}` : d}` : "" });
+          }}
+        />
+      )}
+      {item.kind !== "chat" && item.kind !== "whatsapp" && (
+        <Field label="Endereço (https)" value={item.url} max={1000} placeholder={LINK_HINTS[item.kind]} onChange={(url) => update({ url: url.trim() })} />
+      )}
+      {item.kind === "chat" && <p className="text-[12px] text-text-secondary">Abre o bot vinculado à página (aba Página).</p>}
+    </>
+  );
 }

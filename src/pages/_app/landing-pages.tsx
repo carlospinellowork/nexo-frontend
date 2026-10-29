@@ -111,7 +111,7 @@ function LandingPagesPage() {
                       ) : (
                         <Badge tone="success">No ar</Badge>
                       )}
-                      <span className="text-[12px] text-text-secondary">{theme.name}</span>
+                      <span className="text-[12px] text-text-secondary">{p.settings.layout === "bio" ? "Link na bio" : "Landing page"}, {theme.name}</span>
                     </div>
                     <p className="truncate font-mono text-[12px] text-text-secondary">/p/{p.slug}</p>
                     <p className="flex items-center gap-1.5 text-[13px] text-text-secondary">

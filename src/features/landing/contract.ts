@@ -6,7 +6,7 @@
 export const LANDING_THEMES = ["modern-blue", "espresso-champagne", "midnight-dark", "clean-slate"] as const;
 export type LandingTheme = (typeof LANDING_THEMES)[number];
 
-export const SECTION_TYPES = ["hero", "services", "features", "testimonials", "faq", "cta", "footer"] as const;
+export const SECTION_TYPES = ["hero", "services", "features", "testimonials", "faq", "cta", "footer", "links"] as const;
 export type SectionType = (typeof SECTION_TYPES)[number];
 
 export const LANDING_ICONS = [
@@ -64,6 +64,8 @@ export const MAX = {
   features: 6,
   testimonials: 6,
   faq: 10,
+  links: 12,
+  linkLabel: 40,
 } as const;
 
 export interface HeroData {
@@ -119,6 +121,19 @@ export interface CtaData {
   ctaLink?: string;
   note?: string;
 }
+/** Botões do link na bio. chat abre o bot; os demais abrem o endereço (https). */
+export const LINK_KINDS = ["chat", "whatsapp", "instagram", "tiktok", "google", "site", "link"] as const;
+export type LinkKind = (typeof LINK_KINDS)[number];
+export interface LinkItem {
+  id: string;
+  kind: LinkKind;
+  label: string;
+  url?: string;
+}
+export interface LinksData {
+  items: LinkItem[];
+}
+
 export interface FooterData {
   companyName: string;
   tagline?: string;
@@ -139,13 +154,16 @@ export type LandingSection =
   | SectionBase<"testimonials", ListData<TestimonialItem>>
   | SectionBase<"faq", ListData<FaqItem>>
   | SectionBase<"cta", CtaData>
-  | SectionBase<"footer", FooterData>;
+  | SectionBase<"footer", FooterData>
+  | SectionBase<"links", LinksData>;
 
 export interface LandingPageSettings {
   showChatWidget: boolean;
   seoTitle?: string;
   seoDescription?: string;
   fontHeading: "inter" | "serif" | "outfit";
+  /** page = landing page completa; bio = link na bio */
+  layout?: "page" | "bio";
 }
 
 export const SECTION_LABELS: Record<SectionType, string> = {
@@ -156,6 +174,7 @@ export const SECTION_LABELS: Record<SectionType, string> = {
   faq: "Perguntas frequentes",
   cta: "Chamada final",
   footer: "Rodapé",
+  links: "Links",
 };
 
 export const THEME_INFO: Record<LandingTheme, { name: string; description: string; colors: [string, string, string] }> = {

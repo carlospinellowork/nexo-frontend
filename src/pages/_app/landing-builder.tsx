@@ -92,6 +92,7 @@ function LandingBuilderPage() {
       setDraft(toDraft(page));
       setDirty(false);
       setExpanded(page.sections[0]?.id ?? null);
+      setViewport(page.settings.layout === "bio" ? "mobile" : "desktop");
     }
   }, [page]);
 

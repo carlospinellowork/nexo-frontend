@@ -1,7 +1,7 @@
-import { CheckCircle2, ChevronDown, MessageCircle, Sparkles, Star } from "lucide-react";
+import { CheckCircle2, ChevronDown, Globe, Instagram, Link2, type LucideIcon, MessageCircle, Music2, Phone, Sparkles, Star } from "lucide-react";
 import { AnimatePresence, motion } from "motion/react";
 import { useRef, useState } from "react";
-import type { HeroData, LandingPageSettings, LandingSection, LandingTheme } from "../contract";
+import type { HeroData, LandingPageSettings, LandingSection, LandingTheme, LinkItem, LinkKind } from "../contract";
 import { landingIcon } from "../icons";
 
 // As páginas dos clientes têm paletas próprias (não seguem o tema do painel).
@@ -72,7 +72,7 @@ interface LandingRendererProps {
  * Desenha a landing page. Os tamanhos usam container queries (`@container`): a prévia de celular
  * no editor mostra o layout de celular mesmo numa tela grande.
  */
-export function LandingRenderer({ title, theme, sections, settings, onChat }: LandingRendererProps) {
+function PageRenderer({ title, theme, sections, settings, onChat }: LandingRendererProps) {
   const t = THEMES[theme] ?? THEMES["modern-blue"];
   const heading = settings?.fontHeading === "serif" ? "font-serif" : "";
   const rootRef = useRef<HTMLDivElement>(null);
@@ -285,6 +285,15 @@ export function LandingRenderer({ title, theme, sections, settings, onChat }: La
               );
             }
 
+            case "links":
+              return (
+                <section key={section.id} className="mx-auto flex w-full max-w-md flex-col gap-3 px-5">
+                  {section.data.items.map((item) => (
+                    <LinkButton key={item.id} item={item} t={t} onChat={onChat} />
+                  ))}
+                </section>
+              );
+
             case "footer": {
               const d = section.data;
               return (
@@ -313,4 +322,88 @@ export function LandingRenderer({ title, theme, sections, settings, onChat }: La
       </main>
     </div>
   );
+}
+
+const LINK_ICONS: Record<LinkKind, LucideIcon> = {
+  chat: MessageCircle,
+  whatsapp: Phone,
+  instagram: Instagram,
+  tiktok: Music2,
+  google: Star,
+  site: Globe,
+  link: Link2,
+};
+
+type Palette = (typeof THEMES)[LandingTheme];
+
+function LinkButton({ item, t, onChat, primary }: { item: LinkItem; t: Palette; onChat: () => void; primary?: boolean }) {
+  const Icon = LINK_ICONS[item.kind] ?? Link2;
+  const className = `flex w-full items-center gap-3 rounded-2xl border px-5 py-4 text-left text-[16px] font-semibold transition-transform hover:scale-[1.02] active:scale-[0.98] ${primary ? t.primary : t.secondary}`;
+  const content = (
+    <>
+      <Icon size={20} className="shrink-0" />
+      <span className="flex-1 truncate">{item.label}</span>
+    </>
+  );
+  if (item.kind === "chat") {
+    return (
+      <button type="button" onClick={onChat} className={className}>
+        {content}
+      </button>
+    );
+  }
+  return item.url?.startsWith("https://") ? (
+    <a href={item.url} target="_blank" rel="noopener noreferrer" className={className}>
+      {content}
+    </a>
+  ) : null;
+}
+
+/** Link na bio: coluna estreita para o celular, com o bot no primeiro botão. */
+function BioRenderer({ title, theme, sections, settings, onChat }: LandingRendererProps) {
+  const t = THEMES[theme] ?? THEMES["modern-blue"];
+  const heading = settings?.fontHeading === "serif" ? "font-serif" : "";
+  const visible = sections.filter((s) => s.enabled);
+  const hero = visible.find((s): s is Extract<LandingSection, { type: "hero" }> => s.type === "hero")?.data;
+  const links = visible.find((s): s is Extract<LandingSection, { type: "links" }> => s.type === "links")?.data.items ?? [];
+  const footer = visible.find((s): s is Extract<LandingSection, { type: "footer" }> => s.type === "footer")?.data;
+  const name = hero?.headline || title;
+  const initials = name.split(/\s+/).filter((w) => w.length > 2).slice(0, 2).map((w) => w[0]?.toUpperCase()).join("");
+  const firstChat = links.findIndex((l) => l.kind === "chat");
+
+  return (
+    <div className={`@container min-h-full w-full ${t.page}`}>
+      <div className="mx-auto flex min-h-full max-w-[460px] flex-col items-center px-5 pb-10 pt-14 text-center">
+        <motion.span
+          initial={{ scale: 0.8, opacity: 0 }}
+          animate={{ scale: 1, opacity: 1 }}
+          transition={{ type: "spring", stiffness: 300, damping: 20 }}
+          className={`flex h-24 w-24 items-center justify-center rounded-full border-4 text-[32px] font-extrabold ${t.primary} ${t.line}`}
+          aria-hidden
+        >
+          {initials}
+        </motion.span>
+        <h1 className={`mt-5 text-[26px] font-extrabold leading-tight tracking-tight ${heading}`}>{name}</h1>
+        {hero?.subheadline && <p className={`mt-2 text-[15px] leading-relaxed ${t.muted}`}>{hero.subheadline}</p>}
+
+        <div className="mt-8 flex w-full flex-col gap-3">
+          {links.map((item, i) => (
+            <motion.div key={item.id} initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 + i * 0.06 }}>
+              <LinkButton item={item} t={t} onChat={onChat} primary={i === firstChat} />
+            </motion.div>
+          ))}
+        </div>
+
+        <p className={`mt-auto pt-12 text-[12px] ${t.muted}`}>
+          {footer?.companyName && <span className="block font-semibold">{footer.companyName}</span>}
+          Feito com Nexo
+        </p>
+      </div>
+    </div>
+  );
+}
+
+/** Desenha a página no formato escolhido: landing page completa ou link na bio. */
+export function LandingRenderer(props: LandingRendererProps) {
+  return props.settings?.layout === "bio" ? <BioRenderer {...props} /> : <PageRenderer {...props} />;
 }

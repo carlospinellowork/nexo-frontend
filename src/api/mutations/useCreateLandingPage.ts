@@ -9,6 +9,8 @@ export interface CreateLandingPagePayload {
   chatId?: string | null;
   /** A IA escreve a página a partir da descrição. */
   useAi?: boolean;
+  /** page = landing page completa; bio = link na bio */
+  layout?: "page" | "bio";
 }
 
 export const useCreateLandingPage = () => {

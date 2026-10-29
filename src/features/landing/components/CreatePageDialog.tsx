@@ -1,4 +1,4 @@
-import { LayoutTemplate, Sparkles, X } from "lucide-react";
+import { LayoutTemplate, Link2, PanelsTopLeft, Sparkles, X } from "lucide-react";
 import { AnimatePresence, motion } from "motion/react";
 import { type FormEvent, useEffect, useState } from "react";
 import type { CreateLandingPagePayload } from "../../../api/mutations/useCreateLandingPage";
@@ -22,6 +22,7 @@ export function CreatePageDialog({ open, loading, onClose, onCreate }: CreatePag
   const { data: ai } = useGetAiStatus();
   const { data: chats } = useGetChats();
   const aiOn = Boolean(ai?.configured);
+  const [layout, setLayout] = useState<"page" | "bio">("page");
   const [mode, setMode] = useState<"ai" | "template">("ai");
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
@@ -33,17 +34,24 @@ export function CreatePageDialog({ open, loading, onClose, onCreate }: CreatePag
     if (!open) return;
     setTitle("");
     setDescription("");
+    setLayout("page");
     setMode(aiOn ? "ai" : "template");
     setChatId(firstChatId);
   }, [open, aiOn, firstChatId]);
 
-  const useAi = mode === "ai" && aiOn;
+  const useAi = layout === "page" && mode === "ai" && aiOn;
   const canSubmit = title.trim().length >= 2 && (!useAi || description.trim().length >= 10);
 
   const submit = (e: FormEvent) => {
     e.preventDefault();
     if (!canSubmit) return;
-    onCreate({ title: title.trim(), theme, chatId: chatId || null, ...(useAi ? { useAi: true, description: description.trim() } : {}) });
+    onCreate({
+      title: title.trim(),
+      theme,
+      layout,
+      chatId: chatId || null,
+      ...(useAi ? { useAi: true, description: description.trim() } : layout === "bio" && description.trim() ? { description: description.trim() } : {}),
+    });
   };
 
   return (
@@ -78,6 +86,23 @@ export function CreatePageDialog({ open, loading, onClose, onCreate }: CreatePag
             </div>
 
             <Segmented
+              label="Formato"
+              fullWidth
+              value={layout}
+              onChange={setLayout}
+              options={[
+                { value: "page", label: "Landing page", icon: PanelsTopLeft },
+                { value: "bio", label: "Link na bio", icon: Link2 },
+              ]}
+            />
+            {layout === "bio" && (
+              <p className="text-[13px] leading-snug text-text-secondary">
+                Uma página curta para colar na bio do Instagram e do TikTok, com o seu bot no primeiro botão e os seus links (WhatsApp, avaliação no Google, site).
+              </p>
+            )}
+
+            {layout === "page" && (
+            <Segmented
               label="Como criar"
               fullWidth
               value={mode}
@@ -87,7 +112,8 @@ export function CreatePageDialog({ open, loading, onClose, onCreate }: CreatePag
                 { value: "template", label: "Começar pelo modelo", icon: LayoutTemplate },
               ]}
             />
-            {mode === "ai" && !aiOn && (
+            )}
+            {layout === "page" && mode === "ai" && !aiOn && (
               <p className="rounded-2xl bg-warning/14 p-3 text-[13px] leading-snug text-warning-strong">
                 A IA ainda não está ligada neste servidor. A página será criada pelo modelo, com textos para você trocar.
               </p>
@@ -98,7 +124,14 @@ export function CreatePageDialog({ open, loading, onClose, onCreate }: CreatePag
               <input className={inputClass} value={title} maxLength={100} onChange={(e) => setTitle(e.target.value)} placeholder="Ex.: Clínica Sorriso" />
             </label>
 
-            {mode === "ai" && aiOn && (
+            {layout === "bio" && (
+              <label className="flex flex-col gap-1.5">
+                <span className="text-[13px] font-semibold text-text-secondary">Frase curta (opcional)</span>
+                <input className={inputClass} value={description} maxLength={300} onChange={(e) => setDescription(e.target.value)} placeholder="Ex.: Barbearia no Centro. Agende pelo chat." />
+              </label>
+            )}
+
+            {layout === "page" && mode === "ai" && aiOn && (
               <label className="flex flex-col gap-1.5">
                 <span className="text-[13px] font-semibold text-text-secondary">O que a empresa faz</span>
                 <textarea
