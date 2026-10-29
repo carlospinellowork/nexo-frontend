@@ -10,6 +10,6 @@ export const usePublishLandingPage = () => {
       const { data } = await api.post<LandingPageRecord>(`/landing-pages/${id}/publish`);
       return data;
     },
-    onSuccess: () => queryClient.invalidateQueries({ queryKey: ["landing-pages"] }),
+    onSuccess: () => Promise.all([queryClient.invalidateQueries({ queryKey: ["landing-pages"] }), queryClient.invalidateQueries({ queryKey: ["bio"] })]),
   });
 };

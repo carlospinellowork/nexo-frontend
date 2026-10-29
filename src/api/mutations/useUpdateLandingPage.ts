@@ -19,6 +19,6 @@ export const useUpdateLandingPage = () => {
       const { data } = await api.patch<LandingPageRecord>(`/landing-pages/${id}`, payload);
       return data;
     },
-    onSuccess: () => queryClient.invalidateQueries({ queryKey: ["landing-pages"] }),
+    onSuccess: () => Promise.all([queryClient.invalidateQueries({ queryKey: ["landing-pages"] }), queryClient.invalidateQueries({ queryKey: ["bio"] })]),
   });
 };

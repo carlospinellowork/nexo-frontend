@@ -34,6 +34,11 @@ function LandingPagesPage() {
 
   const create = async (payload: CreateLandingPagePayload) => {
     try {
+      if (payload.layout === "bio") {
+        setDialogOpen(false);
+        navigate({ to: "/minha-bio" });
+        return;
+      }
       const page = await createPage(payload);
       setDialogOpen(false);
       if (payload.useAi && !page.aiUsed) toast.success("Página criada pelo modelo: a IA não está disponível agora.");
@@ -86,7 +91,8 @@ function LandingPagesPage() {
           <div id="tour-landing-cards" className="mx-auto grid w-full max-w-6xl grid-cols-1 gap-5 p-8 sm:grid-cols-2 xl:grid-cols-3">
             {pages.map((p, i) => {
               const theme = THEME_INFO[p.theme];
-              const edit = () => navigate({ to: "/landing-builder", search: { id: p.id } });
+              const isBio = p.settings.layout === "bio";
+              const edit = () => (isBio ? navigate({ to: "/minha-bio" }) : navigate({ to: "/landing-builder", search: { id: p.id } }));
               return (
                 <motion.article
                   key={p.id}
@@ -104,6 +110,7 @@ function LandingPagesPage() {
 
                   <div className="flex flex-1 flex-col gap-3 p-4">
                     <div className="flex flex-wrap items-center gap-1.5">
+                      {isBio && <Badge tone="primary">Minha Bio</Badge>}
                       {!p.publishedAt ? (
                         <Badge tone="neutral">Rascunho</Badge>
                       ) : p.hasUnpublishedChanges ? (
@@ -111,7 +118,7 @@ function LandingPagesPage() {
                       ) : (
                         <Badge tone="success">No ar</Badge>
                       )}
-                      <span className="text-[12px] text-text-secondary">{p.settings.layout === "bio" ? "Link na bio" : "Landing page"}, {theme.name}</span>
+                      <span className="text-[12px] text-text-secondary">{isBio ? "" : `Landing page, `}{theme.name}</span>
                     </div>
                     <p className="truncate font-mono text-[12px] text-text-secondary">/p/{p.slug}</p>
                     <p className="flex items-center gap-1.5 text-[13px] text-text-secondary">

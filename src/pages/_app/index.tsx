@@ -6,6 +6,7 @@ import { useGetIntegrations } from "../../api/queries/useGetIntegrations";
 import { authClient } from "../../lib/auth-client";
 import { Badge } from "../../shared/components/ui/Badge";
 import { useActiveChat } from "../../shared/hooks/useActiveChat";
+import { BioHomeCard } from "../../features/bio/BioHomeCard";
 import { ExampleCompanies } from "../../features/examples/ExampleCompanies";
 import { HelpButton } from "../../features/tour/HelpButton";
 import { startTour } from "../../features/tour/driver-service";
@@ -81,16 +82,20 @@ function HomePage() {
 
   return (
     <div className="h-full overflow-y-auto">
-      <motion.div variants={container} initial="hidden" animate="show" className="mx-auto flex w-full max-w-6xl flex-col gap-8 px-10 py-10">
+      <motion.div variants={container} initial="hidden" animate="show" className="mx-auto flex w-full max-w-6xl flex-col gap-6 px-4 py-6 md:gap-8 md:px-10 md:py-10">
         <motion.div variants={item} className="flex items-center justify-between gap-4">
           <div className="flex flex-col gap-1">
             <span className="text-[15px] text-text-secondary">{today}</span>
-            <h1 className="text-[34px] font-extrabold tracking-[-0.02em] text-text-primary">
+            <h1 className="text-[28px] font-extrabold md:text-[34px] tracking-[-0.02em] text-text-primary">
               {greeting()}
               {firstName ? `, ${firstName}` : ""}
             </h1>
           </div>
           <HelpButton tourKey="home" screenTitle="Início" />
+        </motion.div>
+
+        <motion.div variants={item}>
+          <BioHomeCard />
         </motion.div>
 
         <motion.div id="tour-home-stats" variants={item} className="grid grid-cols-1 gap-5 sm:grid-cols-2 xl:grid-cols-4">

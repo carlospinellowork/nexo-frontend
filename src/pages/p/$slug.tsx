@@ -4,6 +4,7 @@ import { useEffect } from "react";
 import { API_ORIGIN } from "../../api/instance";
 import { useGetPublicLandingPage } from "../../api/queries/useGetPublicLandingPage";
 import { LandingRenderer } from "../../features/landing/components/LandingRenderer";
+import { trackClick } from "../../features/landing/trackClick";
 
 export const Route = createFileRoute("/p/$slug")({
   component: PublicLandingPage,
@@ -11,7 +12,7 @@ export const Route = createFileRoute("/p/$slug")({
 
 declare global {
   interface Window {
-    NexoChat?: { open: () => void; close: () => void };
+    NexoChat?: { open: (prefill?: string) => void; close: () => void };
   }
 }
 
@@ -74,7 +75,11 @@ function PublicLandingPage() {
         theme={page.theme}
         sections={page.sections}
         settings={page.settings}
+        slug={page.slug}
+        canAsk={!!page.chat}
         onChat={() => window.NexoChat?.open()}
+        onAsk={(question) => window.NexoChat?.open(question)}
+        onItemClick={(itemId) => trackClick(page.slug, itemId)}
       />
     </div>
   );

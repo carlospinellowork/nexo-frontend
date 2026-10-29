@@ -18,6 +18,7 @@ import { Route as AppIntegrationsRouteImport } from './pages/_app/integrations'
 import { Route as AppLandingBuilderRouteImport } from './pages/_app/landing-builder'
 import { Route as AppLandingPagesRouteImport } from './pages/_app/landing-pages'
 import { Route as AppLeadsRouteImport } from './pages/_app/leads'
+import { Route as AppMinhaBioRouteImport } from './pages/_app/minha-bio'
 import { Route as AppResultsRouteImport } from './pages/_app/results'
 import { Route as AppSimulateRouteImport } from './pages/_app/simulate'
 import { Route as PSlugRouteImport } from './pages/p/$slug'
@@ -66,6 +67,11 @@ const AppLeadsRoute = AppLeadsRouteImport.update({
   path: '/leads',
   getParentRoute: () => AppLayoutRoute,
 } as any)
+const AppMinhaBioRoute = AppMinhaBioRouteImport.update({
+  id: '/minha-bio',
+  path: '/minha-bio',
+  getParentRoute: () => AppLayoutRoute,
+} as any)
 const AppResultsRoute = AppResultsRouteImport.update({
   id: '/results',
   path: '/results',
@@ -91,6 +97,7 @@ export interface FileRoutesByFullPath {
   '/landing-builder': typeof AppLandingBuilderRoute
   '/landing-pages': typeof AppLandingPagesRoute
   '/leads': typeof AppLeadsRoute
+  '/minha-bio': typeof AppMinhaBioRoute
   '/results': typeof AppResultsRoute
   '/simulate': typeof AppSimulateRoute
   '/p/$slug': typeof PSlugRoute
@@ -103,6 +110,7 @@ export interface FileRoutesByTo {
   '/landing-builder': typeof AppLandingBuilderRoute
   '/landing-pages': typeof AppLandingPagesRoute
   '/leads': typeof AppLeadsRoute
+  '/minha-bio': typeof AppMinhaBioRoute
   '/results': typeof AppResultsRoute
   '/simulate': typeof AppSimulateRoute
   '/p/$slug': typeof PSlugRoute
@@ -118,6 +126,7 @@ export interface FileRoutesById {
   '/_app/landing-builder': typeof AppLandingBuilderRoute
   '/_app/landing-pages': typeof AppLandingPagesRoute
   '/_app/leads': typeof AppLeadsRoute
+  '/_app/minha-bio': typeof AppMinhaBioRoute
   '/_app/results': typeof AppResultsRoute
   '/_app/simulate': typeof AppSimulateRoute
   '/p/$slug': typeof PSlugRoute
@@ -134,6 +143,7 @@ export interface FileRouteTypes {
     | '/landing-builder'
     | '/landing-pages'
     | '/leads'
+    | '/minha-bio'
     | '/results'
     | '/simulate'
     | '/p/$slug'
@@ -146,6 +156,7 @@ export interface FileRouteTypes {
     | '/landing-builder'
     | '/landing-pages'
     | '/leads'
+    | '/minha-bio'
     | '/results'
     | '/simulate'
     | '/p/$slug'
@@ -160,6 +171,7 @@ export interface FileRouteTypes {
     | '/_app/landing-builder'
     | '/_app/landing-pages'
     | '/_app/leads'
+    | '/_app/minha-bio'
     | '/_app/results'
     | '/_app/simulate'
     | '/p/$slug'
@@ -237,6 +249,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppLeadsRouteImport
       parentRoute: typeof AppLayoutRoute
     }
+    '/_app/minha-bio': {
+      id: '/_app/minha-bio'
+      path: '/minha-bio'
+      fullPath: '/minha-bio'
+      preLoaderRoute: typeof AppMinhaBioRouteImport
+      parentRoute: typeof AppLayoutRoute
+    }
     '/_app/results': {
       id: '/_app/results'
       path: '/results'
@@ -268,6 +287,7 @@ interface AppLayoutRouteChildren {
   AppLandingBuilderRoute: typeof AppLandingBuilderRoute
   AppLandingPagesRoute: typeof AppLandingPagesRoute
   AppLeadsRoute: typeof AppLeadsRoute
+  AppMinhaBioRoute: typeof AppMinhaBioRoute
   AppResultsRoute: typeof AppResultsRoute
   AppSimulateRoute: typeof AppSimulateRoute
   AppIndexRoute: typeof AppIndexRoute
@@ -280,6 +300,7 @@ const AppLayoutRouteChildren: AppLayoutRouteChildren = {
   AppLandingBuilderRoute: AppLandingBuilderRoute,
   AppLandingPagesRoute: AppLandingPagesRoute,
   AppLeadsRoute: AppLeadsRoute,
+  AppMinhaBioRoute: AppMinhaBioRoute,
   AppResultsRoute: AppResultsRoute,
   AppSimulateRoute: AppSimulateRoute,
   AppIndexRoute: AppIndexRoute,

@@ -6,7 +6,7 @@
 export const LANDING_THEMES = ["modern-blue", "espresso-champagne", "midnight-dark", "clean-slate"] as const;
 export type LandingTheme = (typeof LANDING_THEMES)[number];
 
-export const SECTION_TYPES = ["hero", "services", "features", "testimonials", "faq", "cta", "footer", "links"] as const;
+export const SECTION_TYPES = ["hero", "services", "features", "testimonials", "faq", "cta", "footer", "links", "products"] as const;
 export type SectionType = (typeof SECTION_TYPES)[number];
 
 export const LANDING_ICONS = [
@@ -66,6 +66,16 @@ export const MAX = {
   faq: 10,
   links: 12,
   linkLabel: 40,
+  message: 300,
+  /** Id de item de link ou produto (único na página). */
+  itemId: 64,
+  /** Chave Pix: o campo no BR Code tem no máximo 99 bytes. */
+  pixKey: 77,
+  pixName: 25,
+  pixCity: 15,
+  products: 12,
+  productName: 80,
+  productPrice: 30,
 } as const;
 
 export interface HeroData {
@@ -122,16 +132,42 @@ export interface CtaData {
   note?: string;
 }
 /** Botões do link na bio. chat abre o bot; os demais abrem o endereço (https). */
-export const LINK_KINDS = ["chat", "whatsapp", "instagram", "tiktok", "google", "site", "link"] as const;
+export const LINK_KINDS = ["chat", "whatsapp", "instagram", "tiktok", "google", "site", "link", "pix", "youtube"] as const;
 export type LinkKind = (typeof LINK_KINDS)[number];
 export interface LinkItem {
   id: string;
   kind: LinkKind;
   label: string;
   url?: string;
+  /** WhatsApp: mensagem pronta. */
+  message?: string;
+  /** Pix estático (sem gateway). */
+  pixKey?: string;
+  pixName?: string;
+  pixCity?: string;
+  pixAmount?: number;
+  /** Links agendados: datas ISO. */
+  startsAt?: string;
+  endsAt?: string;
 }
 export interface LinksData {
   items: LinkItem[];
+}
+export interface ProductItem {
+  id: string;
+  name: string;
+  price?: string;
+  imageUrl?: string;
+  mercadoLivreUrl?: string;
+  shopeeUrl?: string;
+  whatsappUrl?: string;
+  whatsappMessage?: string;
+  startsAt?: string;
+  endsAt?: string;
+}
+export interface ProductsData {
+  title?: string;
+  items: ProductItem[];
 }
 
 export interface FooterData {
@@ -155,7 +191,8 @@ export type LandingSection =
   | SectionBase<"faq", ListData<FaqItem>>
   | SectionBase<"cta", CtaData>
   | SectionBase<"footer", FooterData>
-  | SectionBase<"links", LinksData>;
+  | SectionBase<"links", LinksData>
+  | SectionBase<"products", ProductsData>;
 
 export interface LandingPageSettings {
   showChatWidget: boolean;
@@ -164,6 +201,10 @@ export interface LandingPageSettings {
   fontHeading: "inter" | "serif" | "outfit";
   /** page = landing page completa; bio = link na bio */
   layout?: "page" | "bio";
+  /** Selo "feito com Nexo" na bio. Hoje sempre aparece; planos futuros poderão desligar. */
+  showBadge?: boolean;
+  /** Assistente da bio (gerido pelo servidor). */
+  bio?: { audience: "creator" | "seller" | "business"; faqs: { id: string; question: string; answer: string }[]; flowSignature?: string };
 }
 
 export const SECTION_LABELS: Record<SectionType, string> = {
@@ -175,6 +216,7 @@ export const SECTION_LABELS: Record<SectionType, string> = {
   cta: "Chamada final",
   footer: "Rodapé",
   links: "Links",
+  products: "Produtos",
 };
 
 export const THEME_INFO: Record<LandingTheme, { name: string; description: string; colors: [string, string, string] }> = {

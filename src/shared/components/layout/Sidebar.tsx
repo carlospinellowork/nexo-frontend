@@ -21,7 +21,7 @@ function initials(name?: string | null) {
     .join("");
 }
 
-export function Sidebar({ items }: { items: NavItem[] }) {
+export function Sidebar({ items, className = "w-[264px]", onNavigate }: { items: NavItem[]; className?: string; onNavigate?: () => void }) {
   const { data: session } = authClient.useSession();
   const navigate = useNavigate();
   const pathname = useRouterState({ select: (s) => s.location.pathname });
@@ -31,7 +31,7 @@ export function Sidebar({ items }: { items: NavItem[] }) {
   };
 
   return (
-    <aside className="flex w-[264px] shrink-0 flex-col gap-7 border-r border-border-ui bg-[var(--nx-glass)] px-4 py-6 backdrop-blur-2xl">
+    <aside className={`flex ${className} shrink-0 flex-col gap-7 border-r border-border-ui bg-[var(--nx-glass)] px-4 py-6 backdrop-blur-2xl`}>
       <div className="px-2">
         <Logo size={36} />
       </div>
@@ -43,6 +43,7 @@ export function Sidebar({ items }: { items: NavItem[] }) {
             <Link
               key={to}
               to={to}
+              onClick={onNavigate}
               className={`relative flex h-11 items-center gap-3 rounded-xl px-3 text-[15px] transition-colors ${
                 active ? "font-semibold text-primary-strong" : "font-medium text-text-primary hover:bg-panel-hover"
               }`}

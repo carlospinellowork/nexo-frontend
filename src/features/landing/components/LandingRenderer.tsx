@@ -1,8 +1,11 @@
-import { CheckCircle2, ChevronDown, Globe, Instagram, Link2, type LucideIcon, MessageCircle, Music2, Phone, Sparkles, Star } from "lucide-react";
-import { AnimatePresence, motion } from "motion/react";
-import { useRef, useState } from "react";
-import type { HeroData, LandingPageSettings, LandingSection, LandingTheme, LinkItem, LinkKind } from "../contract";
+import { CheckCircle2, ChevronDown, Globe, Instagram, Link2, type LucideIcon, MessageCircle, Music2, Phone, QrCode, Search, ShoppingBag, Sparkles, Star, X, Youtube } from "lucide-react";
+import { AnimatePresence, motion, useReducedMotion } from "motion/react";
+import { useId, useRef, useState } from "react";
+import { LogoMark } from "../../../shared/components/ui/Logo";
+import type { HeroData, LandingPageSettings, LandingSection, LandingTheme, LinkItem, LinkKind, ProductItem } from "../contract";
 import { landingIcon } from "../icons";
+import { fold } from "../schedule";
+import { PixDialog } from "./PixDialog";
 
 // As páginas dos clientes têm paletas próprias (não seguem o tema do painel).
 const THEMES: Record<
@@ -66,7 +69,20 @@ interface LandingRendererProps {
   settings?: LandingPageSettings;
   /** Botões de conversa: abrem o chat do bot vinculado. */
   onChat: () => void;
+  /** Endereço da página (usado no selo "feito com Nexo"). */
+  slug?: string;
+  /** Há bot vinculado: libera "Perguntar ao assistente" na busca da bio. */
+  canAsk?: boolean;
+  /** Abre o bot com a pergunta já preenchida. */
+  onAsk?: (question: string) => void;
+  /** Clique em link ou produto (só a página pública conta; a prévia do editor não). */
+  onItemClick?: (itemId: string) => void;
+  /** Modo editor da bio: tocar no perfil, em um link ou produto seleciona em vez de abrir. */
+  onEditSelect?: (target: BioTarget) => void;
+  editSelectedId?: string;
 }
+
+export type BioTarget = { type: "profile" } | { type: "link"; id: string } | { type: "product"; id: string };
 
 /**
  * Desenha a landing page. Os tamanhos usam container queries (`@container`): a prévia de celular
@@ -289,10 +305,13 @@ function PageRenderer({ title, theme, sections, settings, onChat }: LandingRende
               return (
                 <section key={section.id} className="mx-auto flex w-full max-w-md flex-col gap-3 px-5">
                   {section.data.items.map((item) => (
-                    <LinkButton key={item.id} item={item} t={t} onChat={onChat} />
+                    <LinkButton key={item.id} item={item} t={t} onChat={onChat} onPix={() => undefined} />
                   ))}
                 </section>
               );
+
+            case "products":
+              return null;
 
             case "footer": {
               const d = section.data;
@@ -332,73 +351,234 @@ const LINK_ICONS: Record<LinkKind, LucideIcon> = {
   google: Star,
   site: Globe,
   link: Link2,
+  pix: QrCode,
+  youtube: Youtube,
 };
 
 type Palette = (typeof THEMES)[LandingTheme];
 
-function LinkButton({ item, t, onChat, primary }: { item: LinkItem; t: Palette; onChat: () => void; primary?: boolean }) {
+/** Endereço do WhatsApp com a mensagem pronta (wa.me/<numero>?text=...). */
+const whatsappLink = (url: string, message?: string) => (message?.trim() ? `${url}?text=${encodeURIComponent(message.trim())}` : url);
+
+interface LinkButtonProps {
+  item: LinkItem;
+  t: Palette;
+  onChat: () => void;
+  onPix: (item: LinkItem) => void;
+  onClick?: (id: string) => void;
+  primary?: boolean;
+}
+
+function LinkButton({ item, t, onChat, onPix, onClick, primary }: LinkButtonProps) {
   const Icon = LINK_ICONS[item.kind] ?? Link2;
-  const className = `flex w-full items-center gap-3 rounded-2xl border px-5 py-4 text-left text-[16px] font-semibold transition-transform hover:scale-[1.02] active:scale-[0.98] ${primary ? t.primary : t.secondary}`;
+  const className = `flex min-h-[52px] w-full items-center gap-3 rounded-2xl border px-5 py-3.5 text-left text-[16px] font-semibold transition-transform hover:scale-[1.02] active:scale-[0.98] ${primary ? t.primary : t.secondary}`;
   const content = (
     <>
       <Icon size={20} className="shrink-0" />
       <span className="flex-1 truncate">{item.label}</span>
     </>
   );
-  if (item.kind === "chat") {
+  if (item.kind === "chat" || item.kind === "pix") {
     return (
-      <button type="button" onClick={onChat} className={className}>
+      <button
+        type="button"
+        onClick={() => {
+          onClick?.(item.id);
+          if (item.kind === "chat") onChat();
+          else onPix(item);
+        }}
+        className={className}
+      >
         {content}
       </button>
     );
   }
-  return item.url?.startsWith("https://") ? (
-    <a href={item.url} target="_blank" rel="noopener noreferrer" className={className}>
+  const href = item.kind === "whatsapp" ? whatsappLink(item.url ?? "", item.message) : item.url;
+  return href?.startsWith("https://") ? (
+    <a href={href} target="_blank" rel="noopener noreferrer" onClick={() => onClick?.(item.id)} className={className}>
       {content}
     </a>
   ) : null;
 }
 
-/** Link na bio: coluna estreita para o celular, com o bot no primeiro botão. */
-function BioRenderer({ title, theme, sections, settings, onChat }: LandingRendererProps) {
+function ProductCard({ product, t, onClick }: { product: ProductItem; t: Palette; onClick?: (id: string) => void }) {
+  const actions: { key: string; label: string; href: string }[] = [];
+  if (product.mercadoLivreUrl?.startsWith("https://")) actions.push({ key: "ml", label: "Comprar no Mercado Livre", href: product.mercadoLivreUrl });
+  if (product.shopeeUrl?.startsWith("https://")) actions.push({ key: "sp", label: "Comprar na Shopee", href: product.shopeeUrl });
+  if (product.whatsappUrl?.startsWith("https://")) {
+    actions.push({ key: "wa", label: "Comprar pelo WhatsApp", href: whatsappLink(product.whatsappUrl, product.whatsappMessage?.trim() || `Olá! Tenho interesse em ${product.name}.`) });
+  }
+  return (
+    <article className={`overflow-hidden rounded-2xl border text-left ${t.card}`}>
+      {product.imageUrl?.startsWith("https://") && <img src={product.imageUrl} alt={product.name} loading="lazy" className="aspect-[4/3] w-full object-cover" />}
+      <div className="flex flex-col gap-3 p-4">
+        <div>
+          <h3 className="text-[16px] font-bold leading-snug">{product.name}</h3>
+          {product.price && <p className={`mt-0.5 text-[15px] font-semibold ${t.accent}`}>{product.price}</p>}
+        </div>
+        {actions.length > 0 && (
+          <div className="flex flex-col gap-2">
+            {actions.map((a) => (
+              <a
+                key={a.key}
+                href={a.href}
+                target="_blank"
+                rel="noopener noreferrer"
+                onClick={() => onClick?.(product.id)}
+                className={`flex min-h-11 items-center justify-center gap-2 rounded-xl border px-3 text-[14px] font-semibold transition-transform active:scale-[0.98] ${t.secondary}`}
+              >
+                {a.key === "wa" ? <Phone size={16} /> : <ShoppingBag size={16} />}
+                {a.label}
+              </a>
+            ))}
+          </div>
+        )}
+      </div>
+    </article>
+  );
+}
+
+const SITE_URL: string = import.meta.env.VITE_SITE_URL ?? "https://nexo.app";
+
+/** Link na bio: coluna estreita para o celular, com busca, links, produtos, Pix e o bot. */
+function BioRenderer({ title, theme, sections, settings, slug, canAsk, onChat, onAsk, onItemClick, onEditSelect, editSelectedId }: LandingRendererProps) {
   const t = THEMES[theme] ?? THEMES["modern-blue"];
   const heading = settings?.fontHeading === "serif" ? "font-serif" : "";
+  const reduceMotion = useReducedMotion();
+  const [query, setQuery] = useState("");
+  const [pix, setPix] = useState<LinkItem | null>(null);
+  const searchId = useId();
   const visible = sections.filter((s) => s.enabled);
   const hero = visible.find((s): s is Extract<LandingSection, { type: "hero" }> => s.type === "hero")?.data;
   const links = visible.find((s): s is Extract<LandingSection, { type: "links" }> => s.type === "links")?.data.items ?? [];
+  const productsSection = visible.find((s): s is Extract<LandingSection, { type: "products" }> => s.type === "products")?.data;
+  const products = productsSection?.items ?? [];
   const footer = visible.find((s): s is Extract<LandingSection, { type: "footer" }> => s.type === "footer")?.data;
   const name = hero?.headline || title;
   const initials = name.split(/\s+/).filter((w) => w.length > 2).slice(0, 2).map((w) => w[0]?.toUpperCase()).join("");
   const firstChat = links.findIndex((l) => l.kind === "chat");
 
+  const words = fold(query).split(/\s+/).filter(Boolean);
+  const matches = (text: string) => {
+    const hay = fold(text);
+    return words.every((w) => hay.includes(w));
+  };
+  const shownLinks = words.length ? links.filter((l) => matches(`${l.label} ${l.message ?? ""}`)) : links;
+  const shownProducts = words.length ? products.filter((p) => matches(`${p.name} ${p.price ?? ""}`)) : products;
+  const empty = words.length > 0 && shownLinks.length === 0 && shownProducts.length === 0;
+  const showBadge = settings?.showBadge !== false;
+  // No editor, o toque seleciona o item (a fase de captura impede abrir o link de verdade).
+  const pick = (target: BioTarget) =>
+    onEditSelect
+      ? {
+          onClickCapture: (e: { preventDefault: () => void; stopPropagation: () => void }) => {
+            e.preventDefault();
+            e.stopPropagation();
+            onEditSelect(target);
+          },
+        }
+      : {};
+  const ring = (id: string) => (onEditSelect ? `rounded-2xl transition-shadow ${editSelectedId === id ? "ring-2 ring-[#FFC400]" : "hover:ring-2 hover:ring-white/30"}` : "");
+
   return (
     <div className={`@container min-h-full w-full ${t.page}`}>
-      <div className="mx-auto flex min-h-full max-w-[460px] flex-col items-center px-5 pb-10 pt-14 text-center">
+      <div className="mx-auto flex min-h-full max-w-[460px] flex-col items-center px-4 pb-8 pt-12 text-center">
+        <div className={`flex w-full flex-col items-center ${ring("profile")}`} {...pick({ type: "profile" })}>
         <motion.span
-          initial={{ scale: 0.8, opacity: 0 }}
+          initial={reduceMotion ? false : { scale: 0.8, opacity: 0 }}
           animate={{ scale: 1, opacity: 1 }}
           transition={{ type: "spring", stiffness: 300, damping: 20 }}
           className={`flex h-24 w-24 items-center justify-center rounded-full border-4 text-[32px] font-extrabold ${t.primary} ${t.line}`}
           aria-hidden
         >
-          {initials}
+          {hero?.imageUrl?.startsWith("https://") ? <img src={hero.imageUrl} alt="" className="h-full w-full rounded-full object-cover" /> : initials}
         </motion.span>
-        <h1 className={`mt-5 text-[26px] font-extrabold leading-tight tracking-tight ${heading}`}>{name}</h1>
+        <h1 className={`mt-5 break-words text-[26px] font-extrabold leading-tight tracking-tight ${heading}`}>{name}</h1>
+        {hero?.badge && <p className={`mt-1 text-[14px] font-semibold ${t.accent}`}>{hero.badge}</p>}
         {hero?.subheadline && <p className={`mt-2 text-[15px] leading-relaxed ${t.muted}`}>{hero.subheadline}</p>}
-
-        <div className="mt-8 flex w-full flex-col gap-3">
-          {links.map((item, i) => (
-            <motion.div key={item.id} initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 + i * 0.06 }}>
-              <LinkButton item={item} t={t} onChat={onChat} primary={i === firstChat} />
-            </motion.div>
-          ))}
         </div>
 
-        <p className={`mt-auto pt-12 text-[12px] ${t.muted}`}>
-          {footer?.companyName && <span className="block font-semibold">{footer.companyName}</span>}
-          Feito com Nexo
-        </p>
+        {(links.length > 0 || products.length > 0) && (
+          <div className="mt-6 w-full">
+            <label htmlFor={searchId} className="sr-only">
+              Procurando algo?
+            </label>
+            <div className={`flex min-h-12 items-center gap-2 rounded-2xl border pl-4 pr-1 ${t.card}`}>
+              <Search size={18} className={`shrink-0 ${t.muted}`} />
+              <input
+                id={searchId}
+                type="search"
+                inputMode="search"
+                enterKeyHint="search"
+                value={query}
+                onChange={(e) => setQuery(e.target.value)}
+                placeholder="Procurando algo?"
+                className="min-w-0 flex-1 bg-transparent py-3 text-[16px] outline-none placeholder:opacity-60"
+              />
+              {query && (
+                <button type="button" onClick={() => setQuery("")} aria-label="Limpar busca" className="flex h-11 w-11 shrink-0 items-center justify-center">
+                  <X size={18} />
+                </button>
+              )}
+            </div>
+          </div>
+        )}
+
+        <div className="mt-5 flex w-full flex-col gap-3">
+          {shownLinks.map((item, i) => (
+            <motion.div key={item.id} initial={reduceMotion ? false : { opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: words.length ? 0 : 0.1 + i * 0.06 }} className={ring(item.id)} {...pick({ type: "link", id: item.id })}>
+              <LinkButton item={item} t={t} onChat={onChat} onPix={setPix} onClick={onItemClick} primary={!words.length && i === firstChat} />
+            </motion.div>
+          ))}
+
+          {shownProducts.length > 0 && (
+            <>
+              <h2 className={`mt-3 text-left text-[18px] font-bold ${heading}`}>{productsSection?.title || "Produtos"}</h2>
+              {shownProducts.map((p) => (
+                <div key={p.id} className={ring(p.id)} {...pick({ type: "product", id: p.id })}>
+                  <ProductCard product={p} t={t} onClick={onItemClick} />
+                </div>
+              ))}
+            </>
+          )}
+
+          {empty && (
+            <div className={`rounded-2xl border p-5 ${t.card}`} role="status">
+              <p className="text-[15px] font-semibold">Não encontrei nada para "{query.trim()}".</p>
+              {canAsk ? (
+                <button
+                  type="button"
+                  onClick={() => onAsk?.(query.trim())}
+                  className={`mt-4 flex min-h-12 w-full items-center justify-center gap-2 rounded-xl px-4 text-[15px] font-semibold ${t.primary}`}
+                >
+                  <MessageCircle size={18} />
+                  Perguntar ao assistente
+                </button>
+              ) : (
+                <p className={`mt-1 text-[13px] ${t.muted}`}>Tente outra palavra.</p>
+              )}
+            </div>
+          )}
+        </div>
+
+        <div className="mt-auto flex flex-col items-center gap-2 pt-12">
+          {footer?.companyName && <span className={`text-[12px] font-semibold ${t.muted}`}>{footer.companyName}</span>}
+          {showBadge && (
+            <a
+              href={`${SITE_URL}?ref=${encodeURIComponent(slug ?? "")}`}
+              target="_blank"
+              rel="noopener"
+              className={`group inline-flex min-h-11 items-center gap-1.5 rounded-full px-3 text-[12px] opacity-70 transition-opacity hover:opacity-100 focus-visible:opacity-100 ${t.muted}`}
+            >
+              <span className="transition-transform duration-200 group-hover:-rotate-6 group-hover:scale-110 motion-reduce:transition-none">
+                <LogoMark size={16} />
+              </span>
+              feito com Nexo
+            </a>
+          )}
+        </div>
       </div>
+      {pix && <PixDialog item={pix} cardClass={t.card} mutedClass={t.muted} buttonClass={t.primary} onClose={() => setPix(null)} />}
     </div>
   );
 }

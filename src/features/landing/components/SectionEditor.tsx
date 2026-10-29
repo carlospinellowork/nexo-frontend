@@ -1,5 +1,5 @@
-import { ArrowDown, ArrowUp, Plus, Star, Trash2, TriangleAlert } from "lucide-react";
-import { type ReactNode, useId } from "react";
+import { ArrowDown, ArrowUp, MousePointerClick, Plus, Star, Trash2, TriangleAlert } from "lucide-react";
+import { type ReactNode, useId, useState } from "react";
 import { inputClass, selectClass, textareaClass } from "../../../shared/components/ui/styles";
 import {
   type CtaData,
@@ -14,14 +14,17 @@ import {
   type LandingIcon,
   type LandingSection,
   MAX,
+  type ProductItem,
   type ServiceItem,
   type TestimonialItem,
 } from "../contract";
 import { landingIcon } from "../icons";
+import { normalizePixKey } from "../pix";
+import { fromLocalInput, scheduleState, toLocalInput } from "../schedule";
 
 const newId = (prefix: string) => `${prefix}-${crypto.randomUUID().slice(0, 6)}`;
 
-function Field({ label, value, max, onChange, multiline, placeholder, required }: { label: string; value: string | undefined; max: number; onChange: (v: string) => void; multiline?: boolean; placeholder?: string; required?: boolean }) {
+export function Field({ label, value, max, onChange, multiline, placeholder, required, inputMode }: { label: string; value: string | undefined; max: number; onChange: (v: string) => void; multiline?: boolean; placeholder?: string; required?: boolean; inputMode?: "text" | "tel" | "email" | "url" | "decimal" | "numeric" }) {
   const id = useId();
   const length = value?.length ?? 0;
   const empty = required && !value?.trim();
@@ -42,9 +45,9 @@ function Field({ label, value, max, onChange, multiline, placeholder, required }
         {length > max * 0.8 && <span className={`text-[11px] tabular-nums ${length >= max ? "text-warning-strong" : "text-text-secondary"}`}>{length}/{max}</span>}
       </div>
       {multiline ? (
-        <textarea {...props} className={`${textareaClass} min-h-20 text-[14px] ${empty ? "border-danger" : ""}`} onChange={(e) => onChange(e.target.value)} />
+        <textarea {...props} className={`${textareaClass} min-h-20 text-[16px] min-[420px]:text-[14px] ${empty ? "border-danger" : ""}`} onChange={(e) => onChange(e.target.value)} />
       ) : (
-        <input {...props} className={`${inputClass} h-10 text-[14px] ${empty ? "border-danger" : ""}`} onChange={(e) => onChange(e.target.value)} />
+        <input {...props} inputMode={inputMode} className={`${inputClass} text-[16px] min-[420px]:text-[14px] ${empty ? "border-danger" : ""}`} onChange={(e) => onChange(e.target.value)} />
       )}
       {empty && (
         <span id={`${id}-error`} className="text-[12px] text-danger-strong">
@@ -56,7 +59,8 @@ function Field({ label, value, max, onChange, multiline, placeholder, required }
 }
 
 /** Lista editável de itens (serviços, diferenciais, depoimentos, perguntas). */
-function ItemList<T extends { id: string }>({ items, max, min = 1, noun, onChange, create, render }: {
+function ItemList<T extends { id: string }>({ items, max, min = 1, noun, onChange, create, render, meta }: {
+  meta?: (item: T) => ReactNode;
   items: T[];
   max: number;
   min?: number;
@@ -75,19 +79,20 @@ function ItemList<T extends { id: string }>({ items, max, min = 1, noun, onChang
       {items.map((item, i) => (
         <div key={item.id} className="flex flex-col gap-2.5 rounded-2xl border border-border-ui bg-panel p-3">
           <div className="flex items-center justify-between">
-            <span className="text-[12px] font-bold text-text-secondary">
+            <span className="flex min-w-0 flex-wrap items-center gap-x-2 gap-y-0.5 text-[12px] font-bold text-text-secondary">
               {noun} {i + 1}
+              {meta?.(item)}
             </span>
-            <div className="flex">
-              <button type="button" className="rounded-md p-1 text-text-secondary hover:bg-panel-hover disabled:opacity-30" disabled={i === 0} onClick={() => move(i, -1)} aria-label="Subir">
+            <div className="flex shrink-0">
+              <button type="button" className="flex h-11 w-11 items-center justify-center rounded-md text-text-secondary hover:bg-panel-hover disabled:opacity-30 min-[420px]:h-8 min-[420px]:w-8" disabled={i === 0} onClick={() => move(i, -1)} aria-label="Subir">
                 <ArrowUp size={14} />
               </button>
-              <button type="button" className="rounded-md p-1 text-text-secondary hover:bg-panel-hover disabled:opacity-30" disabled={i === items.length - 1} onClick={() => move(i, 1)} aria-label="Descer">
+              <button type="button" className="flex h-11 w-11 items-center justify-center rounded-md text-text-secondary hover:bg-panel-hover disabled:opacity-30 min-[420px]:h-8 min-[420px]:w-8" disabled={i === items.length - 1} onClick={() => move(i, 1)} aria-label="Descer">
                 <ArrowDown size={14} />
               </button>
               <button
                 type="button"
-                className="rounded-md p-1 text-text-secondary hover:bg-danger/12 hover:text-danger disabled:opacity-30"
+                className="flex h-11 w-11 items-center justify-center rounded-md text-text-secondary hover:bg-danger/12 hover:text-danger disabled:opacity-30 min-[420px]:h-8 min-[420px]:w-8"
                 disabled={items.length <= min}
                 onClick={() => onChange(items.filter((it) => it.id !== item.id))}
                 aria-label={`Remover ${noun.toLowerCase()} ${i + 1}`}
@@ -103,7 +108,7 @@ function ItemList<T extends { id: string }>({ items, max, min = 1, noun, onChang
         <button
           type="button"
           onClick={() => onChange([...items, create()])}
-          className="flex h-9 items-center justify-center gap-1.5 rounded-xl border border-dashed border-border-ui text-[13px] font-semibold text-primary-strong hover:bg-primary/8"
+          className="flex h-11 items-center justify-center gap-1.5 rounded-xl border border-dashed border-border-ui text-[13px] font-semibold text-primary-strong hover:bg-primary/8"
         >
           <Plus size={15} /> Adicionar {noun.toLowerCase()}
         </button>
@@ -174,7 +179,9 @@ function SectionHeading<D extends { badge?: string; title: string; subtitle?: st
 }
 
 /** Campos de uma seção. `onChange` recebe a seção inteira atualizada. */
-export function SectionEditor({ section, onChange }: { section: LandingSection; onChange: (section: LandingSection) => void }) {
+export type ClickStats = Record<string, { last7: number; last30: number }>;
+
+export function SectionEditor({ section, onChange, clicks }: { section: LandingSection; onChange: (section: LandingSection) => void; clicks?: ClickStats }) {
   const set = <D,>(patch: Partial<D>) => onChange({ ...section, data: { ...section.data, ...patch } } as LandingSection);
 
   switch (section.type) {
@@ -314,12 +321,40 @@ export function SectionEditor({ section, onChange }: { section: LandingSection; 
       return (
         <ItemList<LinkItem>
           noun="Link"
+          meta={(item) => (
+            <>
+              <ScheduleBadge item={item} />
+              <ClickCount stats={clicks?.[item.id]} />
+            </>
+          )}
           items={section.data.items}
           max={MAX.links}
           onChange={(items) => s({ items })}
           create={() => ({ id: newId("lnk"), kind: "site", label: "Meu site", url: "https://" })}
           render={(item, update) => <LinkFields item={item} update={update} />}
         />
+      );
+    }
+    case "products": {
+      const s = set<typeof section.data>;
+      return (
+        <>
+          <Field label="Título da seção" value={section.data.title} max={120} placeholder="Produtos" onChange={(title) => s({ title: title || undefined })} />
+          <ItemList<ProductItem>
+            noun="Produto"
+            meta={(item) => (
+              <>
+                <ScheduleBadge item={item} />
+                <ClickCount stats={clicks?.[item.id]} />
+              </>
+            )}
+            items={section.data.items}
+            max={MAX.products}
+            onChange={(items) => s({ items })}
+            create={() => ({ id: newId("prd"), name: "Novo produto" })}
+            render={(item, update) => <ProductFields item={item} update={update} />}
+          />
+        </>
       );
     }
     case "footer": {
@@ -344,20 +379,92 @@ const LINK_KIND_LABELS: Record<LinkKind, string> = {
   google: "Avaliar no Google",
   site: "Site",
   link: "Outro link",
+  pix: "Pix (QR Code)",
+  youtube: "YouTube",
 };
 
 const LINK_HINTS: Partial<Record<LinkKind, string>> = {
   instagram: "https://instagram.com/seuperfil",
   tiktok: "https://tiktok.com/@seuperfil",
+  youtube: "https://youtube.com/@seucanal",
   google: "Link de \"Pedir avaliações\" do Perfil da Empresa no Google",
   site: "https://",
   link: "https://",
 };
 
+/** Número com DDD a partir do link wa.me guardado. */
+const phoneFromWa = (url?: string) => (url ?? "").replace(/^https:\/\/wa\.me\/(55)?/, "");
+const waFromPhone = (v: string) => {
+  const d = v.replace(/\D/g, "");
+  return d ? `https://wa.me/${d.length <= 11 ? `55${d}` : d}` : "";
+};
+
+/** Estado de um item agendado, mostrado no cabeçalho do cartão. */
+export function ScheduleBadge({ item }: { item: { startsAt?: string; endsAt?: string } }) {
+  const state = scheduleState(item);
+  if (state === "active") return null;
+  return (
+    <span className={`rounded-full px-2 py-0.5 text-[11px] font-semibold ${state === "scheduled" ? "bg-warning/14 text-warning-strong" : "bg-danger/12 text-danger-strong"}`}>
+      {state === "scheduled" ? "Agendado" : "Expirado"}
+    </span>
+  );
+}
+
+export function ClickCount({ stats }: { stats?: { last7: number; last30: number } }) {
+  return (
+    <span className="flex items-center gap-1 text-[11px] font-semibold tabular-nums text-text-secondary" title="Cliques únicos por dia">
+      <MousePointerClick size={12} />
+      {stats?.last7 ?? 0} em 7 dias, {stats?.last30 ?? 0} em 30
+    </span>
+  );
+}
+
+function ScheduleFields({ item, update }: { item: { startsAt?: string; endsAt?: string }; update: (patch: { startsAt?: string; endsAt?: string }) => void }) {
+  const startId = useId();
+  const endId = useId();
+  return (
+    <div className="flex flex-col gap-1.5">
+      <span className="text-[13px] font-semibold text-text-secondary">Aparece na página (opcional)</span>
+      <div className="grid grid-cols-1 gap-2 min-[420px]:grid-cols-2">
+        <label htmlFor={startId} className="flex flex-col gap-1 text-[12px] text-text-secondary">
+          A partir de
+          <input id={startId} type="datetime-local" className={`${inputClass} text-[14px]`} value={toLocalInput(item.startsAt)} onChange={(e) => update({ startsAt: fromLocalInput(e.target.value) })} />
+        </label>
+        <label htmlFor={endId} className="flex flex-col gap-1 text-[12px] text-text-secondary">
+          Até
+          <input id={endId} type="datetime-local" className={`${inputClass} text-[14px]`} value={toLocalInput(item.endsAt)} onChange={(e) => update({ endsAt: fromLocalInput(e.target.value) })} />
+        </label>
+      </div>
+      {item.startsAt && item.endsAt && Date.parse(item.endsAt) <= Date.parse(item.startsAt) && <span className="text-[12px] text-danger-strong">O fim precisa ser depois do início.</span>}
+    </div>
+  );
+}
+
+/** Valor do Pix: guarda o texto digitado (com vírgula) e entrega o número. */
+function AmountField({ value, onChange }: { value?: number; onChange: (v?: number) => void }) {
+  const [text, setText] = useState(value ? String(value).replace(".", ",") : "");
+  return (
+    <Field
+      label="Valor (opcional)"
+      value={text}
+      max={12}
+      inputMode="decimal"
+      placeholder="Deixe vazio para a pessoa digitar"
+      onChange={(v) => {
+        const clean = v.replace(/[^\d,.]/g, "");
+        setText(clean);
+        const n = Number(clean.replace(",", "."));
+        onChange(clean && Number.isFinite(n) && n > 0 ? Math.round(n * 100) / 100 : undefined);
+      }}
+    />
+  );
+}
+
 /** Um botão do link na bio. WhatsApp pede só o número e vira o link oficial wa.me. */
-function LinkFields({ item, update }: { item: LinkItem; update: (patch: Partial<LinkItem>) => void }) {
+export function LinkFields({ item, update }: { item: LinkItem; update: (patch: Partial<LinkItem>) => void }) {
   const id = useId();
-  const phone = item.kind === "whatsapp" ? (item.url ?? "").replace(/^https:\/\/wa\.me\/(55)?/, "") : "";
+  const phone = item.kind === "whatsapp" ? phoneFromWa(item.url) : "";
+  const keyOk = !item.pixKey || normalizePixKey(item.pixKey) !== "";
   return (
     <>
       <div className="flex flex-col gap-1">
@@ -366,11 +473,11 @@ function LinkFields({ item, update }: { item: LinkItem; update: (patch: Partial<
         </label>
         <select
           id={id}
-          className={`${selectClass} h-10 text-[14px]`}
+          className={`${selectClass} text-[14px]`}
           value={item.kind}
           onChange={(e) => {
             const kind = e.target.value as LinkKind;
-            update({ kind, label: LINK_KIND_LABELS[kind], url: kind === "chat" ? undefined : kind === "whatsapp" ? "" : "https://" });
+            update({ kind, label: LINK_KIND_LABELS[kind], url: kind === "chat" || kind === "pix" ? undefined : kind === "whatsapp" ? "" : "https://" });
           }}
         >
           {LINK_KINDS.map((k) => (
@@ -382,21 +489,72 @@ function LinkFields({ item, update }: { item: LinkItem; update: (patch: Partial<
       </div>
       <Field label="Texto do botão" required value={item.label} max={MAX.linkLabel} onChange={(label) => update({ label })} />
       {item.kind === "whatsapp" && (
-        <Field
-          label="WhatsApp com DDD"
-          value={phone}
-          max={20}
-          placeholder="11 91234-5678"
-          onChange={(v) => {
-            const d = v.replace(/\D/g, "");
-            update({ url: d ? `https://wa.me/${d.length <= 11 ? `55${d}` : d}` : "" });
-          }}
-        />
+        <>
+          <Field label="WhatsApp com DDD" value={phone} max={20} inputMode="tel" placeholder="11 91234-5678" onChange={(v) => update({ url: waFromPhone(v) })} />
+          <Field
+            label="Mensagem pronta (opcional)"
+            value={item.message}
+            max={MAX.message}
+            multiline
+            placeholder="Ex.: Vim pela bio e quero saber do curso"
+            onChange={(message) => update({ message: message || undefined })}
+          />
+        </>
       )}
-      {item.kind !== "chat" && item.kind !== "whatsapp" && (
-        <Field label="Endereço (https)" value={item.url} max={1000} placeholder={LINK_HINTS[item.kind]} onChange={(url) => update({ url: url.trim() })} />
+      {item.kind === "pix" && (
+        <>
+          <Field label="Chave Pix" required value={item.pixKey} max={MAX.pixKey} inputMode="text" placeholder="CPF, CNPJ, e-mail, +55... ou chave aleatória" onChange={(pixKey) => update({ pixKey: pixKey.trim() })} />
+          {!keyOk && <span className="text-[12px] text-danger-strong">Chave inválida. Use CPF, CNPJ, e-mail, telefone com +55 ou chave aleatória.</span>}
+          <Field label="Nome de quem recebe" required value={item.pixName} max={MAX.pixName} onChange={(pixName) => update({ pixName })} />
+          <Field label="Cidade" required value={item.pixCity} max={MAX.pixCity} onChange={(pixCity) => update({ pixCity })} />
+          <AmountField value={item.pixAmount} onChange={(pixAmount) => update({ pixAmount })} />
+          <p className="flex gap-2 rounded-2xl bg-warning/14 p-3 text-[12px] leading-snug text-warning-strong">
+            <TriangleAlert size={14} className="mt-px shrink-0" />O dinheiro vai direto para a sua chave, sem taxa. O Nexo não confirma o pagamento: confira no seu banco.
+          </p>
+        </>
+      )}
+      {item.kind !== "chat" && item.kind !== "whatsapp" && item.kind !== "pix" && (
+        <Field label="Endereço (https)" value={item.url} max={1000} inputMode="url" placeholder={LINK_HINTS[item.kind]} onChange={(url) => update({ url: url.trim() })} />
       )}
       {item.kind === "chat" && <p className="text-[12px] text-text-secondary">Abre o bot vinculado à página (aba Página).</p>}
+      <ScheduleFields item={item} update={update} />
+    </>
+  );
+}
+
+/** Um produto: só links de compra, nenhuma integração com loja. */
+export function ProductFields({ item, update }: { item: ProductItem; update: (patch: Partial<ProductItem>) => void }) {
+  const phone = phoneFromWa(item.whatsappUrl);
+  const bad = (url: string | undefined, hosts: string[]) => {
+    if (!url) return false;
+    try {
+      const u = new URL(url);
+      return !(u.protocol === "https:" && hosts.some((h) => u.hostname === h || u.hostname.endsWith(`.${h}`)));
+    } catch {
+      return true;
+    }
+  };
+  return (
+    <>
+      <Field label="Nome do produto" required value={item.name} max={MAX.productName} onChange={(name) => update({ name })} />
+      <Field label="Preço (texto)" value={item.price} max={MAX.productPrice} inputMode="text" placeholder="R$ 129,90" onChange={(price) => update({ price: price || undefined })} />
+      <Field label="Imagem (https)" value={item.imageUrl} max={1000} inputMode="url" placeholder="https://" onChange={(imageUrl) => update({ imageUrl: imageUrl.trim() || undefined })} />
+      <Field label="Link do Mercado Livre" value={item.mercadoLivreUrl} max={1000} inputMode="url" placeholder="https://www.mercadolivre.com.br/..." onChange={(v) => update({ mercadoLivreUrl: v.trim() || undefined })} />
+      {bad(item.mercadoLivreUrl, ["mercadolivre.com.br", "mercadolivre.com"]) && <span className="text-[12px] text-danger-strong">Use um link https de mercadolivre.com.br ou mercadolivre.com.</span>}
+      <Field label="Link da Shopee" value={item.shopeeUrl} max={1000} inputMode="url" placeholder="https://shopee.com.br/..." onChange={(v) => update({ shopeeUrl: v.trim() || undefined })} />
+      {bad(item.shopeeUrl, ["shopee.com.br"]) && <span className="text-[12px] text-danger-strong">Use um link https de shopee.com.br.</span>}
+      <Field label="WhatsApp para comprar (com DDD)" value={phone} max={20} inputMode="tel" placeholder="11 91234-5678" onChange={(v) => update({ whatsappUrl: waFromPhone(v) || undefined })} />
+      {item.whatsappUrl && (
+        <Field
+          label="Mensagem pronta (opcional)"
+          value={item.whatsappMessage}
+          max={MAX.message}
+          multiline
+          placeholder={`Deixe vazio para "Olá! Tenho interesse em ${item.name}."`}
+          onChange={(whatsappMessage) => update({ whatsappMessage: whatsappMessage || undefined })}
+        />
+      )}
+      <ScheduleFields item={item} update={update} />
     </>
   );
 }
