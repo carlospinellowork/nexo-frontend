@@ -1,5 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { CheckCircle2, Loader2, MessageSquarePlus, Plus, Save } from "lucide-react";
+import { CheckCircle2, Eye, Loader2, MessageSquarePlus, Pencil, Plus, Save } from "lucide-react";
 import { useEffect, useState } from "react";
 import { apiErrorMessage } from "../../api/instance";
 import { usePatchChatSettings } from "../../api/mutations/usePatchChatSettings";
@@ -14,6 +14,7 @@ import { Button } from "../../shared/components/ui/Button";
 import { ChatSelect } from "../../shared/components/ui/ChatSelect";
 import { EmptyState } from "../../shared/components/ui/EmptyState";
 import { PromptDialog } from "../../shared/components/ui/PromptDialog";
+import { Segmented } from "../../shared/components/ui/Segmented";
 import { toast } from "../../shared/components/ui/toast-store";
 import { useActiveChat } from "../../shared/hooks/useActiveChat";
 
@@ -27,6 +28,7 @@ function ChatBuilderPage() {
   const { mutateAsync: saveChat, isPending: isSaving } = usePatchChatSettings();
   const { activeChatId, name, draft, dirty, load, markSaved } = useChatBuilderStore();
   const [creating, setCreating] = useState(false);
+  const [pane, setPane] = useState<"edit" | "preview">("edit");
 
   // Carrega o rascunho a partir do servidor quando o chat muda (ou acaba de ser salvo).
   useEffect(() => {
@@ -103,9 +105,25 @@ function ChatBuilderPage() {
           <Loader2 size={32} className="animate-spin text-primary" />
         </div>
       ) : (
-        <div className="flex-1 flex overflow-hidden">
-          <SettingsPanel />
-          <div className="flex min-w-0 flex-1 flex-col overflow-hidden">
+        <div className="flex flex-1 flex-col overflow-hidden md:flex-row">
+          {/* Celular: uma coisa por vez (ajustes ou prévia), como no editor de páginas. */}
+          <div className="border-b border-border-ui px-3 py-2 md:hidden">
+            <Segmented
+              label="Ver"
+              fullWidth
+              size="sm"
+              value={pane}
+              onChange={setPane}
+              options={[
+                { value: "edit", label: "Editar", icon: Pencil },
+                { value: "preview", label: "Prévia", icon: Eye },
+              ]}
+            />
+          </div>
+          <div className={`${pane === "edit" ? "flex" : "hidden"} min-h-0 flex-1 md:flex md:flex-none`}>
+            <SettingsPanel />
+          </div>
+          <div className={`${pane === "preview" ? "flex" : "hidden"} min-h-0 min-w-0 flex-1 flex-col overflow-hidden md:flex`}>
             <WidgetPreview />
             <EmbedCode chatId={chat.id} />
           </div>

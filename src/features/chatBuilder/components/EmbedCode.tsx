@@ -15,7 +15,7 @@ export function EmbedCode({ chatId }: { chatId: string }) {
   };
 
   return (
-    <div className="border-t border-border-ui bg-[var(--nx-glass)] px-6 py-4 backdrop-blur-2xl">
+    <div className="border-t border-border-ui bg-[var(--nx-glass)] px-3 py-3 backdrop-blur-2xl md:px-6 md:py-4">
       <div className="mb-2 flex items-center gap-2 text-[13px] font-semibold text-text-secondary">
         <Code2 size={16} className="text-primary" />
         Instale no site: cole antes de &lt;/body&gt;

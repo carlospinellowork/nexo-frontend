@@ -45,7 +45,7 @@ export function SettingsPanel() {
   const { name, draft, setName, setSetting } = useChatBuilderStore();
 
   return (
-    <div className="flex w-[340px] shrink-0 flex-col gap-3 overflow-y-auto border-r border-border-ui p-3">
+    <div className="flex w-full shrink-0 flex-col gap-3 overflow-y-auto p-3 md:w-[340px] md:border-r md:border-border-ui">
       <Section title="Identificação">
         <label className="flex flex-col gap-2">
           <span className="text-[13px] font-semibold text-text-secondary">Nome interno do chat</span>

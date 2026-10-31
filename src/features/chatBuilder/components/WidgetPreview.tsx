@@ -11,16 +11,16 @@ export function WidgetPreview() {
   const s = useChatBuilderStore((st) => st.draft);
   const [open, setOpen] = useState(true);
   const Icon = ICONS[s.buttonIcon] ?? MessageCircle;
-  const side = s.position === "left" ? "left-8 items-start" : "right-8 items-end";
+  const side = s.position === "left" ? "left-4 items-start md:left-8" : "right-4 items-end md:right-8";
 
   return (
     <div className="relative flex-1 overflow-hidden bg-[radial-gradient(var(--nx-dots)_1.2px,transparent_1.2px)] [background-size:22px_22px]">
       <div className="pointer-events-none absolute inset-0 flex flex-col items-center justify-center gap-2 text-text-secondary/40">
-        <span className="text-[44px] font-extrabold tracking-tight">Site do seu cliente</span>
+        <span className="text-center text-[28px] font-extrabold tracking-tight md:text-[44px]">Site do seu cliente</span>
         <span className="text-[15px] font-medium">Prévia ao vivo do botão de atendimento</span>
       </div>
 
-      <div className={`absolute bottom-8 flex w-[340px] flex-col gap-4 ${side}`}>
+      <div className={`absolute bottom-4 flex w-[min(340px,calc(100%-2rem))] flex-col gap-4 md:bottom-8 ${side}`}>
         <AnimatePresence>
           {open && (
             <motion.div
