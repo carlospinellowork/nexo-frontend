@@ -30,7 +30,9 @@ export function MeshBackground({ className = "" }: { className?: string }) {
     if (!canvas || !ctx) return;
 
     // Desenha em resolução baixa (as luzes são borradas, não precisam de mais) e o CSS estica.
-    const SCALE = 0.35;
+    // Em telas de toque (celular), resolução menor e metade dos quadros: poupa bateria e não trava a rolagem.
+    const touch = window.matchMedia("(pointer: coarse)").matches;
+    const SCALE = touch ? 0.25 : 0.35;
     const resize = () => {
       canvas.width = Math.max(1, Math.round(canvas.clientWidth * SCALE));
       canvas.height = Math.max(1, Math.round(canvas.clientHeight * SCALE));
@@ -67,8 +69,9 @@ export function MeshBackground({ className = "" }: { className?: string }) {
     }
 
     let raf = 0;
+    let frame = 0;
     const loop = (ms: number) => {
-      draw(ms / 1000);
+      if (!touch || frame++ % 2 === 0) draw(ms / 1000);
       raf = requestAnimationFrame(loop);
     };
     raf = requestAnimationFrame(loop);

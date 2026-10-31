@@ -25,7 +25,7 @@ export function GoogleButton({ loading, onClick }: { loading?: boolean; onClick:
       disabled={loading}
       whileTap={loading ? undefined : { scale: 0.97 }}
       transition={{ type: "spring", stiffness: 500, damping: 30 }}
-      className="inline-flex h-12 w-full items-center justify-center gap-3 rounded-2xl border border-border-ui bg-panel text-[16px] font-semibold text-text-primary shadow-card transition-colors hover:bg-panel-hover disabled:cursor-not-allowed disabled:opacity-60"
+      className="inline-flex h-12 w-full items-center justify-center gap-2.5 rounded-xl border border-border-ui bg-panel text-[15px] font-semibold text-text-primary shadow-card transition-colors hover:bg-panel-hover disabled:cursor-not-allowed disabled:opacity-60 lg:h-11"
     >
       {loading ? <Loader2 size={18} className="animate-spin" /> : <GoogleLogo />}
       Continuar com Google

@@ -4,7 +4,8 @@ import { useThemeStore } from "../../../features/theme/theme-store";
 import { Segmented } from "./Segmented";
 
 /** Botão de alternar claro/escuro, com o ícone girando na troca. */
-export function ThemeToggleButton({ className = "" }: { className?: string }) {
+/** glass: versão de vidro, para ficar sobre o fundo vivo (topo do login no celular). */
+export function ThemeToggleButton({ className = "", glass = false }: { className?: string; glass?: boolean }) {
   const { resolved, toggle } = useThemeStore();
   const dark = resolved === "dark";
   return (
@@ -13,7 +14,7 @@ export function ThemeToggleButton({ className = "" }: { className?: string }) {
       onClick={toggle}
       aria-label={dark ? "Usar tema claro" : "Usar tema escuro"}
       title={dark ? "Tema claro" : "Tema escuro"}
-      className={`inline-flex h-11 w-11 items-center justify-center overflow-hidden rounded-2xl border border-border-ui bg-panel text-text-primary shadow-card ${className}`}
+      className={`inline-flex h-11 w-11 items-center justify-center overflow-hidden rounded-xl border ${glass ? "border-white/25 bg-white/15 text-white backdrop-blur-md" : "border-border-ui bg-panel text-text-primary shadow-card"} ${className}`}
     >
       <AnimatePresence mode="wait" initial={false}>
         <motion.span
