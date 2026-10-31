@@ -89,7 +89,7 @@ export function CreatePageDialog({ open, loading, onClose, onCreate }: CreatePag
         </p>
       )}
 
-      {layout === "page" && (
+      {layout === "page" && aiOn && (
       <Segmented
         label="Como criar"
         fullWidth

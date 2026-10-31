@@ -31,6 +31,9 @@ export function AiBar({ chatId }: { chatId: string }) {
     }
   };
 
+  // Sem IA ligada no servidor, a barra não aparece.
+  if (disabled) return null;
+
   return (
     <div id="tour-flow-ai" className="pointer-events-none absolute inset-x-0 bottom-5 z-40 flex justify-center px-[260px]">
       <div className="pointer-events-auto flex w-full max-w-[620px] flex-col items-center gap-2">

@@ -26,17 +26,16 @@ export function BlockLibrary() {
         {BLOCK_GROUPS.map((group) => (
           <div key={group} className="pt-2">
             <p className="px-2 pb-1 text-[12px] font-semibold text-text-secondary">{group}</p>
-            {ADDABLE_BLOCKS.filter((b) => b.group === group).map((b) => {
-              const disabled = Boolean(b.needsAi && ai && !ai.configured);
+            {/* Sem IA ligada no servidor, os blocos de IA nem aparecem (nada de opção desligada na frente do usuário). */}
+            {ADDABLE_BLOCKS.filter((b) => b.group === group && !(b.needsAi && ai && !ai.configured)).map((b) => {
               return (
                 <button
                   key={b.type}
-                  draggable={!disabled}
+                  draggable
                   onDragStart={(e) => onDragStart(e, b.type)}
                   onClick={() => addFromLibrary(b.type)}
-                  disabled={disabled}
-                  title={disabled ? "A IA ainda não está configurada no servidor" : b.description}
-                  className="flex w-full cursor-grab items-center gap-2.5 rounded-xl px-2 py-1.5 text-left transition-[background-color,transform] hover:bg-panel-hover active:scale-[0.97] active:cursor-grabbing disabled:cursor-not-allowed disabled:opacity-45"
+                  title={b.description}
+                  className="flex w-full cursor-grab items-center gap-2.5 rounded-xl px-2 py-1.5 text-left transition-[background-color,transform] hover:bg-panel-hover active:scale-[0.97] active:cursor-grabbing"
                 >
                   <span
                     className="flex h-8 w-8 shrink-0 items-center justify-center rounded-[10px]"

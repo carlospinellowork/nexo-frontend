@@ -308,7 +308,7 @@ function LandingBuilderPage() {
               onChange={setTab}
               options={[
                 { value: "sections", label: "Seções", icon: FileText },
-                { value: "ai", label: "IA", icon: Sparkles },
+                ...(ai?.configured ? [{ value: "ai" as const, label: "IA", icon: Sparkles }] : []),
                 { value: "page", label: "Página", icon: Settings2 },
               ]}
             />

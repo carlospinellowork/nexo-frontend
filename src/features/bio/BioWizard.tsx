@@ -248,7 +248,7 @@ export function BioWizard({ onLock, onCreated }: BioWizardProps) {
         <Label htmlFor="bio-photo">Foto, por link (opcional)</Label>
         <input id="bio-photo" className={inputClass} value={s.photoUrl} inputMode="url" autoCapitalize="none" autoCorrect="off" placeholder="https://" onChange={(e) => set({ photoUrl: e.target.value.trim() })} />
         {s.photoUrl && !isHttps(s.photoUrl) && <span className="text-[12px] text-danger-strong">O endereço da foto precisa começar com https://</span>}
-        <span className="text-[12px] text-text-secondary">O envio de arquivo chega em breve. Por enquanto, use o link de uma imagem.</span>
+        <span className="text-[12px] text-text-secondary">Cole o endereço https de uma imagem.</span>
       </div>
     </div>,
 
