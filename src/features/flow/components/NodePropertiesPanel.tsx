@@ -50,7 +50,8 @@ const VARIABLE_HINT = (
 
 type SetData = (data: Record<string, unknown>) => void;
 
-export function NodePropertiesPanel() {
+/** Edição do bloco selecionado. inSheet: dentro do painel do celular (sem moldura nem cabeçalho próprio). */
+export function NodePropertiesPanel({ inSheet = false }: { inSheet?: boolean } = {}) {
   const { nodes, selectedNodeId, setSelectedNodeId, updateNodeData, deleteNode, testOpen } = useFlowStore();
   const node = nodes.find((n) => n.id === selectedNodeId);
   if (!node) return null;
@@ -68,9 +69,9 @@ export function NodePropertiesPanel() {
       initial={{ opacity: 0, x: 16 }}
       animate={{ opacity: 1, x: 0 }}
       transition={{ type: "spring", stiffness: 400, damping: 32 }}
-      className={`absolute bottom-4 top-4 z-50 flex w-[360px] ${testOpen ? "right-[392px]" : "right-4"} flex-col overflow-hidden rounded-3xl border border-border-ui bg-panel shadow-float`}
+      className={inSheet ? "flex flex-col" : `absolute bottom-4 top-4 z-50 flex w-[360px] ${testOpen ? "right-[392px]" : "right-4"} flex-col overflow-hidden rounded-3xl border border-border-ui bg-panel shadow-float`}
     >
-      <div className="flex items-center gap-3 border-b border-border-ui px-5 py-4">
+      <div className={`${inSheet ? "hidden" : "flex"} items-center gap-3 border-b border-border-ui px-5 py-4`}>
         {def && (
           <span className="flex h-9 w-9 items-center justify-center rounded-xl" style={{ background: `color-mix(in srgb, ${def.color} 14%, transparent)`, color: def.color }}>
             <def.icon size={18} />
@@ -85,7 +86,7 @@ export function NodePropertiesPanel() {
         </button>
       </div>
 
-      <div className="flex flex-1 flex-col gap-5 overflow-y-auto p-5">
+      <div className={inSheet ? "flex flex-col gap-4" : "flex flex-1 flex-col gap-5 overflow-y-auto p-5"}>
         <Field label="Nome do bloco" hint="Só para você se organizar; o cliente não vê.">
           <input className={inputClass} value={String(node.data.label ?? "")} onChange={(e) => set({ label: e.target.value })} />
         </Field>
@@ -118,9 +119,9 @@ export function NodePropertiesPanel() {
       </div>
 
       {type !== "start" && (
-        <div className="border-t border-border-ui p-4">
+        <div className={inSheet ? "pt-4" : "border-t border-border-ui p-4"}>
           <button
-            className="flex h-10 w-full items-center justify-center gap-2 rounded-xl bg-danger/10 text-[14px] font-semibold text-danger-strong transition-colors hover:bg-danger/16"
+            className="flex h-11 w-full items-center justify-center gap-2 rounded-xl bg-danger/10 md:h-10 text-[14px] font-semibold text-danger-strong transition-colors hover:bg-danger/16"
             onClick={() => deleteNode(node.id)}
           >
             <Trash2 size={16} /> Excluir bloco

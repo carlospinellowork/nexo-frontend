@@ -12,10 +12,12 @@ interface TestPanelProps {
   settings: ChatSettings;
   /** Salva o rascunho se houver alterações; false se não conseguiu. */
   ensureSaved: () => Promise<boolean>;
+  /** Celular: ocupa a tela inteira. */
+  fullscreen?: boolean;
 }
 
 /** Teste ao vivo ao lado do editor: roda o rascunho no motor real e acende os blocos executados. */
-export function TestPanel({ chatId, settings, ensureSaved }: TestPanelProps) {
+export function TestPanel({ chatId, settings, ensureSaved, fullscreen = false }: TestPanelProps) {
   const setTestOpen = useFlowStore((s) => s.setTestOpen);
   const setHighlighted = useFlowStore((s) => s.setHighlighted);
   const dirty = useFlowStore((s) => s.dirty);
@@ -43,12 +45,16 @@ export function TestPanel({ chatId, settings, ensureSaved }: TestPanelProps) {
       initial={{ opacity: 0, x: 24 }}
       animate={{ opacity: 1, x: 0 }}
       transition={{ type: "spring", stiffness: 400, damping: 34 }}
-      className="absolute bottom-4 right-4 top-4 z-50 flex w-[360px] flex-col gap-3 rounded-3xl border border-border-ui bg-panel p-3 shadow-float"
+      className={
+        fullscreen
+          ? "fixed inset-0 z-[85] flex flex-col gap-3 bg-panel px-3 pb-[max(0.75rem,env(safe-area-inset-bottom))] pt-[max(0.75rem,env(safe-area-inset-top))]"
+          : "absolute bottom-4 right-4 top-4 z-50 flex w-[360px] flex-col gap-3 rounded-3xl border border-border-ui bg-panel p-3 shadow-float"
+      }
     >
       <div className="flex items-center gap-2 px-2 pt-1">
         <FlaskConical size={17} className="text-accent-strong" />
         <h3 className="flex-1 text-[15px] font-bold tracking-tight text-text-primary">Teste ao vivo</h3>
-        <button onClick={() => setTestOpen(false)} className="rounded-lg p-1.5 text-text-secondary hover:bg-panel-hover" aria-label="Fechar teste">
+        <button onClick={() => setTestOpen(false)} className="flex h-10 w-10 items-center justify-center rounded-lg text-text-secondary hover:bg-panel-hover" aria-label="Fechar teste">
           <X size={18} />
         </button>
       </div>

@@ -6,6 +6,7 @@ import { usePublishFlow } from "../../api/mutations/usePublishFlow";
 import { usePutFlow } from "../../api/mutations/usePutFlow";
 import { useGetFlow } from "../../api/queries/useGetFlow";
 import { withDefaults } from "../../features/chatBuilder/store/chat-builder-store";
+import { FlowList } from "../../features/flow/components/FlowList";
 import { TestPanel } from "../../features/flow/components/TestPanel";
 import { FlowCanvas } from "../../features/flow/FlowCanvas";
 import { useFlowStore } from "../../features/flow/store/flow.store";
@@ -16,6 +17,7 @@ import { ChatSelect } from "../../shared/components/ui/ChatSelect";
 import { EmptyState } from "../../shared/components/ui/EmptyState";
 import { toast } from "../../shared/components/ui/toast-store";
 import { useActiveChat } from "../../shared/hooks/useActiveChat";
+import { useIsMobile } from "../../shared/hooks/useIsMobile";
 import { HelpButton } from "../../features/tour/HelpButton";
 import { startTour } from "../../features/tour/driver-service";
 
@@ -25,18 +27,21 @@ export const Route = createFileRoute("/_app/flow-builder")({
 
 function FlowBuilderPage() {
   const navigate = useNavigate();
+  const isMobile = useIsMobile();
   const { chats, chat, chatId, setChatId, isLoading: loadingChats } = useActiveChat();
   const { dirty, load, markSaved, setHighlighted, testOpen, setTestOpen, undo, redo } = useFlowStore();
   const canUndo = useFlowStore((s) => s.past.length > 0);
   const canRedo = useFlowStore((s) => s.future.length > 0);
   const { data: remoteFlow, isLoading: loadingFlow } = useGetFlow(chatId);
 
+  // O tour aponta para o canvas, que só existe no computador.
   useEffect(() => {
+    if (isMobile) return;
     const timer = setTimeout(() => {
       startTour("flows");
     }, 700);
     return () => clearTimeout(timer);
-  }, []);
+  }, [isMobile]);
   const { mutateAsync: saveFlow, isPending: isSaving } = usePutFlow();
   const { mutateAsync: publishFlow, isPending: isPublishing } = usePublishFlow();
 
@@ -151,7 +156,15 @@ function FlowBuilderPage() {
             <Loader2 size={32} className="animate-spin text-primary" />
           </div>
         )}
-        <FlowCanvas chatId={chatId}>{testOpen && chatId && <TestPanel key={chatId} chatId={chatId} settings={withDefaults(chat?.settings)} ensureSaved={ensureSavedQuietly} />}</FlowCanvas>
+        {/* Celular: a conversa como lista (o canvas fica para o computador); o teste abre em tela cheia. */}
+        {isMobile ? (
+          <>
+            <FlowList />
+            {testOpen && chatId && <TestPanel key={chatId} chatId={chatId} settings={withDefaults(chat?.settings)} ensureSaved={ensureSavedQuietly} fullscreen />}
+          </>
+        ) : (
+          <FlowCanvas chatId={chatId}>{testOpen && chatId && <TestPanel key={chatId} chatId={chatId} settings={withDefaults(chat?.settings)} ensureSaved={ensureSavedQuietly} />}</FlowCanvas>
+        )}
       </div>
     </div>
   );
