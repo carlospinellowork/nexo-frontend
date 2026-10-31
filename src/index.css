@@ -433,3 +433,50 @@ h1, h2, h3, .font-display {
 /* Dentro do celular de prévia a rolagem é como no aparelho: sem barra visível. */
 .nx-phone-scroll { scrollbar-width: none; }
 .nx-phone-scroll::-webkit-scrollbar { display: none; }
+
+/*
+ * ---------- Selo holográfico do Nexo ----------
+ * Perolado iridescente (sem fundo roxo): duas camadas de cor girando em sentidos opostos, linhas finas de
+ * difração, uma faixa de luz que atravessa e o reflexo que segue o ponteiro (--nx-mx/--nx-my, vindos do
+ * componente NexoSeal). O N do Nexo fica em roxo com o amarelo brilhando por trás.
+ */
+@property --nx-holo-ang {
+  syntax: "<angle>";
+  inherits: false;
+  initial-value: 0deg;
+}
+.nx-holo {
+  --nx-mx: 50%;
+  --nx-my: 30%;
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+  color: #241a52;
+  background:
+    radial-gradient(circle at var(--nx-mx) var(--nx-my), rgb(255 255 255 / 0.9), transparent 34%),
+    repeating-linear-gradient(115deg, rgb(255 255 255 / 0) 0 5px, rgb(255 255 255 / 0.45) 5px 6px, rgb(255 255 255 / 0) 6px 11px),
+    linear-gradient(calc(var(--nx-holo-ang) * -1 + 135deg), rgb(255 120 220 / 0.55), rgb(120 230 255 / 0.5) 30%, rgb(255 230 120 / 0.55) 55%, rgb(150 255 190 / 0.45) 75%, rgb(190 150 255 / 0.55)),
+    conic-gradient(from var(--nx-holo-ang) at 50% 50%, #cdbcff, #9fe6ff, #ffb8e8, #ffe58f, #a8f5c6, #b9a3ff, #cdbcff);
+  animation: nx-holo-spin 7s linear infinite;
+}
+.nx-holo::before {
+  content: "";
+  position: absolute;
+  inset: -40%;
+  z-index: -1;
+  pointer-events: none;
+  background: linear-gradient(110deg, transparent 40%, rgb(255 255 255 / 0.75) 48%, rgb(255 255 255 / 0) 56%);
+  mix-blend-mode: soft-light;
+  animation: nx-holo-sweep 3.6s ease-in-out infinite;
+}
+@keyframes nx-holo-spin { to { --nx-holo-ang: 360deg; } }
+@keyframes nx-holo-sweep { 0%, 15% { transform: translateX(-45%); } 60%, 100% { transform: translateX(45%); } }
+
+/* O N do Nexo: traço roxo por cima do brilho amarelo. */
+.nx-nmark path { fill: none; stroke-linecap: round; stroke-linejoin: round; }
+.nx-nmark .nx-n-glow { stroke: #ffc400; }
+.nx-nmark .nx-n-ink { stroke: #6d4aff; }
+
+@media (prefers-reduced-motion: reduce) {
+  .nx-holo, .nx-holo::before { animation: none; }
+}

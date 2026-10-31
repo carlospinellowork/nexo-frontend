@@ -1,7 +1,7 @@
 import { CheckCircle2, ChevronDown, Globe, Instagram, Link2, type LucideIcon, MessageCircle, Music2, Phone, QrCode, Search, ShoppingBag, Sparkles, Star, X, Youtube } from "lucide-react";
 import { AnimatePresence, motion, useReducedMotion } from "motion/react";
 import { useId, useRef, useState } from "react";
-import { LogoMark } from "../../../shared/components/ui/Logo";
+import { SealPill } from "../../../shared/components/ui/NexoSeal";
 import type { HeroData, LandingPageSettings, LandingSection, LandingTheme, LinkItem, LinkKind, ProductItem } from "../contract";
 import { landingIcon } from "../icons";
 import { fold } from "../schedule";
@@ -564,17 +564,7 @@ function BioRenderer({ title, theme, sections, settings, slug, canAsk, onChat, o
         <div className="mt-auto flex flex-col items-center gap-2 pt-12">
           {footer?.companyName && <span className={`text-[12px] font-semibold ${t.muted}`}>{footer.companyName}</span>}
           {showBadge && (
-            <a
-              href={`${SITE_URL}?ref=${encodeURIComponent(slug ?? "")}`}
-              target="_blank"
-              rel="noopener"
-              className={`group inline-flex min-h-11 items-center gap-1.5 rounded-full px-3 text-[12px] opacity-70 transition-opacity hover:opacity-100 focus-visible:opacity-100 ${t.muted}`}
-            >
-              <span className="transition-transform duration-200 group-hover:-rotate-6 group-hover:scale-110 motion-reduce:transition-none">
-                <LogoMark size={16} />
-              </span>
-              feito com Nexo
-            </a>
+            <SealPill href={`${SITE_URL}?ref=${encodeURIComponent(slug ?? "")}`} className="my-2" />
           )}
         </div>
       </div>

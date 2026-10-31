@@ -98,4 +98,7 @@ src/features/auth/         LoginHero e GoogleButton (aparece só se GET /auth-pr
   Não desenhe celular à mão.
 - **Barra de rolagem**: personalizada no painel inteiro (`index.css`, tokens `--nx-scroll`). Dentro do `PhoneFrame` ela
   some, como no aparelho.
+- **Selo do Nexo** (`ui/NexoSeal.tsx`): `SealRosette` (logo; o `LogoMark` usa ela), `SealPill` ("feito com Nexo" no
+  rodapé das bios), `SealStamp` ("verificado pelo Nexo"). CSS holográfico em `index.css` (`.nx-holo`). O site
+  (`nexo-site/src/components/NexoSeal.tsx`) tem uma cópia: mude os dois juntos.
 - **Fundo vivo** (`features/auth/components/MeshBackground.tsx`): luzes da marca num canvas com grão; usado no login.
