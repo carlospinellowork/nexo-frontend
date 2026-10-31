@@ -4,6 +4,7 @@ import { type FormEvent, useEffect, useRef, useState } from "react";
 import type { OutboundMessage } from "../../../api/mutations/useSimulator";
 import type { ChatSettings } from "../../chatBuilder/store/chat-builder-store";
 import type { ChatLine } from "../hooks/useSimulatorSession";
+import { PhoneFrame } from "../../../shared/components/ui/PhoneFrame";
 
 interface SimulationChatProps {
   lines: ChatLine[];
@@ -130,9 +131,9 @@ export function SimulationChat({ lines, settings, canSend, busy, onSend, onResta
   };
 
   const screen = (
-    <div className={`flex min-h-0 flex-1 flex-col overflow-hidden bg-[#F7F8FA] ${compact ? "rounded-[22px]" : "rounded-[38px]"}`}>
+    <div className={`flex min-h-0 flex-1 flex-col overflow-hidden bg-[#F7F8FA] ${compact ? "rounded-[22px]" : ""}`}>
       <div
-        className={`flex items-center gap-3 px-5 pb-3 ${compact ? "pt-3" : "pt-5"}`}
+        className={`flex items-center gap-3 px-5 pb-3 ${compact ? "pt-3" : "pt-12 md:pt-14"}`}
         style={{ backgroundColor: settings.headerBackgroundColor, color: settings.headerTextColor }}
       >
         <span className="flex h-9 w-9 items-center justify-center rounded-full bg-white/25 text-[13px] font-bold">{settings.botName.slice(0, 2).toUpperCase()}</span>
@@ -214,5 +215,9 @@ export function SimulationChat({ lines, settings, canSend, busy, onSend, onResta
   );
 
   if (compact) return <div className="flex h-full min-h-0 flex-col">{screen}</div>;
-  return <div className="mx-auto flex h-full max-h-[760px] w-full max-w-[400px] flex-col rounded-[48px] bg-[#0B1220] p-3 shadow-[0_30px_80px_rgb(11_18_32/0.35)]">{screen}</div>;
+  return (
+    <PhoneFrame scroll={false} statusTone="light" label="Conversa de teste no celular">
+      {screen}
+    </PhoneFrame>
+  );
 }

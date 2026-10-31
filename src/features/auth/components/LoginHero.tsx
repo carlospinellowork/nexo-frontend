@@ -1,7 +1,8 @@
 import { CalendarCheck, Globe, type LucideIcon, MessageCircle, Sparkles, UserPlus } from "lucide-react";
-import { AnimatePresence, motion, useMotionValue, useReducedMotion, useSpring, useTransform } from "motion/react";
-import { type MouseEvent, useEffect, useState } from "react";
+import { AnimatePresence, motion, useReducedMotion } from "motion/react";
+import { useEffect, useState } from "react";
 import { Logo } from "../../../shared/components/ui/Logo";
+import { MeshBackground } from "./MeshBackground";
 
 interface LiveEvent {
   icon: LucideIcon;
@@ -38,48 +39,12 @@ export function LoginHero() {
     return { ...EVENTS[index], key: `${index}-${Math.floor((start + i) / EVENTS.length)}` };
   });
 
-  // Parallax suave das luzes acompanhando o mouse.
-  const mx = useMotionValue(0);
-  const my = useMotionValue(0);
-  const sx = useSpring(mx, { stiffness: 40, damping: 20 });
-  const sy = useSpring(my, { stiffness: 40, damping: 20 });
-  const orbAx = useTransform(sx, (v) => v * 60);
-  const orbAy = useTransform(sy, (v) => v * 60);
-  const orbBx = useTransform(sx, (v) => v * -80);
-  const orbBy = useTransform(sy, (v) => v * -80);
-
-  const onMove = (e: MouseEvent<HTMLElement>) => {
-    if (reduce) return;
-    const rect = e.currentTarget.getBoundingClientRect();
-    mx.set((e.clientX - rect.left) / rect.width - 0.5);
-    my.set((e.clientY - rect.top) / rect.height - 0.5);
-  };
-
-  const loop = (duration: number) => (reduce ? undefined : { duration, repeat: Infinity, ease: "easeInOut" as const });
-
   return (
-    <section
-      onMouseMove={onMove}
-      aria-label="Apresentação do Nexo"
-      className="relative hidden flex-[1.15] flex-col justify-between overflow-hidden bg-[#EEF2FF] p-14 lg:flex dark:bg-[#0B0F24]"
-    >
-      <motion.div style={{ x: orbAx, y: orbAy }} className="pointer-events-none absolute -left-32 -top-36">
-        <motion.div
-          animate={reduce ? undefined : { x: [0, 80, 0], y: [0, 60, 0], scale: [1, 1.15, 1] }}
-          transition={loop(16)}
-          className="h-[560px] w-[560px] rounded-full bg-[#8B6CFF] opacity-50 blur-[90px] dark:bg-[#5B3FD1]"
-        />
-      </motion.div>
-      <motion.div style={{ x: orbBx, y: orbBy }} className="pointer-events-none absolute -bottom-40 -right-40">
-        <motion.div
-          animate={reduce ? undefined : { x: [0, -70, 0], y: [0, -50, 0], scale: [1.1, 0.95, 1.1] }}
-          transition={loop(19)}
-          className="h-[540px] w-[540px] rounded-full bg-[#FFC400] opacity-40 blur-[90px] dark:bg-[#E0A800]"
-        />
-      </motion.div>
+    <section aria-label="Apresentação do Nexo" className="relative hidden flex-[1.15] flex-col justify-between overflow-hidden p-12 text-white lg:flex">
+      <MeshBackground />
 
       <motion.div initial={{ opacity: 0, y: -10 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5 }} className="relative">
-        <Logo size={44} />
+        <Logo size={40} tone="light" />
       </motion.div>
 
       <div className="relative flex h-[300px] flex-col gap-3" aria-live="off">
@@ -93,27 +58,27 @@ export function LoginHero() {
               exit={{ opacity: 0, y: 24, scale: 0.9, transition: { duration: 0.25 } }}
               transition={{ type: "spring", stiffness: 260, damping: 26 }}
               style={{ marginLeft: i * 28 }}
-              className="flex w-[340px] items-center gap-3.5 rounded-[22px] border border-white/80 bg-white/70 p-4 shadow-[0_20px_50px_rgb(11_18_32/0.12)] backdrop-blur-xl dark:border-white/10 dark:bg-white/8"
+              className="flex w-[340px] items-center gap-3 rounded-2xl border border-white/20 bg-white/10 p-3 shadow-[0_20px_50px_rgb(8_4_30/0.35)] backdrop-blur-xl backdrop-saturate-150"
             >
               <span
-                className={`flex h-11 w-11 shrink-0 items-center justify-center rounded-[14px] ${
+                className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-xl ${
                   ev.tone === "primary" ? "bg-[#6D4AFF] text-white" : "bg-[#FFC400] text-[#1A1400]"
                 }`}
               >
                 <ev.icon size={20} />
               </span>
               <span className="flex flex-col">
-                <span className="text-[15px] font-bold text-[#0B1220] dark:text-white">{ev.title}</span>
-                <span className="text-[13px] text-[#3B4558] dark:text-[#C9CFDA]">{ev.detail}</span>
+                <span className="text-[14px] font-bold text-white">{ev.title}</span>
+                <span className="text-[12.5px] text-white/75">{ev.detail}</span>
               </span>
-              <span className="ml-auto text-[12px] font-medium text-[#3B4558]/70 dark:text-white/50">agora</span>
+              <span className="ml-auto text-[11.5px] font-medium text-white/55">agora</span>
             </motion.div>
           ))}
         </AnimatePresence>
       </div>
 
       <div className="relative flex max-w-xl flex-col gap-4">
-        <h1 className="text-[52px] font-extrabold leading-[1.05] tracking-[-0.03em] text-[#0B1220] dark:text-white">
+        <h1 className="text-[50px] font-extrabold leading-[1.04] tracking-[-0.03em] text-white">
           {HEADLINE.map((word, i) => (
             <motion.span
               key={word + i}
@@ -130,7 +95,7 @@ export function LoginHero() {
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ delay: 0.8, duration: 0.6 }}
-          className="text-[18px] leading-relaxed text-[#3B4558] dark:text-[#C9CFDA]"
+          className="text-[17px] leading-relaxed text-white/80"
         >
           Bots com IA no WhatsApp e no Instagram, páginas que vendem e todos os seus contatos juntos.
         </motion.p>

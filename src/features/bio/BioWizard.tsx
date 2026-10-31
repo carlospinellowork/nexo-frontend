@@ -4,11 +4,12 @@ import { useState } from "react";
 import { apiErrorMessage } from "../../api/instance";
 import { useCreateBio } from "../../api/mutations/useBioMutations";
 import { Button } from "../../shared/components/ui/Button";
+import { PhoneFrame } from "../../shared/components/ui/PhoneFrame";
 import { inputClass, textareaClass } from "../../shared/components/ui/styles";
 import { toast } from "../../shared/components/ui/toast-store";
 import { LandingRenderer } from "../landing/components/LandingRenderer";
 import { ThemePicker } from "../landing/components/ThemePicker";
-import { type LandingPageRecord, type LandingSection, type LandingTheme, type LinkItem, type ProductItem } from "../landing/contract";
+import { type LandingPageRecord, type LandingSection, type LandingTheme, type LinkItem, type ProductItem, themeBg, themeIsDark } from "../landing/contract";
 import { normalizePixKey } from "../landing/pix";
 import { parseLinks } from "./parseLinks";
 import { AUDIENCE_PRESETS, BIO_AUDIENCES, type BioAudience } from "./presets";
@@ -426,11 +427,9 @@ export function BioWizard({ onLock, onCreated }: BioWizardProps) {
     <div key="theme" className="flex flex-col gap-4">
       <h1 className="text-[26px] font-extrabold leading-tight tracking-tight text-text-primary">Escolha o visual</h1>
       <ThemePicker value={s.theme} onChange={(theme) => set({ theme })} columns={1} />
-      <div className="mx-auto h-[420px] w-full max-w-[300px] overflow-hidden rounded-[32px] border-[6px] border-[#0B1220] bg-white shadow-float" aria-label="Prévia da bio">
-        <div className="pointer-events-none h-full overflow-hidden">
-          <LandingRenderer title={s.name || "Sua bio"} theme={s.theme} sections={previewSections(s)} settings={{ showChatWidget: true, fontHeading: "inter", layout: "bio", showBadge: true }} onChat={() => undefined} />
-        </div>
-      </div>
+      <PhoneFrame size="sm" inert statusTone={themeIsDark(s.theme) ? "light" : "dark"} statusBg={themeBg(s.theme)} label="Prévia da bio">
+        <LandingRenderer title={s.name || "Sua bio"} theme={s.theme} sections={previewSections(s)} settings={{ showChatWidget: true, fontHeading: "inter", layout: "bio", showBadge: true }} onChat={() => undefined} />
+      </PhoneFrame>
       <p className="text-[13px] leading-snug text-text-secondary">Ao publicar, a sua bio e o bot vão ao ar na hora. Dá para mudar tudo depois.</p>
     </div>,
   ];

@@ -116,7 +116,7 @@ function PageRenderer({ title, theme, sections, settings, onChat }: LandingRende
   const hasServices = visible.some((s) => s.type === "services");
 
   return (
-    <div ref={rootRef} className={`@container min-h-full w-full ${t.page}`}>
+    <div ref={rootRef} className={`nx-landing @container min-h-full w-full ${t.page}`}>
       <header className={`sticky top-0 z-30 border-b backdrop-blur-lg ${t.header}`}>
         <div className="mx-auto flex max-w-6xl items-center justify-between gap-4 px-5 py-3.5 @2xl:px-6">
           <span className={`truncate text-lg font-bold tracking-tight ${heading}`}>{title}</span>
@@ -481,7 +481,7 @@ function BioRenderer({ title, theme, sections, settings, slug, canAsk, onChat, o
   const ring = (id: string) => (onEditSelect ? `rounded-2xl transition-shadow ${editSelectedId === id ? "ring-2 ring-[#FFC400]" : "hover:ring-2 hover:ring-white/30"}` : "");
 
   return (
-    <div className={`@container min-h-full w-full ${t.page}`}>
+    <div className={`nx-landing @container min-h-full w-full ${t.page}`}>
       <div className="mx-auto flex min-h-full max-w-[460px] flex-col items-center px-4 pb-8 pt-12 text-center">
         <div className={`flex w-full flex-col items-center ${ring("profile")}`} {...pick({ type: "profile" })}>
         <motion.span

@@ -7,12 +7,13 @@ import { type UpdateLandingPagePayload, useUpdateLandingPage } from "../../api/m
 import { useGetLandingClicks } from "../../api/queries/useGetLandingClicks";
 import { Badge } from "../../shared/components/ui/Badge";
 import { Button } from "../../shared/components/ui/Button";
+import { PhoneFrame } from "../../shared/components/ui/PhoneFrame";
 import { Segmented } from "../../shared/components/ui/Segmented";
 import { toast } from "../../shared/components/ui/toast-store";
 import { type BioTarget, LandingRenderer } from "../landing/components/LandingRenderer";
 import { ClickCount, Field, LinkFields, ProductFields, ScheduleBadge } from "../landing/components/SectionEditor";
 import { ThemePicker } from "../landing/components/ThemePicker";
-import { type LandingPageRecord, type LandingPageSettings, type LandingSection, type LandingTheme, type LinkItem, type LinkKind, MAX, type ProductItem } from "../landing/contract";
+import { type LandingPageRecord, type LandingPageSettings, type LandingSection, type LandingTheme, type LinkItem, type LinkKind, MAX, type ProductItem, themeBg, themeIsDark } from "../landing/contract";
 import { BioBotTab } from "./BioBotTab";
 import { BioSheet } from "./BioSheet";
 import { BioShare } from "./BioShare";
@@ -348,8 +349,7 @@ export function BioEditor({ page }: { page: LandingPageRecord }) {
         </aside>
 
         <div className={`${pane === "preview" ? "flex" : "hidden"} min-w-0 flex-1 items-center justify-center bg-bg-start p-3 md:flex md:p-6`}>
-          <div className="relative h-full max-h-[780px] w-full max-w-[390px] overflow-hidden rounded-[32px] border-[6px] border-[#0B1220] bg-white shadow-float md:rounded-[44px] md:border-[10px]">
-            <div className="h-full overflow-y-auto">
+          <PhoneFrame statusTone={themeIsDark(draft.theme) ? "light" : "dark"} statusBg={themeBg(draft.theme)} label="Prévia da bio">
               <LandingRenderer
                 title={draft.title}
                 theme={draft.theme}
@@ -362,8 +362,7 @@ export function BioEditor({ page }: { page: LandingPageRecord }) {
                 onEditSelect={setSelection}
                 editSelectedId={selectedId}
               />
-            </div>
-          </div>
+          </PhoneFrame>
         </div>
       </div>
 

@@ -4,6 +4,7 @@ import { AnimatePresence, motion, useAnimationControls } from "motion/react";
 import { type FormEvent, useEffect, useState } from "react";
 import { useGetAuthProviders } from "../api/queries/useGetAuthProviders";
 import { GoogleButton } from "../features/auth/components/GoogleButton";
+import { MeshBackground } from "../features/auth/components/MeshBackground";
 import { LoginHero } from "../features/auth/components/LoginHero";
 import { authClient } from "../lib/auth-client";
 import { Button } from "../shared/components/ui/Button";
@@ -30,11 +31,11 @@ type Mode = "signin" | "signup";
 
 function IconInput({ id, label, icon: Icon, ...props }: React.InputHTMLAttributes<HTMLInputElement> & { id: string; label: string; icon: typeof Mail }) {
   return (
-    <label htmlFor={id} className="flex flex-col gap-2">
+    <label htmlFor={id} className="flex flex-col gap-1.5">
       <span className="text-[13px] font-semibold text-text-secondary">{label}</span>
-      <span className="group flex h-[52px] items-center gap-3 rounded-2xl border border-border-ui bg-panel-2 px-4 text-text-secondary transition-[border-color,box-shadow] focus-within:border-primary focus-within:ring-4 focus-within:ring-primary/15">
-        <Icon size={18} className="transition-colors group-focus-within:text-primary" />
-        <input id={id} className="h-full flex-1 bg-transparent text-[16px] text-text-primary outline-none placeholder:text-text-secondary/60" {...props} />
+      <span className="group flex h-12 items-center gap-2.5 rounded-xl border border-border-ui bg-panel-2 px-3.5 text-text-secondary transition-[border-color,box-shadow] focus-within:border-primary focus-within:ring-[3px] focus-within:ring-primary/15 lg:h-11">
+        <Icon size={18} className="shrink-0 transition-colors group-focus-within:text-primary" />
+        <input id={id} className="h-full min-w-0 flex-1 bg-transparent text-[16px] text-text-primary outline-none placeholder:text-text-secondary/60 lg:text-[15px]" {...props} />
       </span>
     </label>
   );
@@ -112,11 +113,13 @@ function LoginPage() {
   const signup = mode === "signup";
 
   return (
-    <div className="flex h-screen w-full overflow-hidden bg-panel">
+    <div className="flex h-dvh w-full overflow-hidden bg-panel">
       <LoginHero />
 
-      <section className="relative flex flex-1 items-center justify-center p-8">
-        <ThemeToggleButton className="absolute right-8 top-8" />
+      <section className="relative flex flex-1 items-center justify-center overflow-y-auto p-4 sm:p-8">
+        {/* Celular e tablet: o fundo vivo fica atrás do formulário, que vira um cartão. */}
+        <MeshBackground className="lg:hidden" />
+        <ThemeToggleButton className="absolute right-4 top-4 z-10 sm:right-8 sm:top-8" />
 
         <motion.form
           onSubmit={handleSubmit}
@@ -124,10 +127,10 @@ function LoginPage() {
           initial={{ opacity: 0, y: 24 }}
           whileInView={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6, ease: [0.2, 0.8, 0.2, 1] }}
-          className="flex w-full max-w-[400px] flex-col gap-6"
+          className="relative flex w-full max-w-[400px] flex-col gap-5 rounded-2xl border border-border-ui bg-panel/90 p-5 shadow-float backdrop-blur-xl sm:p-6 lg:rounded-none lg:border-0 lg:bg-transparent lg:p-0 lg:shadow-none lg:backdrop-blur-none"
         >
           <div className="lg:hidden">
-            <LogoMark size={48} />
+            <LogoMark size={40} />
           </div>
 
           <div className="flex flex-col gap-2">
@@ -138,12 +141,12 @@ function LoginPage() {
                 animate={{ opacity: 1, y: 0 }}
                 exit={{ opacity: 0, y: -8 }}
                 transition={{ duration: 0.2 }}
-                className="text-[34px] font-extrabold tracking-[-0.02em] text-text-primary"
+                className="text-[28px] font-extrabold tracking-[-0.02em] text-text-primary sm:text-[32px]"
               >
                 {signup ? "Crie sua conta" : "Bem-vindo de volta"}
               </motion.h2>
             </AnimatePresence>
-            <p className="text-[16px] text-text-secondary">
+            <p className="text-[15px] text-text-secondary">
               {signup ? "Grátis para começar. Sem cartão de crédito." : "Entre para continuar de onde parou."}
             </p>
           </div>
@@ -209,7 +212,7 @@ function LoginPage() {
                 initial={{ opacity: 0, y: -6 }}
                 animate={{ opacity: 1, y: 0 }}
                 exit={{ opacity: 0 }}
-                className="rounded-2xl bg-danger/12 px-4 py-3 text-[14px] font-medium text-danger-strong"
+                className="rounded-xl bg-danger/12 px-3 py-2.5 text-[14px] font-medium text-danger-strong"
               >
                 {error}
               </motion.p>

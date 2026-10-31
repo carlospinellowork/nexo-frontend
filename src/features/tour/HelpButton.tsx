@@ -156,15 +156,15 @@ export function HelpButton({ tourKey, screenTitle }: HelpButtonProps) {
       {/* Modal Completo de Guias e Dicas */}
       <AnimatePresence>
         {guideModalOpen && (
-          <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4 backdrop-blur-sm">
+          <div className="fixed inset-0 z-[80] flex items-end justify-center bg-black/40 backdrop-blur-[3px] md:items-center md:p-6" onMouseDown={(e) => e.target === e.currentTarget && setGuideModalOpen(false)}>
             <motion.div
               initial={{ opacity: 0, scale: 0.95, y: 12 }}
               animate={{ opacity: 1, scale: 1, y: 0 }}
               exit={{ opacity: 0, scale: 0.95, y: 12 }}
-              className="flex h-[560px] w-full max-w-3xl overflow-hidden rounded-3xl border border-border-ui bg-panel shadow-float"
+              className="flex max-h-[90dvh] w-full max-w-3xl flex-col overflow-hidden rounded-t-2xl border border-border-ui bg-panel shadow-float md:max-h-[min(640px,86dvh)] md:flex-row md:rounded-2xl"
             >
               {/* Lateral com lista de tópicos */}
-              <div className="w-1/3 border-r border-border-ui bg-panel-2/50 p-4 flex flex-col">
+              <div className="flex max-h-[38dvh] shrink-0 flex-col border-b border-border-ui bg-panel-2/50 p-3 md:max-h-none md:w-1/3 md:border-b-0 md:border-r">
                 <div className="flex items-center gap-2 px-2 pb-4 border-b border-border-ui">
                   <Lightbulb size={18} className="text-warning" />
                   <span className="font-bold text-sm text-text-primary">
@@ -211,7 +211,7 @@ export function HelpButton({ tourKey, screenTitle }: HelpButtonProps) {
               </div>
 
               {/* Conteúdo do Tópico Selecionado */}
-              <div className="flex-1 p-6 flex flex-col justify-between overflow-y-auto">
+              <div className="flex min-h-0 flex-1 flex-col justify-between overflow-y-auto p-4 md:p-5">
                 <div>
                   <div className="flex items-start justify-between">
                     <div>

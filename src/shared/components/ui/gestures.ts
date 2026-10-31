@@ -1,0 +1,76 @@
+import {
+  ArrowRight,
+  Bell,
+  BellRing,
+  Bot,
+  ChartLine,
+  Check,
+  ChevronRight,
+  CircleCheck,
+  Copy,
+  Download,
+  ExternalLink,
+  GitGraph,
+  Globe,
+  House,
+  Link2,
+  type LucideIcon,
+  MessageCircle,
+  Paintbrush,
+  Play,
+  Plus,
+  Printer,
+  QrCode,
+  RefreshCw,
+  Rocket,
+  Send,
+  Share2,
+  Sparkles,
+  Trash2,
+  Upload,
+  Users,
+  Wand2,
+} from "lucide-react";
+
+/**
+ * Gesto de cada ícone no hover (o CSS está em index.css, seção "Ícones animados"):
+ * ring = sino tocando, pop = cresce e volta, nudge = empurra para o lado, twinkle = brilha,
+ * spin = meia-volta, lift = sobe e desce, scan = "lido" pela câmera, tilt = balança.
+ */
+export type Gesture = "ring" | "pop" | "nudge" | "twinkle" | "spin" | "lift" | "scan" | "tilt";
+
+const GESTURES = new Map<LucideIcon, Gesture>([
+  [Bell, "ring"],
+  [BellRing, "ring"],
+  [Sparkles, "twinkle"],
+  [Wand2, "twinkle"],
+  [Bot, "pop"],
+  [ArrowRight, "nudge"],
+  [ChevronRight, "nudge"],
+  [ExternalLink, "nudge"],
+  [Send, "nudge"],
+  [Plus, "spin"],
+  [RefreshCw, "spin"],
+  [Check, "pop"],
+  [CircleCheck, "pop"],
+  [Copy, "pop"],
+  [MessageCircle, "pop"],
+  [Download, "lift"],
+  [Upload, "lift"],
+  [Share2, "lift"],
+  [Rocket, "lift"],
+  [Printer, "lift"],
+  [QrCode, "scan"],
+  [Trash2, "tilt"],
+  [Paintbrush, "tilt"],
+  [House, "pop"],
+  [Link2, "tilt"],
+  [Globe, "spin"],
+  [GitGraph, "pop"],
+  [Play, "nudge"],
+  [Users, "pop"],
+  [ChartLine, "lift"],
+]);
+
+/** Gesto padrão do ícone; ícones sem gesto definido fazem o "pop". */
+export const gestureFor = (icon: LucideIcon): Gesture => GESTURES.get(icon) ?? "pop";

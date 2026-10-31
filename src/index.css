@@ -1,4 +1,7 @@
 @import "tailwindcss";
+/* Fontes do Nexo: Onest no texto, Bricolage Grotesque em títulos e números. A Inter fica só para as páginas dos clientes. */
+@import "@fontsource-variable/onest";
+@import "@fontsource-variable/bricolage-grotesque";
 @import "@fontsource-variable/inter";
 
 /* Tema escuro: classe .dark no <html> (ver features/theme). */
@@ -41,6 +44,9 @@
   --nx-lagoon: #0891b2;
   --nx-lagoon-strong: #0e6a85;
   /* Brilho do fundo da área logada (roxo e amarelo da marca). */
+  /* Barra de rolagem: polegar roxo-acinzentado, trilho invisível. */
+  --nx-scroll: rgb(74 64 120 / 0.28);
+  --nx-scroll-hover: rgb(109 74 255 / 0.55);
   --nx-glow-1: rgb(109 74 255 / 0.10);
   --nx-glow-2: rgb(255 196 0 / 0.10);
   color-scheme: light;
@@ -77,13 +83,16 @@
   --nx-rose-strong: #ff9cc3;
   --nx-lagoon: #22c3e6;
   --nx-lagoon-strong: #8ee6f8;
+  --nx-scroll: rgb(185 166 255 / 0.22);
+  --nx-scroll-hover: rgb(185 166 255 / 0.5);
   --nx-glow-1: rgb(112 80 255 / 0.20);
   --nx-glow-2: rgb(255 210 51 / 0.07);
   color-scheme: dark;
 }
 
 @theme inline {
-  --font-sans: "Inter Variable", -apple-system, "SF Pro Text", system-ui, sans-serif;
+  --font-sans: "Onest Variable", -apple-system, "SF Pro Text", system-ui, sans-serif;
+  --font-inter: "Inter Variable", -apple-system, "SF Pro Text", system-ui, sans-serif;
 
   --color-bg-start: var(--nx-bg);
   --color-bg-end: var(--nx-bg);
@@ -117,7 +126,20 @@
 
   --shadow-card: var(--nx-shadow);
   --shadow-float: var(--nx-shadow-lg);
-  --radius-md: 12px;
+
+  /* Fonte de títulos e números (a do texto é --font-sans). Trocar a família do produto = trocar aqui. */
+  --font-display: "Bricolage Grotesque Variable", "Onest Variable", -apple-system, "SF Pro Display", system-ui, sans-serif;
+
+  /*
+   * Cantos do Nexo: mais justos que o padrão do Tailwind (o "arredondado em tudo" é o que dá cara de
+   * template). Redefinidos aqui para valer em todas as telas sem trocar classe por classe.
+   * Escala: md 8 · lg 10 · xl 12 · 2xl 14 · 3xl 16.
+   */
+  --radius-md: 8px;
+  --radius-lg: 10px;
+  --radius-xl: 12px;
+  --radius-2xl: 14px;
+  --radius-3xl: 16px;
 }
 
 html,
@@ -264,3 +286,150 @@ body {
     print-color-adjust: exact;
   }
 }
+
+
+/* Títulos e números usam a fonte de display. */
+h1, h2, h3, .font-display {
+  font-family: var(--font-display);
+}
+
+/*
+ * Páginas e bios dos clientes (LandingRenderer) continuam na Inter: a fonte do painel não muda a cara
+ * da página de ninguém. O título "clássico" (font-serif) segue valendo por cima disto.
+ */
+.nx-landing,
+.nx-landing :where(h1, h2, h3, .font-display) {
+  font-family: var(--font-inter);
+}
+
+/* ---------- Botão principal: volume, brilho que atravessa no hover e o fio amarelo do Nexo ---------- */
+.nx-btn-primary {
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+  color: #fff;
+  background: linear-gradient(180deg, color-mix(in srgb, var(--nx-primary) 82%, white), var(--nx-primary) 55%, color-mix(in srgb, var(--nx-primary) 88%, black));
+  box-shadow:
+    inset 0 1px 0 rgb(255 255 255 / 0.28),
+    inset 0 -2px 0 rgb(0 0 0 / 0.14),
+    0 0 0 1px color-mix(in srgb, var(--nx-primary) 70%, black),
+    0 6px 16px -4px color-mix(in srgb, var(--nx-primary) 55%, transparent);
+}
+.nx-btn-primary::before {
+  content: "";
+  position: absolute;
+  inset: 0 auto 0 -60%;
+  width: 45%;
+  z-index: -1;
+  background: linear-gradient(100deg, transparent, rgb(255 255 255 / 0.35), transparent);
+  transform: skewX(-20deg);
+  transition: left 0.6s ease;
+}
+.nx-btn-primary:hover:not(:disabled)::before {
+  left: 120%;
+}
+.nx-btn-primary::after {
+  content: "";
+  position: absolute;
+  left: 10px;
+  right: 10px;
+  bottom: 0;
+  height: 2px;
+  border-radius: 2px;
+  background: var(--nx-accent);
+  opacity: 0.9;
+}
+
+/* Dourado: só para ações de crescimento (publicar, compartilhar). */
+.nx-btn-gold {
+  color: var(--nx-on-accent);
+  background: linear-gradient(180deg, #ffd640, #ffbd00);
+  box-shadow:
+    inset 0 1px 0 rgb(255 255 255 / 0.5),
+    0 0 0 1px #e0a800,
+    0 6px 16px -6px rgb(255 196 0 / 0.7);
+}
+
+/*
+ * ---------- Ícones animados ----------
+ * Cada ícone faz o gesto do que significa ao passar o mouse ou tocar no elemento com a classe
+ * "nx-anim" (o botão, o item do menu...). O gesto vem de data-gesture no próprio ícone.
+ * O ícone da tela ativa do menu faz o gesto uma vez ao entrar (classe nx-anim-once).
+ */
+.nx-anim:hover [data-gesture],
+.nx-anim:focus-visible [data-gesture],
+.nx-anim-once [data-gesture] {
+  animation-duration: 0.8s;
+  animation-timing-function: ease;
+  animation-iteration-count: 1;
+  transform-box: fill-box;
+  transform-origin: center;
+}
+.nx-anim:hover [data-gesture="ring"],
+.nx-anim:focus-visible [data-gesture="ring"],
+.nx-anim-once [data-gesture="ring"] { animation-name: nx-ring; transform-origin: 50% 10%; }
+.nx-anim:hover [data-gesture="pop"],
+.nx-anim:focus-visible [data-gesture="pop"],
+.nx-anim-once [data-gesture="pop"] { animation-name: nx-pop; animation-duration: 0.5s; }
+.nx-anim:hover [data-gesture="nudge"],
+.nx-anim:focus-visible [data-gesture="nudge"],
+.nx-anim-once [data-gesture="nudge"] { animation-name: nx-nudge; animation-duration: 0.6s; }
+.nx-anim:hover [data-gesture="twinkle"],
+.nx-anim:focus-visible [data-gesture="twinkle"],
+.nx-anim-once [data-gesture="twinkle"] { animation-name: nx-twinkle; }
+.nx-anim:hover [data-gesture="spin"],
+.nx-anim:focus-visible [data-gesture="spin"],
+.nx-anim-once [data-gesture="spin"] { animation-name: nx-spin; animation-duration: 0.7s; }
+.nx-anim:hover [data-gesture="lift"],
+.nx-anim:focus-visible [data-gesture="lift"],
+.nx-anim-once [data-gesture="lift"] { animation-name: nx-lift; animation-duration: 0.6s; }
+.nx-anim:hover [data-gesture="scan"],
+.nx-anim:focus-visible [data-gesture="scan"],
+.nx-anim-once [data-gesture="scan"] { animation-name: nx-scan; }
+.nx-anim:hover [data-gesture="tilt"],
+.nx-anim:focus-visible [data-gesture="tilt"],
+.nx-anim-once [data-gesture="tilt"] { animation-name: nx-tilt; animation-duration: 0.6s; }
+
+@keyframes nx-ring { 20% { transform: rotate(14deg); } 40% { transform: rotate(-12deg); } 60% { transform: rotate(8deg); } 80% { transform: rotate(-4deg); } }
+@keyframes nx-pop { 40% { transform: scale(1.18); } }
+@keyframes nx-nudge { 50% { transform: translateX(3px); } }
+@keyframes nx-twinkle { 50% { transform: scale(0.75) rotate(18deg); opacity: 0.6; } }
+@keyframes nx-spin { to { transform: rotate(180deg); } }
+@keyframes nx-lift { 45% { transform: translateY(-3px); } }
+@keyframes nx-scan { 30% { transform: scaleY(0.82); } 60% { transform: scaleY(1.06); } }
+@keyframes nx-tilt { 35% { transform: rotate(-10deg); } 70% { transform: rotate(6deg); } }
+
+@media (prefers-reduced-motion: reduce) {
+  .nx-btn-primary::before { transition: none; }
+  [data-gesture] { animation: none !important; }
+}
+
+/*
+ * ---------- Barra de rolagem do Nexo ----------
+ * Fina, com o polegar arredondado na cor da marca e o trilho invisível, no painel inteiro.
+ * Firefox e Chrome 121+ usam scrollbar-color; Safari usa as regras ::-webkit-scrollbar.
+ */
+@supports (scrollbar-color: auto) {
+  * {
+    scrollbar-width: thin;
+    scrollbar-color: var(--nx-scroll) transparent;
+  }
+  *:hover {
+    scrollbar-color: var(--nx-scroll-hover) transparent;
+  }
+}
+@supports not (scrollbar-color: auto) {
+  ::-webkit-scrollbar { width: 10px; height: 10px; }
+  ::-webkit-scrollbar-track { background: transparent; }
+  ::-webkit-scrollbar-thumb {
+    background-color: var(--nx-scroll);
+    border: 3px solid transparent;
+    border-radius: 999px;
+    background-clip: content-box;
+  }
+  ::-webkit-scrollbar-thumb:hover { background-color: var(--nx-scroll-hover); }
+  ::-webkit-scrollbar-corner { background: transparent; }
+}
+/* Dentro do celular de prévia a rolagem é como no aparelho: sem barra visível. */
+.nx-phone-scroll { scrollbar-width: none; }
+.nx-phone-scroll::-webkit-scrollbar { display: none; }

@@ -35,12 +35,13 @@ import { useGetLandingPage } from "../../api/queries/useGetLandingPage";
 import { LandingRenderer } from "../../features/landing/components/LandingRenderer";
 import { SectionEditor } from "../../features/landing/components/SectionEditor";
 import { ThemePicker } from "../../features/landing/components/ThemePicker";
-import { type LandingPageRecord, type LandingPageSettings, type LandingSection, type LandingTheme, SECTION_LABELS } from "../../features/landing/contract";
+import { type LandingPageRecord, type LandingPageSettings, type LandingSection, type LandingTheme, SECTION_LABELS, themeBg, themeIsDark } from "../../features/landing/contract";
 import { startTour } from "../../features/tour/driver-service";
 import { HelpButton } from "../../features/tour/HelpButton";
 import { Badge } from "../../shared/components/ui/Badge";
 import { Button, IconButton } from "../../shared/components/ui/Button";
 import { EmptyState } from "../../shared/components/ui/EmptyState";
+import { PhoneFrame } from "../../shared/components/ui/PhoneFrame";
 import { Segmented } from "../../shared/components/ui/Segmented";
 import { inputClass, selectClass, textareaClass } from "../../shared/components/ui/styles";
 import { Switch } from "../../shared/components/ui/Switch";
@@ -492,26 +493,32 @@ function LandingBuilderPage() {
         </aside>
 
         <div id="tour-builder-preview" className={`${pane === "preview" ? "flex" : "hidden"} min-w-0 flex-1 items-center justify-center bg-bg-start p-3 md:flex md:p-6`}>
-          <motion.div
-            layout
-            transition={{ type: "spring", stiffness: 300, damping: 32 }}
-            className={`relative overflow-hidden bg-white shadow-float ${viewport === "mobile" ? "h-full max-h-[780px] w-full max-w-[390px] rounded-[32px] border-[6px] border-[#0B1220] md:w-[390px] md:rounded-[44px] md:border-[10px]" : "h-full w-full rounded-2xl border border-border-ui"}`}
-          >
-            <div className="h-full overflow-y-auto">
+          {(() => {
+            const page = (
               <LandingRenderer title={draft.title} theme={draft.theme} sections={draft.sections} settings={draft.settings} slug={draft.slug} canAsk={!!draft.chatId} onChat={previewChat} onAsk={previewChat} />
-            </div>
-            {draft.settings.showChatWidget && draft.chatId && (
+            );
+            const chatButton = draft.settings.showChatWidget && draft.chatId && (
               <button
                 type="button"
                 onClick={previewChat}
-                className="absolute bottom-5 right-5 flex h-14 w-14 items-center justify-center rounded-full text-white shadow-float transition-transform hover:scale-105"
+                className="absolute bottom-5 right-5 z-10 flex h-14 w-14 items-center justify-center rounded-full text-white shadow-float transition-transform hover:scale-105"
                 style={{ background: chat?.settings.mainColor ?? "#0A6CFF" }}
                 aria-label="Prévia do botão de chat"
               >
                 <MessageCircle size={26} />
               </button>
-            )}
-          </motion.div>
+            );
+            return viewport === "mobile" ? (
+              <PhoneFrame statusTone={themeIsDark(draft.theme) ? "light" : "dark"} statusBg={themeBg(draft.theme)} overlay={chatButton} label="Prévia da página no celular">
+                {page}
+              </PhoneFrame>
+            ) : (
+              <motion.div layout transition={{ type: "spring", stiffness: 300, damping: 32 }} className="relative h-full w-full overflow-hidden rounded-2xl border border-border-ui bg-white shadow-float">
+                <div className="h-full overflow-y-auto">{page}</div>
+                {chatButton}
+              </motion.div>
+            );
+          })()}
         </div>
       </div>
     </div>

@@ -226,6 +226,16 @@ export const THEME_INFO: Record<LandingTheme, { name: string; description: strin
   "clean-slate": { name: "Claro e sóbrio", description: "Saúde, educação, consultorias", colors: ["#F8FAFC", "#0F172A", "#475569"] },
 };
 
+/** Cor de fundo do tema (a faixa da barra de status do celular de prévia). */
+export const themeBg = (theme: LandingTheme) => THEME_INFO[theme].colors[0];
+
+/** Tema com fundo escuro (a barra de status do celular de prévia fica clara). */
+export function themeIsDark(theme: LandingTheme): boolean {
+  const hex = THEME_INFO[theme].colors[0].replace("#", "");
+  const [r, g, b] = [0, 2, 4].map((i) => parseInt(hex.slice(i, i + 2), 16) / 255);
+  return 0.2126 * r + 0.7152 * g + 0.0722 * b < 0.45;
+}
+
 export const SLUG_REGEX = /^[a-z0-9]+(?:-[a-z0-9]+)*$/;
 
 /** Página como o painel recebe. */

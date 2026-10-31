@@ -32,7 +32,7 @@ src/shared/                layout, ui (PromptDialog, Toaster/toast, ChatSelect, 
 src/shared/navigation.ts   menu do painel (NAV_GROUPS: Presença, Assistente, Acompanhar); tela nova entra aqui
 src/shared/components/ui/tones.ts  cor de cada área (menu, cabeçalho, cartões do Início); use TONES, não classes soltas
 src/features/qr/           QR Codes: QrFormSheet (criar/editar por tipo), QrDetailSheet (baixar PNG/SVG, gráfico), PrintCard (@media print)
-src/shared/components/ui/Sheet.tsx  painel que sobe de baixo no celular e fica na lateral no computador; use para formulários
+src/shared/components/ui/Sheet.tsx  o modal do Nexo (único): centralizado no computador com a altura do conteúdo (até 86% da tela), sobe de baixo no celular; aceita onSubmit (vira <form>) e busy
 src/shared/hooks/useWorkspaceRole.ts  papel do usuário no workspace ativo (esconder ações de Admin para Membro)
 src/features/auth/         LoginHero e GoogleButton (aparece só se GET /auth-providers devolver google: true)
 ```
@@ -76,5 +76,24 @@ src/features/auth/         LoginHero e GoogleButton (aparece só se GET /auth-pr
   `whileTap` nos botões e `useReducedMotion` em animações contínuas.
   **Não use `AnimatePresence` com `exit` em volta de `<Outlet />`**: o elemento que sai também
   renderiza a rota nova e a página monta duas vezes (bug real que já duplicou sessões do simulador).
-- Tipografia: Inter (via `@fontsource-variable/inter`). Rótulos com 13px semibold em
-  `text-text-secondary`; títulos com `tracking-tight`. Nada de rótulo de 10px em caixa alta.
+- Tipografia: **Onest** no texto (`--font-sans`) e **Bricolage Grotesque** em títulos (h1–h3) e números grandes
+  (`--font-display`, classe `font-display`), via `@fontsource-variable`. As páginas dos clientes (`LandingRenderer`,
+  classe `nx-landing`) ficam na Inter (`--font-inter`). Rótulos com 13px
+  semibold em `text-text-secondary`; títulos com `tracking-tight`. Nada de rótulo de 10px em caixa alta.
+- **Densidade** (direção visual aprovada em 31/10/2026): espaços 4 · 6 · 8 · 12 · 16 · 20; cantos redefinidos no
+  `@theme` (`rounded-md` 8, `lg` 10, `xl` 12, `2xl` 14, `3xl` 16); controles com 36 px no computador e 44 px no
+  celular (`h-11 md:h-9`). Prefira `p-3`/`p-4` em cartões; `p-6` só em áreas de destaque.
+- **Botões**: `primary` (roxo com brilho e o fio amarelo do Nexo, classe `nx-btn-primary`), `gold` (só ações de
+  crescimento: publicar, compartilhar; uma por tela), `secondary`, `outline`, `ghost`, `danger`. Não crie botões
+  com classes soltas: use `Button`/`IconButton`.
+- **Ícones animados**: o ícone faz o seu gesto no hover do elemento com a classe `nx-anim` (o `Button` e os itens do
+  menu já têm). O gesto vem de `data-gesture` (`ring`, `pop`, `nudge`, `twinkle`, `spin`, `lift`, `scan`, `tilt`);
+  o padrão de cada ícone fica em `ui/gestures.ts`. `nx-anim-once` faz o gesto uma vez ao montar (tela ativa).
+- **Modais**: sempre `Sheet`. Nada de `fixed inset-0` novo com caixa própria.
+- **Celular de prévia**: sempre `PhoneFrame` (`ui/PhoneFrame.tsx`): moldura, ilha, barra de status e botões laterais.
+  Para páginas e bios, passe `statusBg={themeBg(theme)}` e `statusTone` por `themeIsDark(theme)` (contract da landing):
+  o conteúdo começa abaixo da barra. Sem `statusBg`, o conteúdo passa por baixo dela (cabeçalho colorido do chat).
+  Não desenhe celular à mão.
+- **Barra de rolagem**: personalizada no painel inteiro (`index.css`, tokens `--nx-scroll`). Dentro do `PhoneFrame` ela
+  some, como no aparelho.
+- **Fundo vivo** (`features/auth/components/MeshBackground.tsx`): luzes da marca num canvas com grão; usado no login.

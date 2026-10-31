@@ -51,14 +51,14 @@ export function WorkspaceSelector() {
       <button
         onClick={() => setIsOpen(!isOpen)}
         aria-expanded={isOpen}
-        className="flex w-full items-center gap-3 rounded-2xl border border-border-ui bg-panel p-3 text-left shadow-card transition-colors hover:bg-panel-hover"
+        className="flex w-full items-center gap-2.5 rounded-xl border border-border-ui bg-panel p-2 text-left transition-colors hover:bg-panel-hover"
       >
-        <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-primary/12 text-primary">
+        <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-[9px] bg-primary/12 text-primary">
           <Building2 size={18} />
         </span>
         <span className="flex min-w-0 flex-1 flex-col">
-          <span className="truncate text-[14px] font-semibold text-text-primary">{isLoading ? "Carregando..." : active?.name ?? "Nenhum"}</span>
-          <span className="text-[12px] text-text-secondary">{active ? ROLE_LABEL[active.role] : "Workspace"}</span>
+          <span className="truncate text-[13px] font-semibold text-text-primary">{isLoading ? "Carregando..." : active?.name ?? "Nenhum"}</span>
+          <span className="text-[11.5px] text-text-secondary">{active ? ROLE_LABEL[active.role] : "Workspace"}</span>
         </span>
         <ChevronsUpDown size={16} className="shrink-0 text-text-secondary" />
       </button>

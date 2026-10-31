@@ -18,7 +18,7 @@ export function BioSheet({ title, onClose, children, footer }: BioSheetProps) {
   }, [onClose]);
 
   return (
-    <div className="fixed inset-0 z-40 flex items-end bg-black/40 md:pointer-events-none md:items-stretch md:justify-end md:bg-transparent" onClick={onClose}>
+    <div className="fixed inset-0 z-40 flex items-end bg-black/40 md:pointer-events-none md:items-start md:justify-end md:bg-transparent md:p-3" onClick={onClose}>
       <motion.div
         role="dialog"
         aria-modal="true"
@@ -27,15 +27,15 @@ export function BioSheet({ title, onClose, children, footer }: BioSheetProps) {
         animate={{ y: 0, opacity: 1 }}
         transition={{ type: "spring", stiffness: 400, damping: 34 }}
         onClick={(e) => e.stopPropagation()}
-        className="flex max-h-[88dvh] w-full flex-col rounded-t-3xl border border-border-ui bg-panel shadow-float md:pointer-events-auto md:max-h-none md:w-[400px] md:rounded-none md:rounded-l-3xl"
+        className="flex max-h-[90dvh] w-full flex-col rounded-t-2xl border border-border-ui bg-panel shadow-float md:pointer-events-auto md:max-h-[calc(100dvh-24px)] md:w-[400px] md:rounded-2xl"
       >
-        <div className="flex shrink-0 items-center justify-between gap-2 border-b border-border-ui py-1 pl-4 pr-1">
+        <div className="flex shrink-0 items-center justify-between gap-2 py-1 pl-4 pr-1">
           <h2 className="truncate text-[17px] font-bold text-text-primary">{title}</h2>
           <button type="button" onClick={onClose} aria-label="Fechar" className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl text-text-secondary hover:bg-panel-hover">
             <X size={20} />
           </button>
         </div>
-        <div className="flex min-h-0 flex-1 flex-col gap-3 overflow-y-auto p-4">{children}</div>
+        <div className="flex min-h-0 flex-col gap-3 overflow-y-auto px-4 pb-4 pt-1">{children}</div>
         {footer && <div className="flex shrink-0 items-center gap-2 border-t border-border-ui p-3 pb-[max(0.75rem,env(safe-area-inset-bottom))]">{footer}</div>}
       </motion.div>
     </div>
