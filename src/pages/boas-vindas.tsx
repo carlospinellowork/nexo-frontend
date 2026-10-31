@@ -294,29 +294,43 @@ function WelcomePage() {
     ? ["Escolha a sua foto ou as iniciais com uma cor.", "Assim o Nexo já sugere os textos e o visual certos.", "Marque tudo o que você usa hoje.", "O Início mostra o próximo passo a partir disso."]
     : ["Escolha a sua foto ou as iniciais com uma cor."];
 
+  const skip = !editar && (
+    <button type="button" onClick={() => void finish(true)} disabled={saving} className="rounded-lg px-2 py-1 text-[13px] font-semibold text-white/80 hover:text-white">
+      Pular por agora
+    </button>
+  );
+  const progress = steps.length > 1 && (
+    <div className="flex gap-1.5" aria-label={`Passo ${step + 1} de ${steps.length}`}>
+      {steps.map((label, i) => (
+        <span key={label} className={`h-1.5 flex-1 rounded-full transition-colors ${i <= step ? "bg-primary" : "bg-text-secondary/20"}`} />
+      ))}
+    </div>
+  );
+
   return (
-    <div className="relative flex min-h-dvh w-full items-start justify-center overflow-y-auto px-3 py-6 sm:items-center sm:py-10">
-      <div className="fixed inset-0">
+    <div className="relative flex min-h-dvh w-full flex-col bg-panel sm:items-center sm:justify-center sm:bg-transparent sm:px-3 sm:py-10">
+      {/* Computador e tablet: fundo vivo na tela toda, com o cartão no meio. */}
+      <div className="fixed inset-0 hidden sm:block">
         <MeshBackground />
       </div>
-      <div className="relative flex w-full max-w-[460px] flex-col gap-4">
-        <div className="flex items-center justify-between px-1">
+
+      {/* Celular: faixa do topo com o fundo vivo (como no login); o conteúdo sobe num painel. */}
+      <header className="relative isolate flex shrink-0 items-center justify-between overflow-hidden px-5 pb-10 pt-[max(1rem,env(safe-area-inset-top))] text-white sm:hidden">
+        <MeshBackground />
+        <span className="relative">
+          <Logo size={28} tone="light" />
+        </span>
+        <span className="relative">{skip}</span>
+      </header>
+
+      <div className="relative flex w-full flex-1 flex-col sm:max-w-[460px] sm:flex-none sm:gap-4">
+        <div className="hidden items-center justify-between px-1 sm:flex">
           <Logo size={30} tone="light" />
-          {!editar && (
-            <button type="button" onClick={() => void finish(true)} disabled={saving} className="rounded-lg px-2 py-1 text-[13px] font-semibold text-white/80 hover:text-white">
-              Pular por agora
-            </button>
-          )}
+          {skip}
         </div>
 
-        <section className="flex flex-col gap-4 rounded-2xl border border-border-ui bg-panel/95 p-4 shadow-float backdrop-blur-xl sm:p-5">
-          {steps.length > 1 && (
-            <div className="flex gap-1.5" aria-label={`Passo ${step + 1} de ${steps.length}`}>
-              {steps.map((label, i) => (
-                <span key={label} className={`h-1.5 flex-1 rounded-full transition-colors ${i <= step ? "bg-primary" : "bg-text-secondary/20"}`} />
-              ))}
-            </div>
-          )}
+        <section className="relative z-10 -mt-6 flex flex-1 flex-col gap-4 rounded-t-[24px] bg-panel px-5 pb-28 pt-5 shadow-[0_-12px_30px_-12px_rgb(13_10_31/0.35)] sm:mt-0 sm:flex-none sm:rounded-2xl sm:border sm:border-border-ui sm:bg-panel/95 sm:p-5 sm:shadow-float sm:backdrop-blur-xl">
+          {progress}
           <div className="flex flex-col gap-1">
             <h1 className="text-[24px] font-bold leading-tight tracking-tight text-text-primary">{titles[step]}</h1>
             <p className="text-[14px] text-text-secondary">{subtitles[step]}</p>
@@ -332,7 +346,8 @@ function WelcomePage() {
             </AnimatePresence>
           )}
 
-          <div className="flex items-center gap-2 pt-1">
+          {/* Celular: botões fixos no rodapé, ao alcance do polegar. Computador: no fim do cartão. */}
+          <div className="fixed inset-x-0 bottom-0 z-20 flex items-center gap-2 border-t border-border-ui bg-panel/95 px-5 pb-[max(0.75rem,env(safe-area-inset-bottom))] pt-3 backdrop-blur-xl sm:static sm:border-0 sm:bg-transparent sm:p-0 sm:pt-1 sm:backdrop-blur-none">
             {step > 0 ? (
               <Button variant="ghost" icon={ArrowLeft} onClick={() => setStep((s) => s - 1)} disabled={saving}>
                 Voltar
