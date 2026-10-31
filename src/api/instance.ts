@@ -1,8 +1,11 @@
 import axios, { isAxiosError } from "axios";
 import { useWorkspaceStore } from "../features/workspaces/store/workspace-store";
 
+// VITE_API_URL pode ser absoluto ("http://localhost:3000/api") ou relativo ("/api"). Relativo = a API está
+// no mesmo domínio do painel (em produção a Vercel repassa /api para o backend; ver vercel.json), o que
+// mantém o cookie de login como cookie do próprio site em qualquer navegador.
 export const API_ORIGIN = import.meta.env.VITE_API_URL
-  ? new URL(import.meta.env.VITE_API_URL).origin
+  ? new URL(import.meta.env.VITE_API_URL, window.location.origin).origin
   : "http://localhost:3000";
 
 export const api = axios.create({

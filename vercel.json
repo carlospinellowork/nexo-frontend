@@ -1,0 +1,13 @@
+{
+  "$schema": "https://openapi.vercel.sh/vercel.json",
+  "framework": "vite",
+  "buildCommand": "npm run build",
+  "outputDirectory": "dist",
+  "rewrites": [
+    { "source": "/api/:path*", "destination": "https://nexo-api.onrender.com/api/:path*" },
+    { "source": "/q/:code", "destination": "https://nexo-api.onrender.com/q/:code" },
+    { "source": "/webhooks/:path*", "destination": "https://nexo-api.onrender.com/webhooks/:path*" },
+    { "source": "/nexo-chat.js", "destination": "https://nexo-api.onrender.com/nexo-chat.js" },
+    { "source": "/(.*)", "destination": "/index.html" }
+  ]
+}
