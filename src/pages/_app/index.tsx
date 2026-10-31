@@ -13,6 +13,7 @@ import { useGetResults } from "../../api/queries/useGetResults";
 import { BioHomeCard } from "../../features/bio/BioHomeCard";
 import { ExampleCompanies } from "../../features/examples/ExampleCompanies";
 import { HomeHero } from "../../features/home/HomeHero";
+import { InstallCard } from "../../features/pwa/InstallApp";
 import { QuickActions } from "../../features/home/QuickActions";
 import { StatTile } from "../../features/home/StatTile";
 import { startTour } from "../../features/tour/driver-service";
@@ -89,6 +90,8 @@ function HomePage() {
             actions={<HelpButton tourKey="home" screenTitle="Início" />}
           />
         </motion.div>
+
+        <InstallCard />
 
         <motion.div id="tour-home-stats" variants={item} className="grid grid-cols-2 gap-2.5 md:gap-3 xl:grid-cols-4">
           <StatTile label="Conversas" value={convWeek} previous={convPrev} series={perDay} icon={MessageCircle} tone="ocean" to="/results" />

@@ -3,6 +3,7 @@ import { LogOut } from "lucide-react";
 import { motion } from "motion/react";
 import { useGetMe } from "../../../api/queries/useGetMe";
 import { UserAvatar } from "../../../features/profile/UserAvatar";
+import { InstallMenuItem } from "../../../features/pwa/InstallApp";
 import { WorkspaceSelector } from "../../../features/workspaces/components/WorkspaceSelector";
 import { authClient } from "../../../lib/auth-client";
 import { isNavActive, type NavGroup } from "../../navigation";
@@ -64,6 +65,7 @@ export function Sidebar({ groups, className = "w-[232px]", onNavigate }: { group
       </nav>
 
       <div className="mt-auto flex flex-col gap-2">
+        <InstallMenuItem onDone={onNavigate} />
         <WorkspaceSelector />
         <ThemeSegmented />
         <div className="flex items-center gap-2.5 rounded-xl border border-border-ui bg-panel p-2">
