@@ -1,7 +1,9 @@
-import { Check, Copy, Download, ExternalLink, Share2 } from "lucide-react";
+import { Link } from "@tanstack/react-router";
+import { ArrowRight, Check, Copy, Download, ExternalLink, QrCode, Share2 } from "lucide-react";
 import QRCode from "qrcode";
 import { useEffect, useState } from "react";
 import { Button } from "../../shared/components/ui/Button";
+import { TONES } from "../../shared/components/ui/tones";
 import { toast } from "../../shared/components/ui/toast-store";
 
 import { bioUrl } from "./bioUrl";
@@ -77,6 +79,20 @@ export function BioShare({ slug, name, showSteps = true }: { slug: string; name:
             Baixar QR Code (PNG)
           </Button>
         )}
+        <Link
+          to="/qr-codes"
+          search={{ novo: "bio" }}
+          className="flex min-h-11 w-full items-center gap-3 rounded-2xl bg-panel-2 px-3.5 py-2.5 text-left transition-colors hover:bg-panel-hover"
+        >
+          <span className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-xl ${TONES.lagoon.chip}`}>
+            <QrCode size={18} />
+          </span>
+          <span className="flex min-w-0 flex-1 flex-col">
+            <span className="text-[14px] font-semibold text-text-primary">Criar QR Code da sua bio</span>
+            <span className="text-[12px] leading-snug text-text-secondary">Conta as leituras e vem com cartão para imprimir.</span>
+          </span>
+          <ArrowRight size={16} className="shrink-0 text-text-secondary" />
+        </Link>
       </div>
 
       {showSteps && (

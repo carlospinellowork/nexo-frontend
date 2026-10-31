@@ -3,6 +3,10 @@ import { useState } from "react";
 interface DailyBarsProps {
   data: { date: string; count: number }[];
   label: string;
+  /** Nome do que é contado (singular e plural). Padrão: conversa/conversas. */
+  unit?: { one: string; other: string };
+  /** Altura do gráfico em px. */
+  height?: number;
 }
 
 const dayLabel = (iso: string, opts: Intl.DateTimeFormatOptions) => new Date(`${iso}T12:00:00`).toLocaleDateString("pt-BR", opts);
@@ -11,7 +15,8 @@ const dayLabel = (iso: string, opts: Intl.DateTimeFormatOptions) => new Date(`${
  * Barras de uma série por dia: cor primária, topo arredondado, 2px de respiro entre barras,
  * dica no hover/foco e tabela para leitores de tela.
  */
-export function DailyBars({ data, label }: DailyBarsProps) {
+export function DailyBars({ data, label, unit = { one: "conversa", other: "conversas" }, height = 224 }: DailyBarsProps) {
+  const unitOf = (n: number) => (n === 1 ? unit.one : unit.other);
   const [active, setActive] = useState<number | null>(null);
   const max = Math.max(1, ...data.map((d) => d.count));
   const ticks = [max, Math.round(max / 2), 0];
@@ -20,7 +25,7 @@ export function DailyBars({ data, label }: DailyBarsProps) {
 
   return (
     <figure className="flex flex-col gap-2">
-      <div className="flex h-56 gap-2">
+      <div className="flex gap-2" style={{ height }}>
         <div className="flex w-8 shrink-0 flex-col justify-between pb-6 text-right text-[11px] tabular-nums text-text-secondary" aria-hidden>
           {ticks.map((t, i) => (
             <span key={i}>{t}</span>
@@ -37,7 +42,7 @@ export function DailyBars({ data, label }: DailyBarsProps) {
               <button
                 key={d.date}
                 type="button"
-                aria-label={`${dayLabel(d.date, { day: "numeric", month: "long" })}: ${d.count} ${d.count === 1 ? "conversa" : "conversas"}`}
+                aria-label={`${dayLabel(d.date, { day: "numeric", month: "long" })}: ${d.count} ${unitOf(d.count)}`}
                 onMouseEnter={() => setActive(i)}
                 onFocus={() => setActive(i)}
                 onBlur={() => setActive(null)}
@@ -51,7 +56,7 @@ export function DailyBars({ data, label }: DailyBarsProps) {
                   <span className="pointer-events-none absolute bottom-full left-1/2 z-10 mb-2 -translate-x-1/2 whitespace-nowrap rounded-xl bg-panel px-3 py-2 text-left shadow-float">
                     <span className="block text-[12px] text-text-secondary">{dayLabel(d.date, { weekday: "short", day: "numeric", month: "short" })}</span>
                     <span className="block text-[14px] font-bold tabular-nums text-text-primary">
-                      {d.count} {d.count === 1 ? "conversa" : "conversas"}
+                      {d.count} {unitOf(d.count)}
                     </span>
                   </span>
                 )}
@@ -73,7 +78,7 @@ export function DailyBars({ data, label }: DailyBarsProps) {
         <thead>
           <tr>
             <th>Dia</th>
-            <th>Conversas</th>
+            <th>{unit.other.charAt(0).toUpperCase() + unit.other.slice(1)}</th>
           </tr>
         </thead>
         <tbody>

@@ -38,6 +38,8 @@
   --nx-mint-strong: #0a7a70;
   --nx-rose: #f0458c;
   --nx-rose-strong: #b01f5c;
+  --nx-lagoon: #0891b2;
+  --nx-lagoon-strong: #0e6a85;
   /* Brilho do fundo da área logada (roxo e amarelo da marca). */
   --nx-glow-1: rgb(109 74 255 / 0.10);
   --nx-glow-2: rgb(255 196 0 / 0.10);
@@ -73,6 +75,8 @@
   --nx-mint-strong: #6ee7d8;
   --nx-rose: #ff5c9e;
   --nx-rose-strong: #ff9cc3;
+  --nx-lagoon: #22c3e6;
+  --nx-lagoon-strong: #8ee6f8;
   --nx-glow-1: rgb(112 80 255 / 0.20);
   --nx-glow-2: rgb(255 210 51 / 0.07);
   color-scheme: dark;
@@ -108,6 +112,8 @@
   --color-mint-strong: var(--nx-mint-strong);
   --color-rose: var(--nx-rose);
   --color-rose-strong: var(--nx-rose-strong);
+  --color-lagoon: var(--nx-lagoon);
+  --color-lagoon-strong: var(--nx-lagoon-strong);
 
   --shadow-card: var(--nx-shadow);
   --shadow-float: var(--nx-shadow-lg);
@@ -229,3 +235,32 @@ body {
   border-color: var(--nx-surface) !important;
 }
 
+
+/* Cartão de QR Code para imprimir (features/qr/PrintCard): na impressão, só ele aparece. */
+#nx-print-root {
+  display: none;
+}
+
+@media print {
+  @page {
+    size: A4 portrait;
+    margin: 14mm;
+  }
+
+  html,
+  body {
+    height: auto !important;
+    overflow: visible !important;
+    background: white !important;
+  }
+
+  body > *:not(#nx-print-root) {
+    display: none !important;
+  }
+
+  #nx-print-root {
+    display: block;
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+}

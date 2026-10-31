@@ -3,7 +3,7 @@
  * cabeçalho da tela e nos cartões do Início. As classes ficam escritas por extenso para o Tailwind
  * encontrá-las.
  */
-export type Tone = "violet" | "rose" | "orange" | "ocean" | "mint" | "green" | "amber";
+export type Tone = "violet" | "rose" | "orange" | "ocean" | "mint" | "green" | "amber" | "lagoon";
 
 interface ToneClasses {
   /** Ícone sobre fundo tingido (chip). */
@@ -25,5 +25,6 @@ export const TONES: Record<Tone, ToneClasses> = {
   ocean: { chip: "bg-ocean/12 text-ocean", chipActive: "bg-ocean/22 text-ocean-strong", soft: "bg-ocean/10", text: "text-ocean-strong", glow: "bg-ocean" },
   mint: { chip: "bg-mint/14 text-mint-strong", chipActive: "bg-mint/24 text-mint-strong", soft: "bg-mint/10", text: "text-mint-strong", glow: "bg-mint" },
   green: { chip: "bg-success/14 text-success-strong", chipActive: "bg-success/24 text-success-strong", soft: "bg-success/10", text: "text-success-strong", glow: "bg-success" },
+  lagoon: { chip: "bg-lagoon/14 text-lagoon-strong", chipActive: "bg-lagoon/24 text-lagoon-strong", soft: "bg-lagoon/10", text: "text-lagoon-strong", glow: "bg-lagoon" },
   amber: { chip: "bg-accent/18 text-accent-strong", chipActive: "bg-accent/30 text-accent-strong", soft: "bg-accent/12", text: "text-accent-strong", glow: "bg-accent" },
 };

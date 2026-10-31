@@ -31,6 +31,9 @@ src/features/workspaces/   seletor e store (só o id ativo)
 src/shared/                layout, ui (PromptDialog, Toaster/toast, ChatSelect, EmptyState), hooks/useActiveChat
 src/shared/navigation.ts   menu do painel (NAV_GROUPS: Presença, Assistente, Acompanhar); tela nova entra aqui
 src/shared/components/ui/tones.ts  cor de cada área (menu, cabeçalho, cartões do Início); use TONES, não classes soltas
+src/features/qr/           QR Codes: QrFormSheet (criar/editar por tipo), QrDetailSheet (baixar PNG/SVG, gráfico), PrintCard (@media print)
+src/shared/components/ui/Sheet.tsx  painel que sobe de baixo no celular e fica na lateral no computador; use para formulários
+src/shared/hooks/useWorkspaceRole.ts  papel do usuário no workspace ativo (esconder ações de Admin para Membro)
 src/features/auth/         LoginHero e GoogleButton (aparece só se GET /auth-providers devolver google: true)
 ```
 

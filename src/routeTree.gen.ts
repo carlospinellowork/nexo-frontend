@@ -19,6 +19,7 @@ import { Route as AppLandingBuilderRouteImport } from './pages/_app/landing-buil
 import { Route as AppLandingPagesRouteImport } from './pages/_app/landing-pages'
 import { Route as AppLeadsRouteImport } from './pages/_app/leads'
 import { Route as AppMinhaBioRouteImport } from './pages/_app/minha-bio'
+import { Route as AppQrCodesRouteImport } from './pages/_app/qr-codes'
 import { Route as AppResultsRouteImport } from './pages/_app/results'
 import { Route as AppSimulateRouteImport } from './pages/_app/simulate'
 import { Route as PSlugRouteImport } from './pages/p/$slug'
@@ -72,6 +73,11 @@ const AppMinhaBioRoute = AppMinhaBioRouteImport.update({
   path: '/minha-bio',
   getParentRoute: () => AppLayoutRoute,
 } as any)
+const AppQrCodesRoute = AppQrCodesRouteImport.update({
+  id: '/qr-codes',
+  path: '/qr-codes',
+  getParentRoute: () => AppLayoutRoute,
+} as any)
 const AppResultsRoute = AppResultsRouteImport.update({
   id: '/results',
   path: '/results',
@@ -98,6 +104,7 @@ export interface FileRoutesByFullPath {
   '/landing-pages': typeof AppLandingPagesRoute
   '/leads': typeof AppLeadsRoute
   '/minha-bio': typeof AppMinhaBioRoute
+  '/qr-codes': typeof AppQrCodesRoute
   '/results': typeof AppResultsRoute
   '/simulate': typeof AppSimulateRoute
   '/p/$slug': typeof PSlugRoute
@@ -111,6 +118,7 @@ export interface FileRoutesByTo {
   '/landing-pages': typeof AppLandingPagesRoute
   '/leads': typeof AppLeadsRoute
   '/minha-bio': typeof AppMinhaBioRoute
+  '/qr-codes': typeof AppQrCodesRoute
   '/results': typeof AppResultsRoute
   '/simulate': typeof AppSimulateRoute
   '/p/$slug': typeof PSlugRoute
@@ -127,6 +135,7 @@ export interface FileRoutesById {
   '/_app/landing-pages': typeof AppLandingPagesRoute
   '/_app/leads': typeof AppLeadsRoute
   '/_app/minha-bio': typeof AppMinhaBioRoute
+  '/_app/qr-codes': typeof AppQrCodesRoute
   '/_app/results': typeof AppResultsRoute
   '/_app/simulate': typeof AppSimulateRoute
   '/p/$slug': typeof PSlugRoute
@@ -144,6 +153,7 @@ export interface FileRouteTypes {
     | '/landing-pages'
     | '/leads'
     | '/minha-bio'
+    | '/qr-codes'
     | '/results'
     | '/simulate'
     | '/p/$slug'
@@ -157,6 +167,7 @@ export interface FileRouteTypes {
     | '/landing-pages'
     | '/leads'
     | '/minha-bio'
+    | '/qr-codes'
     | '/results'
     | '/simulate'
     | '/p/$slug'
@@ -172,6 +183,7 @@ export interface FileRouteTypes {
     | '/_app/landing-pages'
     | '/_app/leads'
     | '/_app/minha-bio'
+    | '/_app/qr-codes'
     | '/_app/results'
     | '/_app/simulate'
     | '/p/$slug'
@@ -256,6 +268,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppMinhaBioRouteImport
       parentRoute: typeof AppLayoutRoute
     }
+    '/_app/qr-codes': {
+      id: '/_app/qr-codes'
+      path: '/qr-codes'
+      fullPath: '/qr-codes'
+      preLoaderRoute: typeof AppQrCodesRouteImport
+      parentRoute: typeof AppLayoutRoute
+    }
     '/_app/results': {
       id: '/_app/results'
       path: '/results'
@@ -288,6 +307,7 @@ interface AppLayoutRouteChildren {
   AppLandingPagesRoute: typeof AppLandingPagesRoute
   AppLeadsRoute: typeof AppLeadsRoute
   AppMinhaBioRoute: typeof AppMinhaBioRoute
+  AppQrCodesRoute: typeof AppQrCodesRoute
   AppResultsRoute: typeof AppResultsRoute
   AppSimulateRoute: typeof AppSimulateRoute
   AppIndexRoute: typeof AppIndexRoute
@@ -301,6 +321,7 @@ const AppLayoutRouteChildren: AppLayoutRouteChildren = {
   AppLandingPagesRoute: AppLandingPagesRoute,
   AppLeadsRoute: AppLeadsRoute,
   AppMinhaBioRoute: AppMinhaBioRoute,
+  AppQrCodesRoute: AppQrCodesRoute,
   AppResultsRoute: AppResultsRoute,
   AppSimulateRoute: AppSimulateRoute,
   AppIndexRoute: AppIndexRoute,

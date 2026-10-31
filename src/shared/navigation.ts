@@ -1,4 +1,4 @@
-import { ChartLine, GitGraph, Globe, House, Link2, type LucideIcon, Paintbrush, Play, Send, Users } from "lucide-react";
+import { ChartLine, GitGraph, Globe, House, Link2, type LucideIcon, Paintbrush, Play, QrCode, Send, Users } from "lucide-react";
 import type { Tone } from "./components/ui/tones";
 
 export interface NavItem {
@@ -22,6 +22,7 @@ export const NAV_GROUPS: NavGroup[] = [
     items: [
       { to: "/minha-bio", title: "Minha Bio", icon: Link2, tone: "rose" },
       { to: "/landing-pages", title: "Páginas", icon: Globe, tone: "orange" },
+      { to: "/qr-codes", title: "QR Codes", icon: QrCode, tone: "lagoon" },
     ],
   },
   {
