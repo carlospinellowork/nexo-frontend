@@ -20,12 +20,12 @@ const PERIODS = [
 
 function Stat({ icon: Icon, label, value, hint }: { icon: typeof Users; label: string; value: string; hint?: string }) {
   return (
-    <div className="flex flex-col gap-2 rounded-3xl bg-panel p-5 shadow-card">
+    <div className="flex flex-col gap-1.5 rounded-2xl border border-border-ui/70 bg-panel p-4 shadow-card">
       <span className="flex items-center gap-2 text-[13px] font-semibold text-text-secondary">
         <Icon size={16} />
         {label}
       </span>
-      <span className="text-[32px] font-extrabold leading-none tracking-tight tabular-nums text-text-primary">{value}</span>
+      <span className="font-display text-[28px] font-bold leading-none tracking-tight tabular-nums text-text-primary">{value}</span>
       {hint && <span className="text-[13px] text-text-secondary">{hint}</span>}
     </div>
   );
@@ -53,7 +53,7 @@ function ResultsPage() {
         ) : data.conversations === 0 ? (
           <EmptyState icon={ChartLine} title="Ainda sem conversas no período" description="Os números aparecem quando clientes conversarem com o bot no site, no WhatsApp, no Instagram ou no Telegram. O simulador não conta." />
         ) : (
-          <div className="mx-auto flex w-full max-w-6xl flex-col gap-5 p-8">
+          <div className="mx-auto flex w-full max-w-6xl flex-col gap-4 px-3 py-4 md:px-6 md:py-6">
             <div className="grid grid-cols-2 gap-4 lg:grid-cols-4">
               <Stat icon={MessagesSquare} label="Conversas" value={fmt(data.conversations)} />
               <Stat icon={Users} label="Leads novos" value={fmt(data.leads)} hint="deixaram telefone ou e-mail" />
@@ -66,13 +66,13 @@ function ResultsPage() {
               <Stat icon={Headset} label="Transferidas" value={fmt(data.handoffs)} hint="o bot chamou a equipe" />
             </div>
 
-            <section className="rounded-3xl bg-panel p-6 shadow-card">
+            <section className="rounded-2xl border border-border-ui/70 bg-panel p-4 shadow-card">
               <h2 className="mb-4 text-[16px] font-bold tracking-tight text-text-primary">Conversas por dia</h2>
               <DailyBars data={data.perDay} label={`Conversas por dia nos últimos ${data.days} dias`} />
             </section>
 
-            <div className="grid grid-cols-1 gap-5 lg:grid-cols-2">
-              <section className="rounded-3xl bg-panel p-6 shadow-card">
+            <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
+              <section className="rounded-2xl border border-border-ui/70 bg-panel p-4 shadow-card">
                 <h2 className="text-[16px] font-bold tracking-tight text-text-primary">Onde as pessoas param</h2>
                 <p className="mb-4 text-[13px] text-text-secondary">Bloco em que a conversa ficou parada por mais de 30 minutos sem terminar.</p>
                 {!data.dropOff.length ? (
@@ -101,7 +101,7 @@ function ResultsPage() {
                 )}
               </section>
 
-              <section className="rounded-3xl bg-panel p-6 shadow-card">
+              <section className="rounded-2xl border border-border-ui/70 bg-panel p-4 shadow-card">
                 <h2 className="mb-4 text-[16px] font-bold tracking-tight text-text-primary">Conversas por canal</h2>
                 <ul className="flex flex-col gap-3">
                   {channels.map(([channel, count]) => {

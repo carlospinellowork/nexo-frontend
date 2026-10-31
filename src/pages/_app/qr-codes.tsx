@@ -73,7 +73,7 @@ function QrCodesPage() {
         ) : !items?.length ? (
           <EmptyQr canManage={canManage} onCreate={openCreate} />
         ) : (
-          <div className="mx-auto flex w-full max-w-6xl flex-col gap-5 px-4 py-5 md:px-8 md:py-8">
+          <div className="mx-auto flex w-full max-w-6xl flex-col gap-4 px-3 py-4 md:px-6 md:py-6">
             <Summary items={items} />
             <ul className="grid grid-cols-1 gap-3 sm:grid-cols-2 sm:gap-4 xl:grid-cols-3">
               {items.map((qr, i) => (
@@ -118,8 +118,8 @@ function Summary({ items }: { items: QrCode[] }) {
         { label: "Leituras em 7 dias", value: last7 },
         { label: "Leituras em 30 dias", value: last30 },
       ].map((s) => (
-        <div key={s.label} className="flex min-w-0 flex-col gap-1 rounded-2xl bg-panel p-3 shadow-card sm:rounded-3xl sm:p-5">
-          <span className="text-[24px] font-extrabold leading-none tracking-tight tabular-nums text-text-primary sm:text-[30px]">{fmt(s.value)}</span>
+        <div key={s.label} className="flex min-w-0 flex-col gap-1 rounded-2xl border border-border-ui/70 bg-panel p-3 shadow-card sm:p-4">
+          <span className="font-display text-[24px] font-bold leading-none tracking-tight tabular-nums text-text-primary sm:text-[28px]">{fmt(s.value)}</span>
           <span className="text-[12px] font-semibold leading-tight text-text-secondary sm:text-[13px]">{s.label}</span>
         </div>
       ))}
@@ -157,7 +157,7 @@ function QrCard({ qr, index, onOpen }: { qr: QrCode; index: number; onOpen: () =
         type="button"
         onClick={onOpen}
         whileTap={{ scale: 0.985 }}
-        className="flex h-full w-full flex-col gap-3 rounded-3xl bg-panel p-3.5 text-left shadow-card transition-shadow hover:shadow-float"
+        className="flex h-full w-full flex-col gap-3 rounded-2xl border border-border-ui/70 bg-panel p-3.5 text-left shadow-card transition-shadow hover:shadow-float"
       >
         <span className="flex w-full items-center gap-3.5">
           <QrThumb qr={qr} />
@@ -193,7 +193,7 @@ function QrCard({ qr, index, onOpen }: { qr: QrCode; index: number; onOpen: () =
 
 function ListSkeleton() {
   return (
-    <div className="mx-auto flex w-full max-w-6xl flex-col gap-5 px-4 py-5 md:px-8 md:py-8" aria-busy="true" aria-label="Carregando QR Codes">
+    <div className="mx-auto flex w-full max-w-6xl flex-col gap-4 px-3 py-4 md:px-6 md:py-6" aria-busy="true" aria-label="Carregando QR Codes">
       <div className="grid grid-cols-3 gap-2 sm:gap-4">
         {[0, 1, 2].map((i) => (
           <div key={i} className="h-[72px] animate-pulse rounded-2xl bg-panel shadow-card sm:h-[96px] sm:rounded-3xl" />
@@ -236,7 +236,7 @@ function EmptyQr({ canManage, onCreate }: { canManage: boolean; onCreate: () => 
           <QrCodeIcon size={38} strokeWidth={1.8} />
         </span>
         <div className="flex flex-col gap-1.5">
-          <h2 className="text-[24px] font-extrabold leading-tight tracking-tight text-text-primary">Seu primeiro QR Code</h2>
+          <h2 className="text-[22px] font-bold leading-tight tracking-tight text-text-primary">Seu primeiro QR Code</h2>
           <p className="text-[15px] leading-relaxed text-text-secondary">Imprima uma vez e troque o destino quando quiser; veja quantas pessoas leram.</p>
         </div>
         <ul className="flex w-full flex-col gap-2 text-left">

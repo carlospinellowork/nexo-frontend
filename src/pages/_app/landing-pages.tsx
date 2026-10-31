@@ -88,7 +88,7 @@ function LandingPagesPage() {
             </Button>
           </EmptyState>
         ) : (
-          <div id="tour-landing-cards" className="mx-auto grid w-full max-w-6xl grid-cols-1 gap-5 p-8 sm:grid-cols-2 xl:grid-cols-3">
+          <div id="tour-landing-cards" className="mx-auto grid w-full max-w-6xl grid-cols-1 gap-3 px-3 py-4 sm:grid-cols-2 md:gap-4 md:px-6 md:py-6 xl:grid-cols-3">
             {pages.map((p, i) => {
               const theme = THEME_INFO[p.theme];
               const isBio = p.settings.layout === "bio";
@@ -99,7 +99,7 @@ function LandingPagesPage() {
                   initial={{ opacity: 0, y: 12 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ type: "spring", stiffness: 400, damping: 32, delay: i * 0.04 }}
-                  className="group flex flex-col overflow-hidden rounded-3xl bg-panel shadow-card transition-shadow hover:shadow-float"
+                  className="group flex flex-col overflow-hidden rounded-2xl border border-border-ui/70 bg-panel shadow-card transition-shadow hover:shadow-float"
                 >
                   <button type="button" onClick={edit} className="relative flex h-28 items-end p-4 text-left" style={{ background: theme.colors[0] }} aria-label={`Editar ${p.title}`}>
                     <span className="absolute right-4 top-4 h-8 w-8 rounded-full" style={{ background: theme.colors[1] }} aria-hidden />

@@ -53,8 +53,8 @@ export function ChannelCard({ channel, chatId, integration, warning }: ChannelCa
   };
 
   return (
-    <motion.div layout className="overflow-hidden rounded-3xl bg-panel shadow-card">
-      <div className="flex items-center gap-4 p-5">
+    <motion.div layout className="overflow-hidden rounded-xl border border-border-ui/70 bg-panel-2/40">
+      <div className="flex items-center gap-3 p-3.5">
         <span className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl text-white shadow-card" style={{ backgroundColor: channel.color }}>
           <Icon size={24} />
         </span>
@@ -87,7 +87,7 @@ export function ChannelCard({ channel, chatId, integration, warning }: ChannelCa
             transition={{ duration: 0.28, ease: [0.2, 0.8, 0.2, 1] }}
             className="overflow-hidden"
           >
-            <div className="flex flex-col gap-4 border-t border-border-ui p-5">
+            <div className="flex flex-col gap-3 border-t border-border-ui p-3.5">
               {warning && (
                 <p className="flex gap-2.5 rounded-2xl bg-warning/14 p-3.5 text-[13px] leading-snug text-warning-strong">
                   <TriangleAlert size={18} className="shrink-0" />

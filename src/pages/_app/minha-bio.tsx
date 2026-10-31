@@ -31,12 +31,12 @@ function MinhaBioPage() {
   if (mode === "done" && created) {
     return (
       <div className="h-full overflow-y-auto">
-        <div className="mx-auto flex w-full max-w-xl flex-col gap-5 px-4 py-6">
+        <div className="mx-auto flex w-full max-w-xl flex-col gap-4 px-3 py-4 md:px-6 md:py-6">
           <div className="flex flex-col items-center gap-2 text-center">
             <span className="flex h-14 w-14 items-center justify-center rounded-2xl bg-success/14 text-success-strong">
               <PartyPopper size={28} />
             </span>
-            <h1 className="text-[26px] font-extrabold leading-tight tracking-tight text-text-primary">Sua bio está no ar</h1>
+            <h1 className="text-[24px] font-bold leading-tight tracking-tight text-text-primary">Sua bio está no ar</h1>
             <p className="text-[15px] text-text-secondary">O bot já responde as suas perguntas. Agora é só colocar o link onde os seguidores te encontram.</p>
           </div>
           <BioShare slug={created.slug} name={created.title} />

@@ -6,7 +6,7 @@ import { type ChatSettings, useChatBuilderStore } from "../store/chat-builder-st
 
 function Section({ title, children }: { title: string; children: ReactNode }) {
   return (
-    <section className="flex flex-col gap-4 rounded-3xl bg-panel p-5 shadow-card">
+    <section className="flex flex-col gap-3 rounded-2xl border border-border-ui/70 bg-panel p-4 shadow-card">
       <h3 className="text-[15px] font-bold text-text-primary">{title}</h3>
       {children}
     </section>
@@ -45,7 +45,7 @@ export function SettingsPanel() {
   const { name, draft, setName, setSetting } = useChatBuilderStore();
 
   return (
-    <div className="flex w-[360px] shrink-0 flex-col gap-4 overflow-y-auto border-r border-border-ui p-5">
+    <div className="flex w-[340px] shrink-0 flex-col gap-3 overflow-y-auto border-r border-border-ui p-3">
       <Section title="Identificação">
         <label className="flex flex-col gap-2">
           <span className="text-[13px] font-semibold text-text-secondary">Nome interno do chat</span>

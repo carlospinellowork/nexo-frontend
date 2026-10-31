@@ -31,7 +31,7 @@ export function ExampleCompanies() {
   };
 
   return (
-    <div className="rounded-3xl bg-panel p-6 shadow-card">
+    <div className="rounded-2xl border border-border-ui/70 bg-panel p-4 shadow-card">
       <h2 className="text-[18px] font-bold text-text-primary">Empresas de exemplo</h2>
       <p className="mt-1 text-[14px] text-text-secondary">Veja um negócio completo funcionando no Nexo e use como ponto de partida.</p>
 
