@@ -2,6 +2,7 @@ import { createFileRoute, Outlet, useNavigate, useRouterState } from "@tanstack/
 import { Menu, X } from "lucide-react";
 import { motion } from "motion/react";
 import { useEffect, useState } from "react";
+import { useGetMe } from "../../api/queries/useGetMe";
 import { authClient } from "../../lib/auth-client";
 import { Sidebar } from "../../shared/components/layout/Sidebar";
 import { LogoMark } from "../../shared/components/ui/Logo";
@@ -18,9 +19,16 @@ function AppLayout() {
   const pathname = useRouterState({ select: (s) => s.location.pathname });
   const [menuOpen, setMenuOpen] = useState(false);
 
+  const { data: me } = useGetMe();
+
   useEffect(() => {
     if (!isPending && !session) navigate({ to: "/login" });
   }, [session, isPending, navigate]);
+
+  // Primeiro login: antes do painel, o "conhecer você" (dá para pular).
+  useEffect(() => {
+    if (me && !me.user.onboarded) navigate({ to: "/boas-vindas" });
+  }, [me, navigate]);
 
   if (isPending || !session) {
     return (

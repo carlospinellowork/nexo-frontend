@@ -10,6 +10,7 @@
 
 import { Route as rootRouteImport } from './pages/__root'
 import { Route as AppLayoutRouteImport } from './pages/_app/layout'
+import { Route as BoasVindasRouteImport } from './pages/boas-vindas'
 import { Route as LoginRouteImport } from './pages/login'
 import { Route as AppIndexRouteImport } from './pages/_app/index'
 import { Route as AppChatBuilderRouteImport } from './pages/_app/chat-builder'
@@ -26,6 +27,11 @@ import { Route as PSlugRouteImport } from './pages/p/$slug'
 
 const AppLayoutRoute = AppLayoutRouteImport.update({
   id: '/_app',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const BoasVindasRoute = BoasVindasRouteImport.update({
+  id: '/boas-vindas',
+  path: '/boas-vindas',
   getParentRoute: () => rootRouteImport,
 } as any)
 const LoginRoute = LoginRouteImport.update({
@@ -96,6 +102,7 @@ const PSlugRoute = PSlugRouteImport.update({
 
 export interface FileRoutesByFullPath {
   '/': typeof AppIndexRoute
+  '/boas-vindas': typeof BoasVindasRoute
   '/login': typeof LoginRoute
   '/chat-builder': typeof AppChatBuilderRoute
   '/flow-builder': typeof AppFlowBuilderRoute
@@ -110,6 +117,7 @@ export interface FileRoutesByFullPath {
   '/p/$slug': typeof PSlugRoute
 }
 export interface FileRoutesByTo {
+  '/boas-vindas': typeof BoasVindasRoute
   '/login': typeof LoginRoute
   '/chat-builder': typeof AppChatBuilderRoute
   '/flow-builder': typeof AppFlowBuilderRoute
@@ -127,6 +135,7 @@ export interface FileRoutesByTo {
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/_app': typeof AppLayoutRouteWithChildren
+  '/boas-vindas': typeof BoasVindasRoute
   '/login': typeof LoginRoute
   '/_app/chat-builder': typeof AppChatBuilderRoute
   '/_app/flow-builder': typeof AppFlowBuilderRoute
@@ -145,6 +154,7 @@ export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
+    | '/boas-vindas'
     | '/login'
     | '/chat-builder'
     | '/flow-builder'
@@ -159,6 +169,7 @@ export interface FileRouteTypes {
     | '/p/$slug'
   fileRoutesByTo: FileRoutesByTo
   to:
+    | '/boas-vindas'
     | '/login'
     | '/chat-builder'
     | '/flow-builder'
@@ -175,6 +186,7 @@ export interface FileRouteTypes {
   id:
     | '__root__'
     | '/_app'
+    | '/boas-vindas'
     | '/login'
     | '/_app/chat-builder'
     | '/_app/flow-builder'
@@ -192,6 +204,7 @@ export interface FileRouteTypes {
 }
 export interface RootRouteChildren {
   AppLayoutRoute: typeof AppLayoutRouteWithChildren
+  BoasVindasRoute: typeof BoasVindasRoute
   LoginRoute: typeof LoginRoute
   PSlugRoute: typeof PSlugRoute
 }
@@ -203,6 +216,13 @@ declare module '@tanstack/react-router' {
       path: ''
       fullPath: '/'
       preLoaderRoute: typeof AppLayoutRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/boas-vindas': {
+      id: '/boas-vindas'
+      path: '/boas-vindas'
+      fullPath: '/boas-vindas'
+      preLoaderRoute: typeof BoasVindasRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/login': {
@@ -333,6 +353,7 @@ const AppLayoutRouteWithChildren = AppLayoutRoute._addFileChildren(
 
 const rootRouteChildren: RootRouteChildren = {
   AppLayoutRoute: AppLayoutRouteWithChildren,
+  BoasVindasRoute: BoasVindasRoute,
   LoginRoute: LoginRoute,
   PSlugRoute: PSlugRoute,
 }

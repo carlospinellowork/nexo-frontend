@@ -1,6 +1,8 @@
 import { Link, useNavigate, useRouterState } from "@tanstack/react-router";
 import { LogOut } from "lucide-react";
 import { motion } from "motion/react";
+import { useGetMe } from "../../../api/queries/useGetMe";
+import { UserAvatar } from "../../../features/profile/UserAvatar";
 import { WorkspaceSelector } from "../../../features/workspaces/components/WorkspaceSelector";
 import { authClient } from "../../../lib/auth-client";
 import { isNavActive, type NavGroup } from "../../navigation";
@@ -8,19 +10,11 @@ import { Logo } from "../ui/Logo";
 import { ThemeSegmented } from "../ui/ThemeToggle";
 import { gestureFor } from "../ui/gestures";
 
-function initials(name?: string | null) {
-  return (name ?? "?")
-    .split(" ")
-    .filter(Boolean)
-    .slice(0, 2)
-    .map((p) => p[0]?.toUpperCase())
-    .join("");
-}
-
 export function Sidebar({ groups, className = "w-[232px]", onNavigate }: { groups: NavGroup[]; className?: string; onNavigate?: () => void }) {
   const { data: session } = authClient.useSession();
   const navigate = useNavigate();
   const pathname = useRouterState({ select: (s) => s.location.pathname });
+  const { data: me } = useGetMe();
 
   const handleLogout = async () => {
     await authClient.signOut({ fetchOptions: { onSuccess: () => navigate({ to: "/login" }) } });
@@ -73,11 +67,11 @@ export function Sidebar({ groups, className = "w-[232px]", onNavigate }: { group
         <WorkspaceSelector />
         <ThemeSegmented />
         <div className="flex items-center gap-2.5 rounded-xl border border-border-ui bg-panel p-2">
-          <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-accent/14 text-[12px] font-bold text-accent-strong">
-            {initials(session?.user.name)}
-          </span>
+          <Link to="/boas-vindas" search={{ editar: true }} onClick={onNavigate} aria-label="Editar o seu perfil" title="Editar o seu perfil" className="shrink-0 rounded-full transition-transform hover:scale-105">
+            <UserAvatar name={me?.user.name ?? session?.user.name} color={me?.user.avatarColor} image={me?.user.avatarImage} size={32} />
+          </Link>
           <div className="flex min-w-0 flex-1 flex-col">
-            <span className="truncate text-[13px] font-semibold text-text-primary">{session?.user.name ?? "Usuário"}</span>
+            <span className="truncate text-[13px] font-semibold text-text-primary">{me?.user.name ?? session?.user.name ?? "Usuário"}</span>
             <span className="truncate text-[11.5px] text-text-secondary">{session?.user.email}</span>
           </div>
           <button

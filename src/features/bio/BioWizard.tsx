@@ -1,6 +1,6 @@
 import { ArrowLeft, Bot, Briefcase, Check, ChevronRight, Info, Link2, Plus, Rocket, ShoppingBag, Sparkles, Trash2, UserRound, X } from "lucide-react";
 import { AnimatePresence, motion, useReducedMotion } from "motion/react";
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
 import { apiErrorMessage } from "../../api/instance";
 import { useCreateBio } from "../../api/mutations/useBioMutations";
 import { Button } from "../../shared/components/ui/Button";
@@ -13,6 +13,7 @@ import { type LandingPageRecord, type LandingSection, type LandingTheme, type Li
 import { normalizePixKey } from "../landing/pix";
 import { parseLinks } from "./parseLinks";
 import { AUDIENCE_PRESETS, BIO_AUDIENCES, type BioAudience } from "./presets";
+import { useGetMe } from "../../api/queries/useGetMe";
 
 const AUDIENCE_ICONS: Record<BioAudience, typeof UserRound> = { creator: Sparkles, seller: ShoppingBag, business: Briefcase };
 
@@ -149,6 +150,29 @@ export function BioWizard({ onLock, onCreated }: BioWizardProps) {
   const [s, setS] = useState<WizardState>(INITIAL);
   const set = (patch: Partial<WizardState>) => setS((cur) => ({ ...cur, ...patch }));
   const preset = AUDIENCE_PRESETS[s.audience ?? "business"];
+  const { data: me } = useGetMe();
+  const prefilled = useRef(false);
+
+  // Já vem preenchida com o que a pessoa contou no "conhecer você" (público, marca ou @, cidade).
+  useEffect(() => {
+    if (!me || prefilled.current) return;
+    prefilled.current = true;
+    const p = me.workspace.profile;
+    const brand = p.brandName?.trim() ?? "";
+    const isHandle = brand.startsWith("@");
+    setS((cur) => {
+      const audience = cur.audience ?? p.audience ?? null;
+      const ap = audience ? AUDIENCE_PRESETS[audience] : null;
+      return {
+        ...cur,
+        audience,
+        ...(ap && !cur.audience ? { theme: ap.defaultTheme, faqs: cur.faqsTouched ? cur.faqs : ap.suggestions.slice(0, 3).map((x) => ({ key: newKey(), question: x.question, answer: "", hint: x.hint })) } : {}),
+        name: cur.name || (isHandle ? me.user.name ?? "" : brand || me.user.name || ""),
+        handle: cur.handle || (isHandle ? brand : ""),
+        pixCity: cur.pixCity || (p.city ?? "").slice(0, 15),
+      };
+    });
+  }, [me]);
 
   const pickAudience = (audience: BioAudience) => {
     const p = AUDIENCE_PRESETS[audience];

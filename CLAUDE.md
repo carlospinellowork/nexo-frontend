@@ -33,6 +33,8 @@ src/shared/navigation.ts   menu do painel (NAV_GROUPS: Presença, Assistente, Ac
 src/shared/components/ui/tones.ts  cor dos ícones e destaques das áreas: desde 31/10/2026 é UMA cor só (o roxo da marca) para todas; não crie cor por área
 src/features/qr/           QR Codes: QrFormSheet (criar/editar por tipo), QrDetailSheet (baixar PNG/SVG, gráfico), PrintCard (@media print)
 src/shared/components/ui/Sheet.tsx  o modal do Nexo (único): centralizado no computador com a altura do conteúdo (até 86% da tela), sobe de baixo no celular; aceita onSubmit (vira <form>) e busy
+src/features/profile/      "conhecer você": UserAvatar (foto ou iniciais na cor), avatar.ts (cores), resizeImage (recorta 256 px em JPEG);
+                           a tela é pages/boas-vindas.tsx (primeiro login; editar pelo avatar do menu, ?editar=1). GET/PUT /api/me
 src/shared/hooks/useWorkspaceRole.ts  papel do usuário no workspace ativo (esconder ações de Admin para Membro)
 src/features/auth/         LoginHero e GoogleButton (aparece só se GET /auth-providers devolver google: true)
 ```

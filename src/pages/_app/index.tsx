@@ -7,6 +7,7 @@ import { useGetChats } from "../../api/queries/useGetChats";
 import { useGetHandoffs } from "../../api/queries/useGetHandoffs";
 import { useGetIntegrations } from "../../api/queries/useGetIntegrations";
 import { useGetLandingClicks } from "../../api/queries/useGetLandingClicks";
+import { useGetMe } from "../../api/queries/useGetMe";
 import { useGetQrCodes } from "../../api/queries/useGetQrCodes";
 import { useGetResults } from "../../api/queries/useGetResults";
 import { BioHomeCard } from "../../features/bio/BioHomeCard";
@@ -39,6 +40,7 @@ function HomePage() {
   const { data: qrCodes } = useGetQrCodes();
   const { data: bio } = useGetBio();
   const { data: bioClicks } = useGetLandingClicks(bio?.id);
+  const { data: me } = useGetMe();
 
   useEffect(() => {
     const timer = setTimeout(() => startTour("home"), 700);
@@ -57,12 +59,21 @@ function HomePage() {
 
   const chatCount = chats?.length ?? 0;
   const channelCount = integrations?.length ?? 0;
-  const steps = [
-    { done: Boolean(bio), title: "Crie a sua bio", description: "Links, Pix e o assistente numa página só.", to: "/minha-bio" },
-    { done: chatCount > 0, title: "Monte a conversa do bot", description: "Mensagens, perguntas e decisões.", to: "/flow-builder" },
-    { done: (qrCodes?.length ?? 0) > 0, title: "Crie um QR Code", description: "Para o balcão, a vitrine ou a embalagem.", to: "/qr-codes" },
-    { done: channelCount > 0, title: "Conecte um canal", description: "WhatsApp, Instagram, Telegram ou site.", to: "/integrations" },
+  const allSteps = [
+    { key: "bio", done: Boolean(bio), title: "Crie a sua bio", description: "Links, Pix e o assistente numa página só.", to: "/minha-bio" },
+    { key: "bot", done: chatCount > 0, title: "Monte a conversa do bot", description: "Mensagens, perguntas e decisões.", to: "/flow-builder" },
+    { key: "qr", done: (qrCodes?.length ?? 0) > 0, title: "Crie um QR Code", description: "Para o balcão, a vitrine ou a embalagem.", to: "/qr-codes" },
+    { key: "channel", done: channelCount > 0, title: "Conecte um canal", description: "WhatsApp, Instagram, Telegram ou site.", to: "/integrations" },
   ];
+  // O objetivo contado no "conhecer você" decide a ordem dos passos.
+  const ORDER: Record<string, string[]> = {
+    whatsapp: ["bio", "qr", "bot", "channel"],
+    links: ["bio", "qr", "bot", "channel"],
+    autoreply: ["bot", "channel", "bio", "qr"],
+    sources: ["qr", "bio", "bot", "channel"],
+  };
+  const order = ORDER[me?.workspace.profile.goal ?? ""] ?? ["bio", "bot", "qr", "channel"];
+  const steps = [...allSteps].sort((a, b) => order.indexOf(a.key) - order.indexOf(b.key));
   const pending = steps.filter((s) => !s.done).length;
   const next = steps.find((s) => !s.done);
 
@@ -71,7 +82,7 @@ function HomePage() {
       <motion.div variants={container} initial="hidden" animate="show" className="mx-auto flex w-full max-w-6xl flex-col gap-4 px-3 py-3 md:gap-5 md:px-6 md:py-6">
         <motion.div variants={item}>
           <HomeHero
-            firstName={session?.user.name?.split(" ")[0]}
+            firstName={(me?.user.name ?? session?.user.name)?.split(" ")[0]}
             today={convToday}
             week={convWeek}
             waiting={handoffs?.length ?? 0}
