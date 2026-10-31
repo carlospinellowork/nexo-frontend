@@ -12,6 +12,8 @@ import { Route as rootRouteImport } from './pages/__root'
 import { Route as AppLayoutRouteImport } from './pages/_app/layout'
 import { Route as BoasVindasRouteImport } from './pages/boas-vindas'
 import { Route as LoginRouteImport } from './pages/login'
+import { Route as PrivacidadeRouteImport } from './pages/privacidade'
+import { Route as TermosRouteImport } from './pages/termos'
 import { Route as AppIndexRouteImport } from './pages/_app/index'
 import { Route as AppChatBuilderRouteImport } from './pages/_app/chat-builder'
 import { Route as AppFlowBuilderRouteImport } from './pages/_app/flow-builder'
@@ -37,6 +39,16 @@ const BoasVindasRoute = BoasVindasRouteImport.update({
 const LoginRoute = LoginRouteImport.update({
   id: '/login',
   path: '/login',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const PrivacidadeRoute = PrivacidadeRouteImport.update({
+  id: '/privacidade',
+  path: '/privacidade',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const TermosRoute = TermosRouteImport.update({
+  id: '/termos',
+  path: '/termos',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AppIndexRoute = AppIndexRouteImport.update({
@@ -104,6 +116,8 @@ export interface FileRoutesByFullPath {
   '/': typeof AppIndexRoute
   '/boas-vindas': typeof BoasVindasRoute
   '/login': typeof LoginRoute
+  '/privacidade': typeof PrivacidadeRoute
+  '/termos': typeof TermosRoute
   '/chat-builder': typeof AppChatBuilderRoute
   '/flow-builder': typeof AppFlowBuilderRoute
   '/integrations': typeof AppIntegrationsRoute
@@ -119,6 +133,8 @@ export interface FileRoutesByFullPath {
 export interface FileRoutesByTo {
   '/boas-vindas': typeof BoasVindasRoute
   '/login': typeof LoginRoute
+  '/privacidade': typeof PrivacidadeRoute
+  '/termos': typeof TermosRoute
   '/chat-builder': typeof AppChatBuilderRoute
   '/flow-builder': typeof AppFlowBuilderRoute
   '/integrations': typeof AppIntegrationsRoute
@@ -137,6 +153,8 @@ export interface FileRoutesById {
   '/_app': typeof AppLayoutRouteWithChildren
   '/boas-vindas': typeof BoasVindasRoute
   '/login': typeof LoginRoute
+  '/privacidade': typeof PrivacidadeRoute
+  '/termos': typeof TermosRoute
   '/_app/chat-builder': typeof AppChatBuilderRoute
   '/_app/flow-builder': typeof AppFlowBuilderRoute
   '/_app/integrations': typeof AppIntegrationsRoute
@@ -156,6 +174,8 @@ export interface FileRouteTypes {
     | '/'
     | '/boas-vindas'
     | '/login'
+    | '/privacidade'
+    | '/termos'
     | '/chat-builder'
     | '/flow-builder'
     | '/integrations'
@@ -171,6 +191,8 @@ export interface FileRouteTypes {
   to:
     | '/boas-vindas'
     | '/login'
+    | '/privacidade'
+    | '/termos'
     | '/chat-builder'
     | '/flow-builder'
     | '/integrations'
@@ -188,6 +210,8 @@ export interface FileRouteTypes {
     | '/_app'
     | '/boas-vindas'
     | '/login'
+    | '/privacidade'
+    | '/termos'
     | '/_app/chat-builder'
     | '/_app/flow-builder'
     | '/_app/integrations'
@@ -206,6 +230,8 @@ export interface RootRouteChildren {
   AppLayoutRoute: typeof AppLayoutRouteWithChildren
   BoasVindasRoute: typeof BoasVindasRoute
   LoginRoute: typeof LoginRoute
+  PrivacidadeRoute: typeof PrivacidadeRoute
+  TermosRoute: typeof TermosRoute
   PSlugRoute: typeof PSlugRoute
 }
 
@@ -230,6 +256,20 @@ declare module '@tanstack/react-router' {
       path: '/login'
       fullPath: '/login'
       preLoaderRoute: typeof LoginRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/privacidade': {
+      id: '/privacidade'
+      path: '/privacidade'
+      fullPath: '/privacidade'
+      preLoaderRoute: typeof PrivacidadeRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/termos': {
+      id: '/termos'
+      path: '/termos'
+      fullPath: '/termos'
+      preLoaderRoute: typeof TermosRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/_app/': {
@@ -355,6 +395,8 @@ const rootRouteChildren: RootRouteChildren = {
   AppLayoutRoute: AppLayoutRouteWithChildren,
   BoasVindasRoute: BoasVindasRoute,
   LoginRoute: LoginRoute,
+  PrivacidadeRoute: PrivacidadeRoute,
+  TermosRoute: TermosRoute,
   PSlugRoute: PSlugRoute,
 }
 export const routeTree = rootRouteImport

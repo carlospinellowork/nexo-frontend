@@ -1,4 +1,4 @@
-import { createFileRoute, useNavigate } from "@tanstack/react-router";
+import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { ArrowRight, Lock, Mail, User } from "lucide-react";
 import { AnimatePresence, motion, useAnimationControls } from "motion/react";
 import { type FormEvent, useEffect, useState } from "react";
@@ -232,7 +232,15 @@ function LoginPage() {
           </Button>
 
           <p className="text-center text-[13px] text-text-secondary">
-            Ao continuar, você concorda com os Termos de Uso e a Política de Privacidade.
+            Ao continuar, você concorda com os{" "}
+            <Link to="/termos" className="font-semibold text-text-primary underline underline-offset-2">
+              Termos de Uso
+            </Link>{" "}
+            e a{" "}
+            <Link to="/privacidade" className="font-semibold text-text-primary underline underline-offset-2">
+              Política de Privacidade
+            </Link>
+            .
           </p>
         </motion.form>
       </section>

@@ -331,7 +331,13 @@ function PageRenderer({ title, theme, sections, settings, onChat }: LandingRende
                         ))}
                       </nav>
                     )}
-                    {d.copyright && <p className={`text-[13px] ${t.muted}`}>{d.copyright}</p>}
+                    <div className="flex flex-col gap-1">
+                      {d.copyright && <p className={`text-[13px] ${t.muted}`}>{d.copyright}</p>}
+                      {/* Os visitantes podem deixar dados no chat: link para a política do Nexo (operador). */}
+                      <a href="/privacidade" target="_blank" rel="noopener" className={`text-[12px] underline-offset-2 hover:underline ${t.muted}`}>
+                        Privacidade
+                      </a>
+                    </div>
                   </div>
                 </footer>
               );
@@ -563,9 +569,11 @@ function BioRenderer({ title, theme, sections, settings, slug, canAsk, onChat, o
 
         <div className="mt-auto flex flex-col items-center gap-2 pt-12">
           {footer?.companyName && <span className={`text-[12px] font-semibold ${t.muted}`}>{footer.companyName}</span>}
-          {showBadge && (
-            <SealPill href={`${SITE_URL}?ref=${encodeURIComponent(slug ?? "")}`} className="my-2" />
-          )}
+          {showBadge && <SealPill href={`${SITE_URL}?ref=${encodeURIComponent(slug ?? "")}`} className="my-2" />}
+          {/* Os visitantes podem deixar dados no chat: link para a política do Nexo (operador). */}
+          <a href="/privacidade" target="_blank" rel="noopener" className={`inline-flex min-h-8 items-center px-2 text-[12px] underline-offset-2 hover:underline ${t.muted}`}>
+            Privacidade
+          </a>
         </div>
       </div>
       {pix && <PixDialog item={pix} cardClass={t.card} mutedClass={t.muted} buttonClass={t.primary} onClose={() => setPix(null)} />}
