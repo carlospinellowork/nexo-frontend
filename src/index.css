@@ -480,3 +480,13 @@ h1, h2, h3, .font-display {
 @media (prefers-reduced-motion: reduce) {
   .nx-holo, .nx-holo::before { animation: none; }
 }
+
+/*
+ * Celular: campos com no mínimo 16 px. Abaixo disso o iPhone dá zoom sozinho ao tocar no campo.
+ * Vale para o painel; as páginas dos clientes (nx-landing) têm o próprio tamanho.
+ */
+@media (max-width: 767px) {
+  :where(input:not([type="checkbox"]):not([type="radio"]):not([type="range"]), textarea, select) {
+    font-size: max(16px, 1em) !important;
+  }
+}

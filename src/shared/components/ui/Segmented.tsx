@@ -27,7 +27,7 @@ export function Segmented<T extends string>({ options, value, onChange, label, s
             aria-checked={active}
             onClick={() => onChange(opt.value)}
             className={`relative flex flex-1 items-center justify-center gap-1.5 whitespace-nowrap rounded-[8px] font-semibold transition-colors ${fullWidth ? "min-w-0" : "shrink-0"} ${
-              size === "sm" ? "h-7 px-1.5 text-[12px]" : "h-8 px-3 text-[13.5px]"
+              size === "sm" ? "h-9 px-1.5 text-[13px] md:h-7 md:text-[12px]" : "h-10 px-3 text-[14px] md:h-8 md:text-[13.5px]"
             } ${active ? "text-text-primary" : "text-text-secondary hover:text-text-primary"}`}
           >
             {active && (

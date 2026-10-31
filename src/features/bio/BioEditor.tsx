@@ -216,9 +216,9 @@ export function BioEditor({ page }: { page: LandingPageRecord }) {
         </div>
         <div className="flex w-full items-center gap-2 md:ml-auto md:w-auto">
           {page.publishedAt && (
-            <a href={`/p/${page.slug}`} target="_blank" rel="noreferrer" className="flex h-11 items-center gap-1.5 rounded-xl px-3 text-[14px] font-semibold text-text-primary hover:bg-panel-hover">
+            <a href={`/p/${page.slug}`} target="_blank" rel="noreferrer" aria-label="Ver no ar" title="Ver no ar" className="flex h-11 min-w-11 shrink-0 items-center justify-center gap-1.5 whitespace-nowrap rounded-xl border border-border-ui px-3 text-[14px] font-semibold text-text-primary hover:bg-panel-hover sm:border-0">
               <ExternalLink size={16} />
-              Ver no ar
+              <span className="hidden sm:inline">Ver no ar</span>
             </a>
           )}
           <Button variant="outline" icon={Save} onClick={() => void ensureSaved(true)} loading={saving && !publishing} disabled={!dirty} className="ml-auto h-11 md:ml-0">

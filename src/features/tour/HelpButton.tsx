@@ -92,7 +92,7 @@ export function HelpButton({ tourKey, screenTitle }: HelpButtonProps) {
         <button
           type="button"
           onClick={() => setMenuOpen(!menuOpen)}
-          className="flex items-center gap-1.5 rounded-xl border border-border-ui bg-panel-2 px-3 py-1.5 text-xs font-semibold text-text-secondary transition-all hover:border-primary/40 hover:bg-panel-hover hover:text-text-primary"
+          className="flex h-10 min-w-10 items-center justify-center gap-1.5 rounded-xl border border-border-ui bg-panel-2 px-2.5 text-xs font-semibold text-text-secondary transition-all hover:border-primary/40 hover:bg-panel-hover hover:text-text-primary sm:h-8 sm:px-3"
           title="Ajuda e Tutoriais"
         >
           <HelpCircle size={15} className="text-primary" />
