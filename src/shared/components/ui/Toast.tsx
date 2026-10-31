@@ -5,7 +5,7 @@ import { useToastStore } from "./toast-store";
 export function Toaster() {
   const { items, dismiss } = useToastStore();
   return (
-    <div className="pointer-events-none fixed bottom-6 right-6 z-[100] flex max-w-sm flex-col gap-2">
+    <div className="pointer-events-none fixed inset-x-3 bottom-[calc(4.25rem+env(safe-area-inset-bottom))] z-[100] flex flex-col gap-2 md:inset-x-auto md:bottom-6 md:right-6 md:max-w-sm">
       <AnimatePresence initial={false}>
         {items.map((t) => (
           <motion.div
