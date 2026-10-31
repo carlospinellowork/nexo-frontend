@@ -1,179 +1,143 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { ArrowRight, Bot, ChartLine, CheckCircle2, Circle, LayoutTemplate, type LucideIcon, Users } from "lucide-react";
+import { ArrowRight, CheckCircle2, Circle, MessageCircle, MousePointerClick, QrCode, Users } from "lucide-react";
 import { motion } from "motion/react";
+import { useEffect } from "react";
+import { useGetBio } from "../../api/queries/useGetBio";
 import { useGetChats } from "../../api/queries/useGetChats";
+import { useGetHandoffs } from "../../api/queries/useGetHandoffs";
 import { useGetIntegrations } from "../../api/queries/useGetIntegrations";
-import { authClient } from "../../lib/auth-client";
-import { Badge } from "../../shared/components/ui/Badge";
-import { type Tone, TONES } from "../../shared/components/ui/tones";
-import { useActiveChat } from "../../shared/hooks/useActiveChat";
+import { useGetLandingClicks } from "../../api/queries/useGetLandingClicks";
+import { useGetQrCodes } from "../../api/queries/useGetQrCodes";
+import { useGetResults } from "../../api/queries/useGetResults";
 import { BioHomeCard } from "../../features/bio/BioHomeCard";
 import { ExampleCompanies } from "../../features/examples/ExampleCompanies";
-import { HelpButton } from "../../features/tour/HelpButton";
+import { HomeHero } from "../../features/home/HomeHero";
+import { QuickActions } from "../../features/home/QuickActions";
+import { StatTile } from "../../features/home/StatTile";
 import { startTour } from "../../features/tour/driver-service";
-import { useEffect } from "react";
+import { HelpButton } from "../../features/tour/HelpButton";
+import { authClient } from "../../lib/auth-client";
+import { useActiveChat } from "../../shared/hooks/useActiveChat";
 
 export const Route = createFileRoute("/_app/")({
   component: HomePage,
 });
 
-interface Pillar {
-  title: string;
-  description: string;
-  icon: LucideIcon;
-  tone: Tone;
-  to?: string;
-  status: string;
-  soon?: boolean;
-}
+const container = { hidden: {}, show: { transition: { staggerChildren: 0.05 } } };
+const item = { hidden: { opacity: 0, y: 12 }, show: { opacity: 1, y: 0, transition: { duration: 0.4, ease: [0.2, 0.8, 0.2, 1] as const } } };
 
-const container = { hidden: {}, show: { transition: { staggerChildren: 0.06 } } };
-const item = { hidden: { opacity: 0, y: 14 }, show: { opacity: 1, y: 0, transition: { duration: 0.4, ease: [0.2, 0.8, 0.2, 1] as const } } };
-
-function greeting() {
-  const h = new Date().getHours();
-  return h < 12 ? "Bom dia" : h < 18 ? "Boa tarde" : "Boa noite";
-}
+const sum = (values: number[]) => values.reduce((a, b) => a + b, 0);
 
 function HomePage() {
   const { data: session } = authClient.useSession();
   const { data: chats } = useGetChats();
   const { chatId } = useActiveChat();
   const { data: integrations } = useGetIntegrations(chatId);
-
-  const chatCount = chats?.length ?? 0;
-  const channelCount = integrations?.length ?? 0;
-  const firstName = session?.user.name?.split(" ")[0];
-  const date = new Date().toLocaleDateString("pt-BR", { weekday: "long", day: "numeric", month: "long" });
-  const today = date.charAt(0).toUpperCase() + date.slice(1);
+  const { data: results30 } = useGetResults(30);
+  const { data: results7 } = useGetResults(7);
+  const { data: handoffs } = useGetHandoffs();
+  const { data: qrCodes } = useGetQrCodes();
+  const { data: bio } = useGetBio();
+  const { data: bioClicks } = useGetLandingClicks(bio?.id);
 
   useEffect(() => {
-    const timer = setTimeout(() => {
-      startTour("home");
-    }, 700);
+    const timer = setTimeout(() => startTour("home"), 700);
     return () => clearTimeout(timer);
   }, []);
 
-  const pillars: Pillar[] = [
-    {
-      title: "Conversas",
-      description: "Bots no WhatsApp, Instagram, Telegram e no seu site",
-      icon: Bot,
-      tone: "ocean",
-      to: "/flow-builder",
-      status: chatCount ? `${chatCount} ${chatCount === 1 ? "bot criado" : "bots criados"}` : "Criar primeiro bot",
-    },
-    { title: "Páginas", description: "Landing pages criadas conversando com a IA", icon: LayoutTemplate, tone: "orange", to: "/landing-pages", status: "Criar página" },
-    { title: "Leads", description: "Quem deixou contato e quem espera atendimento", icon: Users, tone: "green", to: "/leads", status: "Ver leads" },
-    { title: "Resultados", description: "Conversas, leads e onde as pessoas desistem", icon: ChartLine, tone: "amber", to: "/results", status: "Ver resultados" },
-  ];
+  // Números reais: últimos 7 dias contra os 7 anteriores.
+  // (O endpoint de Resultados aceita 7, 30 ou 90 dias; as duas últimas semanas saem da série de 30.)
+  const perDay = results30?.perDay.map((d) => d.count).slice(-14);
+  const convWeek = perDay ? sum(perDay.slice(-7)) : undefined;
+  const convPrev = perDay && perDay.length >= 14 ? sum(perDay.slice(0, 7)) : undefined;
+  const convToday = perDay?.at(-1);
+  const leadsWeek = results7?.leads;
+  const qrWeek = qrCodes ? sum(qrCodes.map((q) => q.stats?.last7 ?? 0)) : undefined;
+  const clicksWeek = bio === null ? 0 : bioClicks ? sum(Object.values(bioClicks.items).map((i) => i.last7)) : undefined;
 
+  const chatCount = chats?.length ?? 0;
+  const channelCount = integrations?.length ?? 0;
   const steps = [
-    { done: chatCount > 0, title: "Crie seu assistente", description: "Nome e aparência do bot.", to: "/chat-builder" },
-    { done: chatCount > 0, title: "Monte a conversa", description: "Mensagens, perguntas e decisões.", to: "/flow-builder" },
-    { done: false, title: "Teste como cliente", description: "Converse com o bot antes de publicar.", to: "/simulate" },
+    { done: Boolean(bio), title: "Crie a sua bio", description: "Links, Pix e o assistente numa página só.", to: "/minha-bio" },
+    { done: chatCount > 0, title: "Monte a conversa do bot", description: "Mensagens, perguntas e decisões.", to: "/flow-builder" },
+    { done: (qrCodes?.length ?? 0) > 0, title: "Crie um QR Code", description: "Para o balcão, a vitrine ou a embalagem.", to: "/qr-codes" },
     { done: channelCount > 0, title: "Conecte um canal", description: "WhatsApp, Instagram, Telegram ou site.", to: "/integrations" },
   ];
-
-  const next = !chatCount
-    ? { title: "Crie seu primeiro assistente e veja ele conversando em um minuto", cta: "Criar assistente", to: "/chat-builder" }
-    : !channelCount
-      ? { title: "Conecte o WhatsApp ou o Instagram e comece a atender automaticamente", cta: "Conectar canal", to: "/integrations" }
-      : { title: "Seu bot está no ar. Teste a conversa como se fosse um cliente", cta: "Abrir simulador", to: "/simulate" };
+  const pending = steps.filter((s) => !s.done).length;
+  const next = steps.find((s) => !s.done);
 
   return (
     <div className="h-full overflow-y-auto">
-      <motion.div variants={container} initial="hidden" animate="show" className="mx-auto flex w-full max-w-6xl flex-col gap-6 px-4 py-6 md:gap-8 md:px-10 md:py-10">
-        <motion.div variants={item} className="flex items-center justify-between gap-4">
-          <div className="flex flex-col gap-1">
-            <span className="text-[15px] text-text-secondary">{today}</span>
-            <h1 className="text-[28px] font-extrabold md:text-[34px] tracking-[-0.02em] text-text-primary">
-              {greeting()}
-              {firstName ? `, ${firstName}` : ""}
-            </h1>
-          </div>
-          <HelpButton tourKey="home" screenTitle="Início" />
+      <motion.div variants={container} initial="hidden" animate="show" className="mx-auto flex w-full max-w-6xl flex-col gap-4 px-3 py-3 md:gap-5 md:px-6 md:py-6">
+        <motion.div variants={item}>
+          <HomeHero
+            firstName={session?.user.name?.split(" ")[0]}
+            today={convToday}
+            week={convWeek}
+            waiting={handoffs?.length ?? 0}
+            actions={<HelpButton tourKey="home" screenTitle="Início" />}
+          />
+        </motion.div>
+
+        <motion.div id="tour-home-stats" variants={item} className="grid grid-cols-2 gap-2.5 md:gap-3 xl:grid-cols-4">
+          <StatTile label="Conversas" value={convWeek} previous={convPrev} series={perDay} icon={MessageCircle} tone="ocean" to="/results" />
+          <StatTile label="Leads novos" value={leadsWeek} icon={Users} tone="green" to="/leads" />
+          <StatTile label="Leituras de QR" value={qrWeek} icon={QrCode} tone="lagoon" to="/qr-codes" />
+          <StatTile label="Cliques na bio" value={clicksWeek} icon={MousePointerClick} tone="rose" to="/minha-bio" hint={bio === null ? "crie a sua bio" : "nos últimos 7 dias"} />
         </motion.div>
 
         <motion.div variants={item}>
+          <QuickActions />
+        </motion.div>
+
+        <motion.div variants={item} className="grid grid-cols-1 gap-4 lg:grid-cols-[minmax(0,1.6fr)_minmax(0,1fr)]">
           <BioHomeCard />
+
+          {next ? (
+            <div className="relative flex flex-col gap-3 overflow-hidden rounded-2xl border border-accent/30 bg-panel p-4 shadow-card">
+              <span className="pointer-events-none absolute -right-14 -top-14 h-40 w-40 rounded-full bg-accent opacity-25 blur-3xl" />
+              <span className="relative flex items-center gap-1.5 text-[12px] font-bold uppercase tracking-[0.08em] text-accent-strong">
+                Próximo passo · faltam {pending}
+              </span>
+              <p className="relative font-display text-[19px] font-bold leading-snug text-text-primary">{next.title}</p>
+              <p className="relative text-[14px] text-text-secondary">{next.description}</p>
+              <Link to={next.to} className="nx-btn-gold nx-anim relative mt-auto inline-flex h-10 w-full items-center justify-center gap-1.5 rounded-[11px] px-4 text-[14px] font-semibold sm:w-fit">
+                Fazer agora
+                <ArrowRight size={16} data-gesture="nudge" />
+              </Link>
+            </div>
+          ) : (
+            <div className="flex flex-col justify-center gap-2 rounded-2xl border border-success/30 bg-success/8 p-4">
+              <CheckCircle2 size={22} className="text-success-strong" />
+              <p className="font-display text-[18px] font-bold text-text-primary">Tudo configurado</p>
+              <p className="text-[14px] text-text-secondary">Bio, bot, QR Code e canal prontos. Agora é divulgar o link da bio.</p>
+            </div>
+          )}
         </motion.div>
 
-        <motion.div id="tour-home-stats" variants={item} className="grid grid-cols-1 gap-5 sm:grid-cols-2 xl:grid-cols-4">
-          {pillars.map((p) => {
-            const t = TONES[p.tone];
-            const content = (
-              <>
-                {/* Brilho na cor da área, no canto do cartão. */}
-                <span className={`pointer-events-none absolute -right-10 -top-10 h-32 w-32 rounded-full opacity-[0.16] blur-2xl ${t.glow}`} />
-                <span className={`relative flex h-12 w-12 items-center justify-center rounded-2xl ${t.chip}`}>
-                  <p.icon size={24} />
-                </span>
-                <span className="relative flex flex-col gap-1">
-                  <span className="text-[18px] font-bold text-text-primary">{p.title}</span>
-                  <span className="text-[14px] leading-snug text-text-secondary">{p.description}</span>
-                </span>
-                {p.soon ? (
-                  <Badge>Em breve</Badge>
-                ) : (
-                  <span className={`relative mt-auto inline-flex items-center gap-1.5 text-[14px] font-semibold ${t.text}`}>
-                    {p.status}
-                    <ArrowRight size={16} className="transition-transform group-hover:translate-x-0.5" />
-                  </span>
-                )}
-              </>
-            );
-            const className = "group relative flex h-full flex-col items-start gap-4 overflow-hidden rounded-3xl border border-border-ui/60 bg-panel p-6 shadow-card";
-            return p.to ? (
-              <motion.div key={p.title} whileHover={{ y: -4 }} transition={{ type: "spring", stiffness: 400, damping: 28 }}>
-                <Link to={p.to} className={`${className} transition-shadow hover:shadow-float`}>
-                  {content}
-                </Link>
-              </motion.div>
-            ) : (
-              <div key={p.title} className={`${className} opacity-80`}>
-                {content}
-              </div>
-            );
-          })}
-        </motion.div>
-
-        <motion.div variants={item} className="grid grid-cols-1 gap-5 lg:grid-cols-[minmax(0,2fr)_minmax(0,1fr)]">
-          <div className="rounded-3xl bg-panel p-6 shadow-card">
-            <h2 className="mb-4 text-[18px] font-bold text-text-primary">Comece por aqui</h2>
-            <ol className="flex flex-col">
-              {steps.map((step, i) => (
+        {pending > 0 && (
+          <motion.section variants={item} className="rounded-2xl border border-border-ui/70 bg-panel p-3 shadow-card md:p-4">
+            <h2 className="mb-1 px-1 text-[16px] font-bold text-text-primary">Comece por aqui</h2>
+            <ol className="grid grid-cols-1 gap-0.5 sm:grid-cols-2">
+              {steps.map((step) => (
                 <li key={step.title}>
-                  <Link to={step.to} className="flex items-center gap-4 rounded-2xl px-3 py-3 transition-colors hover:bg-panel-hover">
-                    <span className="w-5 text-center text-[13px] font-bold text-text-secondary">{i + 1}</span>
-                    <span className="flex flex-1 flex-col">
-                      <span className="text-[15px] font-semibold text-text-primary">{step.title}</span>
-                      <span className="text-[14px] text-text-secondary">{step.description}</span>
+                  <Link to={step.to} className="flex items-center gap-3 rounded-xl px-2 py-2 transition-colors hover:bg-panel-hover">
+                    {step.done ? <CheckCircle2 size={20} className="shrink-0 text-success" /> : <Circle size={20} className="shrink-0 text-text-secondary/40" />}
+                    <span className="flex min-w-0 flex-col">
+                      <span className={`truncate text-[14px] font-semibold ${step.done ? "text-text-secondary line-through decoration-text-secondary/40" : "text-text-primary"}`}>{step.title}</span>
+                      <span className="truncate text-[12.5px] text-text-secondary">{step.description}</span>
                     </span>
-                    {step.done ? <CheckCircle2 size={22} className="text-success" /> : <Circle size={22} className="text-text-secondary/40" />}
                   </Link>
                 </li>
               ))}
             </ol>
-          </div>
-
-          <div className="relative flex flex-col gap-4 overflow-hidden rounded-3xl bg-[#0B1220] p-6 text-white">
-            <div className="pointer-events-none absolute -right-16 -top-16 h-48 w-48 rounded-full bg-[#FFC400] opacity-30 blur-3xl" />
-            <span className="relative text-[13px] font-bold uppercase tracking-wider text-[#FFC400]">Próximo passo</span>
-            <p className="relative text-[20px] font-bold leading-snug">{next.title}</p>
-            <Link
-              to={next.to}
-              className="relative mt-auto flex h-11 items-center justify-center gap-2 rounded-2xl bg-white text-[15px] font-semibold text-[#0B1220] transition-transform active:scale-[0.98]"
-            >
-              {next.cta}
-              <ArrowRight size={18} />
-            </Link>
-          </div>
-        </motion.div>
+          </motion.section>
+        )}
 
         <motion.div variants={item}>
           <ExampleCompanies />
         </motion.div>
+
       </motion.div>
     </div>
   );

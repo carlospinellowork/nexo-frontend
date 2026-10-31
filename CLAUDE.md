@@ -30,7 +30,7 @@ src/features/tour/         tour guiado (driver.js) e HelpButton; títulos com í
 src/features/workspaces/   seletor e store (só o id ativo)
 src/shared/                layout, ui (PromptDialog, Toaster/toast, ChatSelect, EmptyState), hooks/useActiveChat
 src/shared/navigation.ts   menu do painel (NAV_GROUPS: Presença, Assistente, Acompanhar); tela nova entra aqui
-src/shared/components/ui/tones.ts  cor de cada área (menu, cabeçalho, cartões do Início); use TONES, não classes soltas
+src/shared/components/ui/tones.ts  cor dos ícones e destaques das áreas: desde 31/10/2026 é UMA cor só (o roxo da marca) para todas; não crie cor por área
 src/features/qr/           QR Codes: QrFormSheet (criar/editar por tipo), QrDetailSheet (baixar PNG/SVG, gráfico), PrintCard (@media print)
 src/shared/components/ui/Sheet.tsx  o modal do Nexo (único): centralizado no computador com a altura do conteúdo (até 86% da tela), sobe de baixo no celular; aceita onSubmit (vira <form>) e busy
 src/shared/hooks/useWorkspaceRole.ts  papel do usuário no workspace ativo (esconder ações de Admin para Membro)
@@ -89,6 +89,8 @@ src/features/auth/         LoginHero e GoogleButton (aparece só se GET /auth-pr
 - **Ícones animados**: o ícone faz o seu gesto no hover do elemento com a classe `nx-anim` (o `Button` e os itens do
   menu já têm). O gesto vem de `data-gesture` (`ring`, `pop`, `nudge`, `twinkle`, `spin`, `lift`, `scan`, `tilt`);
   o padrão de cada ícone fica em `ui/gestures.ts`. `nx-anim-once` faz o gesto uma vez ao montar (tela ativa).
+- **Uma cor só**: ícones, chips e destaques usam o roxo da marca (`primary`), em todas as áreas. No menu, ícone neutro e
+  o item ativo em roxo. Cor só para estado (sucesso, aviso, erro) e para a ação de crescimento (dourado).
 - **Modais**: sempre `Sheet`. Nada de `fixed inset-0` novo com caixa própria.
 - **Celular de prévia**: sempre `PhoneFrame` (`ui/PhoneFrame.tsx`): moldura, ilha, barra de status e botões laterais.
   Para páginas e bios, passe `statusBg={themeBg(theme)}` e `statusTone` por `themeIsDark(theme)` (contract da landing):

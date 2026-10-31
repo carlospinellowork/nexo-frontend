@@ -14,7 +14,7 @@ export function BioHomeCard() {
 
   if (isLoading) {
     return (
-      <div className="flex h-40 items-center justify-center rounded-3xl bg-panel shadow-card">
+      <div className="flex h-36 items-center justify-center rounded-2xl bg-panel shadow-card">
         <Loader2 className="animate-spin text-primary" />
       </div>
     );
@@ -22,16 +22,16 @@ export function BioHomeCard() {
 
   if (!page) {
     return (
-      <div className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-[#6D4AFF] to-[#4B2FD0] p-6 text-white shadow-float">
+      <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-[#6D4AFF] to-[#4B2FD0] p-4 text-white shadow-float md:p-5">
         <div className="pointer-events-none absolute -right-12 -top-12 h-44 w-44 rounded-full bg-[#FFC400] opacity-30 blur-3xl" />
         <span className="relative flex w-fit items-center gap-1.5 rounded-full bg-white/15 px-3 py-1 text-[13px] font-semibold">
           <Sparkles size={14} /> Pronta em 2 minutos
         </span>
-        <h2 className="relative mt-3 text-[26px] font-extrabold leading-tight tracking-tight">Crie sua bio que conversa</h2>
-        <p className="relative mt-2 max-w-xl text-[15px] leading-relaxed text-white/85">Seus links, Pix e produtos numa página só, com um assistente que responde seus seguidores sozinho.</p>
-        <Link to="/minha-bio" className="relative mt-5 flex min-h-12 w-full items-center justify-center gap-2 rounded-2xl bg-[#FFC400] px-6 text-[16px] font-bold text-[#1B1400] transition-transform active:scale-[0.98] sm:w-fit">
+        <h2 className="relative mt-2.5 text-[22px] font-bold leading-tight tracking-tight">Crie sua bio que conversa</h2>
+        <p className="relative mt-1.5 max-w-xl text-[14px] leading-relaxed text-white/85">Seus links, Pix e produtos numa página só, com um assistente que responde seus seguidores sozinho.</p>
+        <Link to="/minha-bio" className="nx-btn-gold nx-anim relative mt-4 inline-flex h-11 w-full items-center justify-center gap-1.5 rounded-xl px-5 text-[15px] font-semibold active:scale-[0.98] sm:w-fit md:h-10">
           Criar minha bio
-          <ArrowRight size={18} />
+          <ArrowRight size={17} data-gesture="nudge" />
         </Link>
       </div>
     );
@@ -50,16 +50,16 @@ export function BioHomeCard() {
   };
 
   return (
-    <div className="flex flex-col gap-4 rounded-3xl bg-panel p-6 shadow-card">
+    <div className="flex flex-col gap-3 rounded-2xl border border-border-ui/70 bg-panel p-4 shadow-card">
       <div className="flex items-start justify-between gap-3">
         <div className="flex min-w-0 flex-col gap-1">
           <span className="flex items-center gap-1.5 text-[13px] font-semibold text-primary-strong">
             <Link2 size={14} /> Sua bio
           </span>
-          <h2 className="truncate text-[22px] font-extrabold tracking-tight text-text-primary">{page.title}</h2>
+          <h2 className="truncate text-[20px] font-bold tracking-tight text-text-primary">{page.title}</h2>
         </div>
         <div className="flex shrink-0 flex-col items-end">
-          <span className="flex items-center gap-1 text-[26px] font-extrabold tabular-nums text-text-primary">
+          <span className="font-display flex items-center gap-1 text-[24px] font-bold tabular-nums text-text-primary">
             <MousePointerClick size={20} className="text-text-secondary" />
             {last7}
           </span>
@@ -68,13 +68,13 @@ export function BioHomeCard() {
       </div>
       <div className="flex items-center gap-1 rounded-xl bg-panel-2 p-1 pl-3">
         <span className="min-w-0 flex-1 truncate font-mono text-[13px] text-text-primary">{url}</span>
-        <button type="button" onClick={() => void copy()} aria-label="Copiar o link da bio" className="flex h-11 w-11 shrink-0 items-center justify-center rounded-lg text-text-secondary hover:bg-panel-hover">
+        <button type="button" onClick={() => void copy()} aria-label="Copiar o link da bio" className="flex h-11 w-11 shrink-0 items-center justify-center rounded-lg text-text-secondary hover:bg-panel-hover md:h-9 md:w-9">
           {copied ? <Check size={18} className="text-success" /> : <Copy size={18} />}
         </button>
       </div>
-      <Link to="/minha-bio" className="flex min-h-12 w-full items-center justify-center gap-2 rounded-2xl bg-primary px-6 text-[15px] font-semibold text-white transition-transform active:scale-[0.98] sm:w-fit">
+      <Link to="/minha-bio" className="nx-btn-primary nx-anim inline-flex h-11 w-full items-center justify-center gap-1.5 rounded-xl px-5 text-[14px] font-semibold active:scale-[0.98] sm:w-fit md:h-10">
         Editar minha bio
-        <ArrowRight size={18} />
+        <ArrowRight size={16} data-gesture="nudge" />
       </Link>
     </div>
   );

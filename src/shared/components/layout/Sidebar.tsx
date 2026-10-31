@@ -7,7 +7,6 @@ import { isNavActive, type NavGroup } from "../../navigation";
 import { Logo } from "../ui/Logo";
 import { ThemeSegmented } from "../ui/ThemeToggle";
 import { gestureFor } from "../ui/gestures";
-import { TONES } from "../ui/tones";
 
 function initials(name?: string | null) {
   return (name ?? "?")
@@ -37,9 +36,8 @@ export function Sidebar({ groups, className = "w-[232px]", onNavigate }: { group
         {groups.map((group, gi) => (
           <div key={group.label ?? gi} className="flex flex-col gap-0.5">
             {group.label && <span className="mb-0.5 px-2 text-[12px] font-semibold text-text-secondary">{group.label}</span>}
-            {group.items.map(({ to, title, icon: Icon, tone }) => {
+            {group.items.map(({ to, title, icon: Icon }) => {
               const active = isNavActive(to, pathname);
-              const t = TONES[tone];
               return (
                 <Link
                   key={to}
@@ -53,12 +51,12 @@ export function Sidebar({ groups, className = "w-[232px]", onNavigate }: { group
                     <motion.span
                       layoutId="sidebar-active"
                       transition={{ type: "spring", stiffness: 500, damping: 40 }}
-                      className={`absolute inset-0 rounded-[10px] ${t.soft}`}
+                      className="absolute inset-0 rounded-[10px] bg-primary/10"
                     />
                   )}
                   <span
                     className={`relative flex h-7 w-7 items-center justify-center rounded-lg transition-colors ${
-                      active ? t.chipActive : `${t.chip} opacity-80 group-hover:opacity-100`
+                      active ? "bg-primary text-white shadow-[0_4px_10px_-2px_color-mix(in_srgb,var(--nx-primary)_55%,transparent)]" : "text-text-secondary group-hover:text-text-primary"
                     }`}
                   >
                     <Icon size={16} strokeWidth={2.2} data-gesture={gestureFor(Icon)} />
