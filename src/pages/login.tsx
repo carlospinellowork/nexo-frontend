@@ -2,6 +2,8 @@ import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { ArrowRight, Lock, Mail, User } from "lucide-react";
 import { AnimatePresence, motion, useAnimationControls } from "motion/react";
 import { type FormEvent, useEffect, useState } from "react";
+import { useGetAuthProviders } from "../api/queries/useGetAuthProviders";
+import { GoogleButton } from "../features/auth/components/GoogleButton";
 import { LoginHero } from "../features/auth/components/LoginHero";
 import { authClient } from "../lib/auth-client";
 import { Button } from "../shared/components/ui/Button";
@@ -11,7 +13,18 @@ import { ThemeToggleButton } from "../shared/components/ui/ThemeToggle";
 
 export const Route = createFileRoute("/login")({
   component: LoginPage,
+  // O Google devolve para cá com ?error=... quando o login não deu certo.
+  validateSearch: (search: Record<string, unknown>): { error?: string } =>
+    typeof search.error === "string" ? { error: search.error } : {},
 });
+
+/** Mensagens para os erros que a better-auth devolve ao voltar do Google. */
+function oauthErrorMessage(code: string): string {
+  if (code === "account_not_linked")
+    return "Já existe uma conta com esse e-mail, criada com senha. Entre com o e-mail e a senha.";
+  if (code === "access_denied") return "O login com o Google foi cancelado.";
+  return "Não foi possível entrar com o Google. Tente novamente.";
+}
 
 type Mode = "signin" | "signup";
 
@@ -36,7 +49,10 @@ function LoginPage() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState("");
+  const search = Route.useSearch();
+  const [error, setError] = useState(() => (search.error ? oauthErrorMessage(search.error) : ""));
+  const [googleLoading, setGoogleLoading] = useState(false);
+  const { data: providers } = useGetAuthProviders();
 
   useEffect(() => {
     if (session) navigate({ to: "/" });
@@ -69,6 +85,27 @@ function LoginPage() {
       fail("Não foi possível conectar ao servidor.");
     } finally {
       setLoading(false);
+    }
+  };
+
+  const handleGoogle = async () => {
+    setGoogleLoading(true);
+    setError("");
+    const origin = window.location.origin;
+    try {
+      // Redireciona para o Google; ao voltar, a sessão já está criada.
+      const { error: err } = await authClient.signIn.social({
+        provider: "google",
+        callbackURL: `${origin}/`,
+        errorCallbackURL: `${origin}/login`,
+      });
+      if (err) {
+        fail(err.message || "Não foi possível entrar com o Google.");
+        setGoogleLoading(false);
+      }
+    } catch {
+      fail("Não foi possível conectar ao servidor.");
+      setGoogleLoading(false);
     }
   };
 
@@ -124,6 +161,17 @@ function LoginPage() {
               { value: "signup", label: "Criar conta" },
             ]}
           />
+
+          {providers?.google && (
+            <div className="flex flex-col gap-4">
+              <GoogleButton loading={googleLoading} onClick={handleGoogle} />
+              <div className="flex items-center gap-3 text-[13px] text-text-secondary">
+                <span className="h-px flex-1 bg-border-ui" />
+                ou com e-mail
+                <span className="h-px flex-1 bg-border-ui" />
+              </div>
+            </div>
+          )}
 
           <div className="flex flex-col gap-4">
             <AnimatePresence initial={false}>

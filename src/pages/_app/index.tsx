@@ -5,6 +5,7 @@ import { useGetChats } from "../../api/queries/useGetChats";
 import { useGetIntegrations } from "../../api/queries/useGetIntegrations";
 import { authClient } from "../../lib/auth-client";
 import { Badge } from "../../shared/components/ui/Badge";
+import { type Tone, TONES } from "../../shared/components/ui/tones";
 import { useActiveChat } from "../../shared/hooks/useActiveChat";
 import { BioHomeCard } from "../../features/bio/BioHomeCard";
 import { ExampleCompanies } from "../../features/examples/ExampleCompanies";
@@ -20,7 +21,7 @@ interface Pillar {
   title: string;
   description: string;
   icon: LucideIcon;
-  tint: string;
+  tone: Tone;
   to?: string;
   status: string;
   soon?: boolean;
@@ -58,13 +59,13 @@ function HomePage() {
       title: "Conversas",
       description: "Bots no WhatsApp, Instagram, Telegram e no seu site",
       icon: Bot,
-      tint: "bg-primary/12 text-primary",
+      tone: "ocean",
       to: "/flow-builder",
       status: chatCount ? `${chatCount} ${chatCount === 1 ? "bot criado" : "bots criados"}` : "Criar primeiro bot",
     },
-    { title: "Páginas", description: "Landing pages criadas conversando com a IA", icon: LayoutTemplate, tint: "bg-accent/14 text-accent-strong", to: "/landing-pages", status: "Criar página" },
-    { title: "Leads", description: "Quem deixou contato e quem espera atendimento", icon: Users, tint: "bg-success/14 text-success-strong", to: "/leads", status: "Ver leads" },
-    { title: "Resultados", description: "Conversas, leads e onde as pessoas desistem", icon: ChartLine, tint: "bg-warning/16 text-warning-strong", to: "/results", status: "Ver resultados" },
+    { title: "Páginas", description: "Landing pages criadas conversando com a IA", icon: LayoutTemplate, tone: "orange", to: "/landing-pages", status: "Criar página" },
+    { title: "Leads", description: "Quem deixou contato e quem espera atendimento", icon: Users, tone: "green", to: "/leads", status: "Ver leads" },
+    { title: "Resultados", description: "Conversas, leads e onde as pessoas desistem", icon: ChartLine, tone: "amber", to: "/results", status: "Ver resultados" },
   ];
 
   const steps = [
@@ -100,19 +101,29 @@ function HomePage() {
 
         <motion.div id="tour-home-stats" variants={item} className="grid grid-cols-1 gap-5 sm:grid-cols-2 xl:grid-cols-4">
           {pillars.map((p) => {
+            const t = TONES[p.tone];
             const content = (
               <>
-                <span className={`flex h-12 w-12 items-center justify-center rounded-2xl ${p.tint}`}>
+                {/* Brilho na cor da área, no canto do cartão. */}
+                <span className={`pointer-events-none absolute -right-10 -top-10 h-32 w-32 rounded-full opacity-[0.16] blur-2xl ${t.glow}`} />
+                <span className={`relative flex h-12 w-12 items-center justify-center rounded-2xl ${t.chip}`}>
                   <p.icon size={24} />
                 </span>
-                <span className="flex flex-col gap-1">
+                <span className="relative flex flex-col gap-1">
                   <span className="text-[18px] font-bold text-text-primary">{p.title}</span>
                   <span className="text-[14px] leading-snug text-text-secondary">{p.description}</span>
                 </span>
-                {p.soon ? <Badge>Em breve</Badge> : <span className="text-[14px] font-semibold text-primary-strong">{p.status}</span>}
+                {p.soon ? (
+                  <Badge>Em breve</Badge>
+                ) : (
+                  <span className={`relative mt-auto inline-flex items-center gap-1.5 text-[14px] font-semibold ${t.text}`}>
+                    {p.status}
+                    <ArrowRight size={16} className="transition-transform group-hover:translate-x-0.5" />
+                  </span>
+                )}
               </>
             );
-            const className = "flex h-full flex-col items-start gap-4 rounded-3xl bg-panel p-6 shadow-card";
+            const className = "group relative flex h-full flex-col items-start gap-4 overflow-hidden rounded-3xl border border-border-ui/60 bg-panel p-6 shadow-card";
             return p.to ? (
               <motion.div key={p.title} whileHover={{ y: -4 }} transition={{ type: "spring", stiffness: 400, damping: 28 }}>
                 <Link to={p.to} className={`${className} transition-shadow hover:shadow-float`}>

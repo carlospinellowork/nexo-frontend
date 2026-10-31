@@ -1,26 +1,16 @@
 import { createFileRoute, Outlet, useNavigate, useRouterState } from "@tanstack/react-router";
-import { ChartLine, GitGraph, Globe, House, Link2, Menu, Paintbrush, Play, Send, Users, X } from "lucide-react";
+import { Menu, X } from "lucide-react";
 import { motion } from "motion/react";
 import { useEffect, useState } from "react";
 import { authClient } from "../../lib/auth-client";
-import { type NavItem, Sidebar } from "../../shared/components/layout/Sidebar";
+import { Sidebar } from "../../shared/components/layout/Sidebar";
 import { LogoMark } from "../../shared/components/ui/Logo";
+import { NAV_GROUPS } from "../../shared/navigation";
 
 export const Route = createFileRoute("/_app")({
   component: AppLayout,
 });
 
-const NAV: NavItem[] = [
-  { to: "/minha-bio", title: "Minha Bio", icon: Link2 },
-  { to: "/", title: "Início", icon: House },
-  { to: "/flow-builder", title: "Fluxos", icon: GitGraph },
-  { to: "/landing-pages", title: "Páginas", icon: Globe },
-  { to: "/leads", title: "Leads", icon: Users },
-  { to: "/results", title: "Resultados", icon: ChartLine },
-  { to: "/simulate", title: "Simulador", icon: Play },
-  { to: "/chat-builder", title: "Aparência", icon: Paintbrush },
-  { to: "/integrations", title: "Canais", icon: Send },
-];
 
 function AppLayout() {
   const { data: session, isPending } = authClient.useSession();
@@ -43,9 +33,9 @@ function AppLayout() {
   }
 
   return (
-    <div className="flex h-dvh w-full flex-col overflow-hidden bg-bg-start text-text-primary md:h-screen md:flex-row">
+    <div className="nx-app-bg flex h-dvh w-full flex-col overflow-hidden text-text-primary md:h-screen md:flex-row">
       <div className="hidden md:flex">
-        <Sidebar items={NAV} />
+        <Sidebar groups={NAV_GROUPS} />
       </div>
 
       {/* Celular: barra no topo e menu em gaveta. */}
@@ -58,7 +48,7 @@ function AppLayout() {
       </div>
       {menuOpen && (
         <div className="fixed inset-0 z-50 flex md:hidden" role="dialog" aria-modal="true" aria-label="Menu">
-          <Sidebar items={NAV} className="h-full w-[280px] max-w-[85vw] overflow-y-auto bg-panel" onNavigate={() => setMenuOpen(false)} />
+          <Sidebar groups={NAV_GROUPS} className="h-full w-[280px] max-w-[85vw] overflow-y-auto bg-panel" onNavigate={() => setMenuOpen(false)} />
           <button type="button" className="relative flex-1 bg-black/40" aria-label="Fechar o menu" onClick={() => setMenuOpen(false)}>
             <X size={22} className="absolute right-3 top-3 text-white" />
           </button>

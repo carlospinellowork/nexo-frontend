@@ -31,6 +31,16 @@
   --nx-shadow-lg: 0 16px 40px rgb(11 18 32 / 0.14);
   --nx-glass: rgb(255 255 255 / 0.72);
   --nx-dots: #d5dbe6;
+  /* Cores das áreas do painel (menu, cabeçalhos e cartões). Mais cor, sempre com a mesma lógica. */
+  --nx-ocean: #2f7bff;
+  --nx-ocean-strong: #1a56c9;
+  --nx-mint: #0fb5a6;
+  --nx-mint-strong: #0a7a70;
+  --nx-rose: #f0458c;
+  --nx-rose-strong: #b01f5c;
+  /* Brilho do fundo da área logada (roxo e amarelo da marca). */
+  --nx-glow-1: rgb(109 74 255 / 0.10);
+  --nx-glow-2: rgb(255 196 0 / 0.10);
   color-scheme: light;
 }
 
@@ -57,6 +67,14 @@
   --nx-shadow-lg: 0 16px 40px rgb(0 0 0 / 0.45);
   --nx-glass: rgb(17 24 39 / 0.72);
   --nx-dots: #1f2a40;
+  --nx-ocean: #4d8eff;
+  --nx-ocean-strong: #9cc0ff;
+  --nx-mint: #2dd4bf;
+  --nx-mint-strong: #6ee7d8;
+  --nx-rose: #ff5c9e;
+  --nx-rose-strong: #ff9cc3;
+  --nx-glow-1: rgb(112 80 255 / 0.20);
+  --nx-glow-2: rgb(255 210 51 / 0.07);
   color-scheme: dark;
 }
 
@@ -84,6 +102,12 @@
   --color-warning-strong: var(--nx-warning-strong);
   --color-danger: var(--nx-danger);
   --color-danger-strong: var(--nx-danger-strong);
+  --color-ocean: var(--nx-ocean);
+  --color-ocean-strong: var(--nx-ocean-strong);
+  --color-mint: var(--nx-mint);
+  --color-mint-strong: var(--nx-mint-strong);
+  --color-rose: var(--nx-rose);
+  --color-rose-strong: var(--nx-rose-strong);
 
   --shadow-card: var(--nx-shadow);
   --shadow-float: var(--nx-shadow-lg);
@@ -97,6 +121,14 @@ body {
   font-family: var(--font-sans);
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+}
+
+/* Fundo da área logada: dois brilhos suaves no topo, fixos atrás do conteúdo. */
+.nx-app-bg {
+  background:
+    radial-gradient(900px 420px at 12% -8%, var(--nx-glow-1), transparent 70%),
+    radial-gradient(700px 380px at 92% -10%, var(--nx-glow-2), transparent 70%),
+    var(--nx-bg);
 }
 
 ::selection {

@@ -29,6 +29,9 @@ src/features/landing/      contract.ts (tipos e limites), LandingRenderer, Secti
 src/features/tour/         tour guiado (driver.js) e HelpButton; títulos com ícone Lucide
 src/features/workspaces/   seletor e store (só o id ativo)
 src/shared/                layout, ui (PromptDialog, Toaster/toast, ChatSelect, EmptyState), hooks/useActiveChat
+src/shared/navigation.ts   menu do painel (NAV_GROUPS: Presença, Assistente, Acompanhar); tela nova entra aqui
+src/shared/components/ui/tones.ts  cor de cada área (menu, cabeçalho, cartões do Início); use TONES, não classes soltas
+src/features/auth/         LoginHero e GoogleButton (aparece só se GET /auth-providers devolver google: true)
 ```
 
 ## Regras
