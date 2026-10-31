@@ -20,7 +20,7 @@ export interface BusinessProfile {
 }
 
 export interface Me {
-  user: { id: string; name: string | null; email: string; avatarColor: AvatarColor | null; avatarImage: string | null; onboarded: boolean };
+  user: { id: string; name: string | null; email: string; avatarColor: AvatarColor | null; avatarImage: string | null; onboarded: boolean; isAdmin?: boolean };
   workspace: { id: string; name: string; role: "OWNER" | "ADMIN" | "MEMBER"; profile: BusinessProfile };
 }
 

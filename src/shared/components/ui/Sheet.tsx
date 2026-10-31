@@ -1,6 +1,7 @@
 import { ChevronLeft, X } from "lucide-react";
 import { AnimatePresence, motion, useReducedMotion } from "motion/react";
 import { type FormEvent, type ReactNode, useEffect, useRef } from "react";
+import { createPortal } from "react-dom";
 
 interface SheetProps {
   open: boolean;
@@ -89,7 +90,9 @@ export function Sheet({ open, title, onClose, onBack, children, footer, width = 
     </>
   );
 
-  return (
+  // Portal no <body>: um pai com transform ou backdrop-filter (ex.: o menu em gaveta, de vidro) prenderia o
+  // "fixed" dentro dele, e o painel abriria espremido.
+  return createPortal(
     <AnimatePresence>
       {open && (
         <motion.div
@@ -112,6 +115,7 @@ export function Sheet({ open, title, onClose, onBack, children, footer, width = 
           )}
         </motion.div>
       )}
-    </AnimatePresence>
+    </AnimatePresence>,
+    document.body,
   );
 }

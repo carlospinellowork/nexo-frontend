@@ -15,6 +15,7 @@ import { Route as LoginRouteImport } from './pages/login'
 import { Route as PrivacidadeRouteImport } from './pages/privacidade'
 import { Route as TermosRouteImport } from './pages/termos'
 import { Route as AppIndexRouteImport } from './pages/_app/index'
+import { Route as AppAdminRouteImport } from './pages/_app/admin'
 import { Route as AppChatBuilderRouteImport } from './pages/_app/chat-builder'
 import { Route as AppFlowBuilderRouteImport } from './pages/_app/flow-builder'
 import { Route as AppIntegrationsRouteImport } from './pages/_app/integrations'
@@ -54,6 +55,11 @@ const TermosRoute = TermosRouteImport.update({
 const AppIndexRoute = AppIndexRouteImport.update({
   id: '/',
   path: '/',
+  getParentRoute: () => AppLayoutRoute,
+} as any)
+const AppAdminRoute = AppAdminRouteImport.update({
+  id: '/admin',
+  path: '/admin',
   getParentRoute: () => AppLayoutRoute,
 } as any)
 const AppChatBuilderRoute = AppChatBuilderRouteImport.update({
@@ -118,6 +124,7 @@ export interface FileRoutesByFullPath {
   '/login': typeof LoginRoute
   '/privacidade': typeof PrivacidadeRoute
   '/termos': typeof TermosRoute
+  '/admin': typeof AppAdminRoute
   '/chat-builder': typeof AppChatBuilderRoute
   '/flow-builder': typeof AppFlowBuilderRoute
   '/integrations': typeof AppIntegrationsRoute
@@ -135,6 +142,7 @@ export interface FileRoutesByTo {
   '/login': typeof LoginRoute
   '/privacidade': typeof PrivacidadeRoute
   '/termos': typeof TermosRoute
+  '/admin': typeof AppAdminRoute
   '/chat-builder': typeof AppChatBuilderRoute
   '/flow-builder': typeof AppFlowBuilderRoute
   '/integrations': typeof AppIntegrationsRoute
@@ -155,6 +163,7 @@ export interface FileRoutesById {
   '/login': typeof LoginRoute
   '/privacidade': typeof PrivacidadeRoute
   '/termos': typeof TermosRoute
+  '/_app/admin': typeof AppAdminRoute
   '/_app/chat-builder': typeof AppChatBuilderRoute
   '/_app/flow-builder': typeof AppFlowBuilderRoute
   '/_app/integrations': typeof AppIntegrationsRoute
@@ -176,6 +185,7 @@ export interface FileRouteTypes {
     | '/login'
     | '/privacidade'
     | '/termos'
+    | '/admin'
     | '/chat-builder'
     | '/flow-builder'
     | '/integrations'
@@ -193,6 +203,7 @@ export interface FileRouteTypes {
     | '/login'
     | '/privacidade'
     | '/termos'
+    | '/admin'
     | '/chat-builder'
     | '/flow-builder'
     | '/integrations'
@@ -212,6 +223,7 @@ export interface FileRouteTypes {
     | '/login'
     | '/privacidade'
     | '/termos'
+    | '/_app/admin'
     | '/_app/chat-builder'
     | '/_app/flow-builder'
     | '/_app/integrations'
@@ -277,6 +289,13 @@ declare module '@tanstack/react-router' {
       path: '/'
       fullPath: '/'
       preLoaderRoute: typeof AppIndexRouteImport
+      parentRoute: typeof AppLayoutRoute
+    }
+    '/_app/admin': {
+      id: '/_app/admin'
+      path: '/admin'
+      fullPath: '/admin'
+      preLoaderRoute: typeof AppAdminRouteImport
       parentRoute: typeof AppLayoutRoute
     }
     '/_app/chat-builder': {
@@ -360,6 +379,7 @@ declare module '@tanstack/react-router' {
 }
 
 interface AppLayoutRouteChildren {
+  AppAdminRoute: typeof AppAdminRoute
   AppChatBuilderRoute: typeof AppChatBuilderRoute
   AppFlowBuilderRoute: typeof AppFlowBuilderRoute
   AppIntegrationsRoute: typeof AppIntegrationsRoute
@@ -374,6 +394,7 @@ interface AppLayoutRouteChildren {
 }
 
 const AppLayoutRouteChildren: AppLayoutRouteChildren = {
+  AppAdminRoute: AppAdminRoute,
   AppChatBuilderRoute: AppChatBuilderRoute,
   AppFlowBuilderRoute: AppFlowBuilderRoute,
   AppIntegrationsRoute: AppIntegrationsRoute,

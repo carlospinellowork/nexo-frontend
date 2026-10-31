@@ -1,8 +1,9 @@
 import { Link, useNavigate, useRouterState } from "@tanstack/react-router";
-import { LogOut } from "lucide-react";
+import { Gauge, LogOut } from "lucide-react";
 import { motion } from "motion/react";
 import { useGetMe } from "../../../api/queries/useGetMe";
 import { UserAvatar } from "../../../features/profile/UserAvatar";
+import { FeedbackButton } from "../../../features/feedback/FeedbackButton";
 import { InstallMenuItem } from "../../../features/pwa/InstallApp";
 import { WorkspaceSelector } from "../../../features/workspaces/components/WorkspaceSelector";
 import { authClient } from "../../../lib/auth-client";
@@ -64,7 +65,21 @@ export function Sidebar({ groups, className = "w-[232px]", onNavigate }: { group
         ))}
       </nav>
 
+      {me?.user.isAdmin && (
+        <Link
+          to="/admin"
+          onClick={onNavigate}
+          className={`nx-anim flex h-11 items-center gap-2.5 rounded-[10px] px-1.5 text-[14px] font-medium md:h-9 ${isNavActive("/admin", pathname) ? "bg-primary/10 font-semibold text-text-primary" : "text-text-primary hover:bg-panel-hover"}`}
+        >
+          <span className="flex h-7 w-7 items-center justify-center rounded-lg text-text-secondary">
+            <Gauge size={16} strokeWidth={2.2} data-gesture="pop" />
+          </span>
+          Acompanhamento
+        </Link>
+      )}
+
       <div className="mt-auto flex flex-col gap-2">
+        <FeedbackButton />
         <InstallMenuItem onDone={onNavigate} />
         <WorkspaceSelector />
         <ThemeSegmented />
