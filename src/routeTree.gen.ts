@@ -9,6 +9,7 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './pages/__root'
+import { Route as SlugRouteImport } from './pages/$slug'
 import { Route as AppLayoutRouteImport } from './pages/_app/layout'
 import { Route as BoasVindasRouteImport } from './pages/boas-vindas'
 import { Route as LoginRouteImport } from './pages/login'
@@ -28,6 +29,11 @@ import { Route as AppResultsRouteImport } from './pages/_app/results'
 import { Route as AppSimulateRouteImport } from './pages/_app/simulate'
 import { Route as PSlugRouteImport } from './pages/p/$slug'
 
+const SlugRoute = SlugRouteImport.update({
+  id: '/$slug',
+  path: '/$slug',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const AppLayoutRoute = AppLayoutRouteImport.update({
   id: '/_app',
   getParentRoute: () => rootRouteImport,
@@ -120,6 +126,7 @@ const PSlugRoute = PSlugRouteImport.update({
 
 export interface FileRoutesByFullPath {
   '/': typeof AppIndexRoute
+  '/$slug': typeof SlugRoute
   '/boas-vindas': typeof BoasVindasRoute
   '/login': typeof LoginRoute
   '/privacidade': typeof PrivacidadeRoute
@@ -138,6 +145,7 @@ export interface FileRoutesByFullPath {
   '/p/$slug': typeof PSlugRoute
 }
 export interface FileRoutesByTo {
+  '/$slug': typeof SlugRoute
   '/boas-vindas': typeof BoasVindasRoute
   '/login': typeof LoginRoute
   '/privacidade': typeof PrivacidadeRoute
@@ -159,6 +167,7 @@ export interface FileRoutesByTo {
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/_app': typeof AppLayoutRouteWithChildren
+  '/$slug': typeof SlugRoute
   '/boas-vindas': typeof BoasVindasRoute
   '/login': typeof LoginRoute
   '/privacidade': typeof PrivacidadeRoute
@@ -181,6 +190,7 @@ export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
+    | '/$slug'
     | '/boas-vindas'
     | '/login'
     | '/privacidade'
@@ -199,6 +209,7 @@ export interface FileRouteTypes {
     | '/p/$slug'
   fileRoutesByTo: FileRoutesByTo
   to:
+    | '/$slug'
     | '/boas-vindas'
     | '/login'
     | '/privacidade'
@@ -219,6 +230,7 @@ export interface FileRouteTypes {
   id:
     | '__root__'
     | '/_app'
+    | '/$slug'
     | '/boas-vindas'
     | '/login'
     | '/privacidade'
@@ -240,6 +252,7 @@ export interface FileRouteTypes {
 }
 export interface RootRouteChildren {
   AppLayoutRoute: typeof AppLayoutRouteWithChildren
+  SlugRoute: typeof SlugRoute
   BoasVindasRoute: typeof BoasVindasRoute
   LoginRoute: typeof LoginRoute
   PrivacidadeRoute: typeof PrivacidadeRoute
@@ -249,6 +262,13 @@ export interface RootRouteChildren {
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/$slug': {
+      id: '/$slug'
+      path: '/$slug'
+      fullPath: '/$slug'
+      preLoaderRoute: typeof SlugRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/_app': {
       id: '/_app'
       path: ''
@@ -414,6 +434,7 @@ const AppLayoutRouteWithChildren = AppLayoutRoute._addFileChildren(
 
 const rootRouteChildren: RootRouteChildren = {
   AppLayoutRoute: AppLayoutRouteWithChildren,
+  SlugRoute: SlugRoute,
   BoasVindasRoute: BoasVindasRoute,
   LoginRoute: LoginRoute,
   PrivacidadeRoute: PrivacidadeRoute,

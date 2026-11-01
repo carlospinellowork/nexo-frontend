@@ -1,5 +1,5 @@
 import { Link } from "@tanstack/react-router";
-import { ArrowRight, Check, Copy, Download, ExternalLink, QrCode, Share2 } from "../../shared/icons";
+import { ArrowRight, Check, Copy, Download, ExternalLink, Instagram, QrCode, Share2 } from "../../shared/icons";
 import QRCode from "qrcode";
 import { useEffect, useState } from "react";
 import { Button } from "../../shared/components/ui/Button";
@@ -7,12 +7,14 @@ import { TONES } from "../../shared/components/ui/tones";
 import { toast } from "../../shared/components/ui/toast-store";
 
 import { bioUrl } from "./bioUrl";
+import { InstagramGuide } from "./InstagramGuide";
 
 /** Link, QR Code, compartilhar e o passo a passo para colar na bio das redes. */
 export function BioShare({ slug, name, showSteps = true }: { slug: string; name: string; showSteps?: boolean }) {
   const url = bioUrl(slug);
   const [qr, setQr] = useState("");
   const [copied, setCopied] = useState(false);
+  const [igGuide, setIgGuide] = useState(false);
   const canShare = typeof navigator !== "undefined" && typeof navigator.share === "function";
 
   useEffect(() => {
@@ -79,6 +81,10 @@ export function BioShare({ slug, name, showSteps = true }: { slug: string; name:
             Baixar QR Code (PNG)
           </Button>
         )}
+        <Button variant="gold" size="lg" icon={Instagram} onClick={() => setIgGuide(true)} className="w-full">
+          Colocar no Instagram, passo a passo
+        </Button>
+        <InstagramGuide url={url} open={igGuide} onClose={() => setIgGuide(false)} />
         <Link
           to="/qr-codes"
           search={{ novo: "bio" }}
