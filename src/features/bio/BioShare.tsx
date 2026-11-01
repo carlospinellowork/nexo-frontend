@@ -7,6 +7,7 @@ import { TONES } from "../../shared/components/ui/tones";
 import { toast } from "../../shared/components/ui/toast-store";
 
 import { bioUrl } from "./bioUrl";
+import { PutOnInstagram } from "./PutOnInstagram";
 import { SocialGuide } from "./SocialGuide";
 import { NETWORK_IDS, NETWORKS, type SocialNetwork } from "./socialNetworks";
 
@@ -87,9 +88,11 @@ export function BioShare({ slug, name, showSteps = true }: { slug: string; name:
             Baixar QR Code (PNG)
           </Button>
         )}
-        <Button variant="gold" size="lg" icon={Share2} onClick={() => openGuide("instagram")} className="w-full">
-          Colocar nas redes, passo a passo
-        </Button>
+        {!showSteps && (
+          <div className="w-full border-t border-border-ui pt-4">
+            <PutOnInstagram url={url} />
+          </div>
+        )}
         <SocialGuide url={url} network={guide ?? lastGuide} open={guide !== null} onClose={() => setGuide(null)} />
         <Link
           to="/qr-codes"
@@ -109,7 +112,7 @@ export function BioShare({ slug, name, showSteps = true }: { slug: string; name:
 
       {showSteps && (
         <div className="rounded-3xl bg-panel p-5 shadow-card">
-          <h3 className="text-[16px] font-bold text-text-primary">Coloque o link nas suas redes</h3>
+          <h3 className="text-[16px] font-bold text-text-primary">Outras redes, passo a passo</h3>
           <p className="mt-1.5 rounded-xl bg-warning/14 px-3 py-2 text-[13px] leading-snug text-warning-strong">
             No texto da bio o link não fica clicável (regra do Instagram e do TikTok). Ele precisa ir no campo de links do perfil.
           </p>

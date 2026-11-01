@@ -1,16 +1,18 @@
 import { Link } from "@tanstack/react-router";
-import { ArrowRight, Check, Copy, Link2, Loader2, MousePointerClick, Sparkles } from "../../shared/icons";
+import { ArrowRight, Check, Copy, Instagram, Link2, Loader2, MousePointerClick, Sparkles } from "../../shared/icons";
 import { useState } from "react";
 import { useGetLandingClicks } from "../../api/queries/useGetLandingClicks";
 import { useGetBio } from "../../api/queries/useGetBio";
 import { toast } from "../../shared/components/ui/toast-store";
 import { bioUrl } from "./bioUrl";
+import { PutOnInstagramSheet } from "./PutOnInstagram";
 
 /** Cartão grande do Início: criar a bio ou, com ela pronta, o link e os cliques. */
 export function BioHomeCard() {
   const { data: page, isLoading } = useGetBio();
   const { data: stats } = useGetLandingClicks(page?.id);
   const [copied, setCopied] = useState(false);
+  const [ig, setIg] = useState(false);
 
   if (isLoading) {
     return (
@@ -72,10 +74,19 @@ export function BioHomeCard() {
           {copied ? <Check size={18} className="text-success" /> : <Copy size={18} />}
         </button>
       </div>
-      <Link to="/minha-bio" className="nx-btn-primary nx-anim inline-flex h-11 w-full items-center justify-center gap-1.5 rounded-xl px-5 text-[14px] font-semibold active:scale-[0.98] sm:w-fit md:h-10">
-        Editar minha bio
-        <ArrowRight size={16} data-gesture="nudge" />
-      </Link>
+      <div className="flex flex-col gap-2 sm:flex-row">
+        {page.publishedAt && (
+          <button type="button" onClick={() => setIg(true)} className="nx-btn-gold nx-anim inline-flex h-11 w-full items-center justify-center gap-1.5 rounded-xl px-5 text-[14px] font-semibold active:scale-[0.98] sm:w-fit md:h-10">
+            <Instagram size={17} />
+            Colocar no Instagram
+          </button>
+        )}
+        <Link to="/minha-bio" className="nx-btn-primary nx-anim inline-flex h-11 w-full items-center justify-center gap-1.5 rounded-xl px-5 text-[14px] font-semibold active:scale-[0.98] sm:w-fit md:h-10">
+          Editar minha bio
+          <ArrowRight size={16} data-gesture="nudge" />
+        </Link>
+      </div>
+      {page.publishedAt && <PutOnInstagramSheet url={url} open={ig} onClose={() => setIg(false)} />}
     </div>
   );
 }

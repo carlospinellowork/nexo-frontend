@@ -17,6 +17,8 @@ import { type LandingPageRecord, type LandingPageSettings, type LandingSection, 
 import { BioBotTab } from "./BioBotTab";
 import { BioSheet } from "./BioSheet";
 import { BioShare } from "./BioShare";
+import { bioUrl } from "./bioUrl";
+import { PutOnInstagramSheet } from "./PutOnInstagram";
 import { NEW_ITEM_OPTIONS, type NewItemKey } from "./presets";
 import { ImageField } from "../uploads/ImageField";
 
@@ -93,7 +95,7 @@ function moveItem<T>(list: T[], index: number, dir: -1 | 1): T[] {
 type Selection = BioTarget | null;
 
 /** Editor próprio da bio: o celular no centro, toque para editar, arraste para reordenar. */
-export function BioEditor({ page }: { page: LandingPageRecord }) {
+export function BioEditor({ page, openInstagram = false }: { page: LandingPageRecord; openInstagram?: boolean }) {
   const { mutateAsync: updatePage, isPending: saving } = useUpdateLandingPage();
   const { mutateAsync: publishPage, isPending: publishing } = usePublishLandingPage();
   const { data: clickStats } = useGetLandingClicks(page.id);
@@ -102,6 +104,8 @@ export function BioEditor({ page }: { page: LandingPageRecord }) {
   const [draft, setDraft] = useState<Draft>(() => toDraft(page));
   const [dirty, setDirty] = useState(false);
   const [tab, setTab] = useState<"items" | "bot" | "page">("items");
+  const [igOpen, setIgOpen] = useState(openInstagram && Boolean(page.publishedAt));
+  const [igTitle, setIgTitle] = useState("Colocar no Instagram");
   const [pane, setPane] = useState<"edit" | "preview">("edit");
   const [selection, setSelection] = useState<Selection>(null);
   const [adding, setAdding] = useState(false);
@@ -155,9 +159,15 @@ export function BioEditor({ page }: { page: LandingPageRecord }) {
 
   const publish = async () => {
     if (!(await ensureSaved())) return;
+    const firstTime = !page.publishedAt;
     try {
       await publishPage(page.id);
       toast.success(`Bio no ar em /p/${page.slug}`);
+      // Na primeira publicação, já oferece o passo que faz a bio funcionar: o link no Instagram.
+      if (firstTime) {
+        setIgTitle("Sua bio está no ar!");
+        setIgOpen(true);
+      }
     } catch (err) {
       toast.error(apiErrorMessage(err, "Não foi possível publicar a bio."));
     }
@@ -222,8 +232,13 @@ export function BioEditor({ page }: { page: LandingPageRecord }) {
               <span className="hidden sm:inline">Ver no ar</span>
             </a>
           )}
-          <Button variant="outline" icon={Save} onClick={() => void ensureSaved(true)} loading={saving && !publishing} disabled={!dirty} className="ml-auto h-11 md:ml-0">
-            Salvar
+          {page.publishedAt && (
+            <Button variant="gold" icon={Instagram} onClick={() => { setIgTitle("Colocar no Instagram"); setIgOpen(true); }} aria-label="Colocar no Instagram" className="h-11 shrink-0">
+              Instagram
+            </Button>
+          )}
+          <Button variant="outline" icon={Save} onClick={() => void ensureSaved(true)} loading={saving && !publishing} disabled={!dirty} aria-label="Salvar" className="ml-auto h-11 md:ml-0">
+            <span className="hidden min-[430px]:inline">Salvar</span>
           </Button>
           <Button icon={Rocket} onClick={() => void publish()} loading={publishing} disabled={!dirty && !page.hasUnpublishedChanges} className="h-11">
             Publicar
@@ -238,6 +253,7 @@ export function BioEditor({ page }: { page: LandingPageRecord }) {
           ))}
         </div>
       </header>
+      <PutOnInstagramSheet url={bioUrl(page.slug)} open={igOpen} title={igTitle} onClose={() => setIgOpen(false)} />
 
       <div className="flex min-h-0 flex-1">
         <aside className={`${pane === "edit" ? "flex" : "hidden"} w-full min-w-0 shrink-0 flex-col border-r border-border-ui bg-panel md:flex md:w-[400px]`}>

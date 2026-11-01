@@ -73,8 +73,9 @@ function HomePage() {
       key: "share",
       done: (whatsapp?.week ?? 0) > 0 || (clicksWeek ?? 0) > 0,
       title: "Divulgue o link da bio",
-      description: "Na bio do Instagram, no status e no QR do balcão.",
+      description: "Um toque copia o link e abre o Instagram.",
       to: "/minha-bio",
+      search: { instagram: true },
     },
   ];
   // O objetivo contado no "conhecer você" decide quais passos aparecem e em que ordem. Fluxos e canais
@@ -150,7 +151,7 @@ function HomePage() {
             <ol className="grid grid-cols-1 gap-0.5 sm:grid-cols-2">
               {steps.map((step) => (
                 <li key={step.title}>
-                  <Link to={step.to} className="flex items-center gap-3 rounded-xl px-2 py-2 transition-colors hover:bg-panel-hover">
+                  <Link to={step.to} search={"search" in step ? step.search : undefined} className="flex items-center gap-3 rounded-xl px-2 py-2 transition-colors hover:bg-panel-hover">
                     {step.done ? <CheckCircle2 size={20} className="shrink-0 text-success" /> : <Circle size={20} className="shrink-0 text-text-secondary/40" />}
                     <span className="flex min-w-0 flex-col">
                       <span className={`truncate text-[14px] font-semibold ${step.done ? "text-text-secondary line-through decoration-text-secondary/40" : "text-text-primary"}`}>{step.title}</span>

@@ -5,17 +5,21 @@ import { useGetBio } from "../../api/queries/useGetBio";
 import { BioEditor } from "../../features/bio/BioEditor";
 import { BioShare } from "../../features/bio/BioShare";
 import { BioWizard } from "../../features/bio/BioWizard";
+import { bioUrl } from "../../features/bio/bioUrl";
+import { PutOnInstagram } from "../../features/bio/PutOnInstagram";
 import type { LandingPageRecord } from "../../features/landing/contract";
 import { Button } from "../../shared/components/ui/Button";
 import { EmptyState } from "../../shared/components/ui/EmptyState";
 
 export const Route = createFileRoute("/_app/minha-bio")({
   component: MinhaBioPage,
+  validateSearch: (search: Record<string, unknown>): { instagram?: boolean } => (search.instagram ? { instagram: true } : {}),
 });
 
 /** "Minha Bio": com bio, abre o editor; sem bio, a criação guiada. A bio é uma LandingPage com layout "bio". */
 function MinhaBioPage() {
   const { data: page, isLoading, isError } = useGetBio();
+  const { instagram } = Route.useSearch();
   const [mode, setMode] = useState<"auto" | "wizard" | "done">("auto");
   const [created, setCreated] = useState<LandingPageRecord | null>(null);
 
@@ -37,8 +41,12 @@ function MinhaBioPage() {
               <PartyPopper size={28} />
             </span>
             <h1 className="text-[24px] font-bold leading-tight tracking-tight text-text-primary">Sua bio está no ar</h1>
-            <p className="text-[15px] text-text-secondary">O bot já responde as suas perguntas. Agora é só colocar o link onde os seguidores te encontram.</p>
+            <p className="text-[15px] text-text-secondary">Agora coloque o link no Instagram para os seguidores chegarem até você.</p>
           </div>
+          <div className="rounded-3xl bg-panel p-5 shadow-card">
+            <PutOnInstagram url={bioUrl(created.slug)} />
+          </div>
+          <p className="text-center text-[13px] text-text-secondary">Sem tempo agora? O botão <b>Instagram</b> fica no alto da sua bio e no Início.</p>
           <BioShare slug={created.slug} name={created.title} />
           <Button size="lg" variant="outline" icon={Pencil} onClick={() => setMode("auto")} className="w-full">
             Editar minha bio
@@ -60,5 +68,5 @@ function MinhaBioPage() {
     );
   }
 
-  return page ? <BioEditor key={page.id} page={page} /> : null;
+  return page ? <BioEditor key={page.id} page={page} openInstagram={instagram} /> : null;
 }
