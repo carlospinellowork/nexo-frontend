@@ -18,6 +18,7 @@ import { BioBotTab } from "./BioBotTab";
 import { BioSheet } from "./BioSheet";
 import { BioShare } from "./BioShare";
 import { NEW_ITEM_OPTIONS, type NewItemKey } from "./presets";
+import { ImageField } from "../uploads/ImageField";
 
 interface Draft {
   title: string;
@@ -382,8 +383,7 @@ export function BioEditor({ page }: { page: LandingPageRecord }) {
           <Field label="Nome" required value={hero.data.headline} max={MAX.headline} onChange={(headline) => { patchHero({ headline }); change({ title: headline.slice(0, 100) || draft.title }); }} />
           <Field label="Seu @" value={hero.data.badge} max={MAX.badge} placeholder="@seuperfil" onChange={(badge) => patchHero({ badge: badge || undefined })} />
           <Field label="Frase curta" multiline value={hero.data.subheadline} max={MAX.subheadline} onChange={(subheadline) => patchHero({ subheadline: subheadline || undefined })} />
-          <Field label="Foto (link https)" inputMode="url" value={hero.data.imageUrl} max={1000} placeholder="https://" onChange={(imageUrl) => patchHero({ imageUrl: imageUrl.trim() || undefined })} />
-          {hero.data.imageUrl && !hero.data.imageUrl.startsWith("https://") && <span className="text-[12px] text-danger-strong">O endereço da foto precisa começar com https://</span>}
+          <ImageField label="Foto do perfil" value={hero.data.imageUrl} shape="square" hint="Aparece redonda no topo da bio." onChange={(imageUrl) => patchHero({ imageUrl })} />
         </BioSheet>
       )}
 

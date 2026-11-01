@@ -11,6 +11,7 @@ import { loadFont } from "../look/fonts";
 import { buttonClass, PALETTE, type Palette, resolveLook } from "../look/resolve";
 import { getTheme } from "../look/themes";
 import type { ButtonShape, ButtonStyle } from "../look/types";
+import { imageSrc, isImageUrl } from "../../uploads/image";
 
 // As páginas dos clientes têm paletas próprias (não seguem o tema do painel): ver ../look.
 interface LandingRendererProps {
@@ -121,8 +122,8 @@ function PageRenderer({ title, theme, sections, settings, onChat }: LandingRende
                       </button>
                     )}
                   </div>
-                  {d.imageUrl?.startsWith("https://") && (
-                    <img src={d.imageUrl} alt="" className={`mt-12 w-full max-w-4xl rounded-3xl border object-cover ${t.line}`} loading="lazy" />
+                  {isImageUrl(d.imageUrl) && (
+                    <img src={imageSrc(d.imageUrl)} alt="" className={`mt-12 w-full max-w-4xl rounded-3xl border object-cover ${t.line}`} loading="lazy" />
                   )}
                 </section>
               );
@@ -369,7 +370,7 @@ function ProductCard({ product, t, onClick }: { product: ProductItem; t: Palette
   }
   return (
     <article className={`overflow-hidden rounded-2xl border text-left ${t.card}`}>
-      {product.imageUrl?.startsWith("https://") && <img src={product.imageUrl} alt={product.name} loading="lazy" className="aspect-[4/3] w-full object-cover" />}
+      {isImageUrl(product.imageUrl) && <img src={imageSrc(product.imageUrl)} alt={product.name} loading="lazy" className="aspect-[4/3] w-full object-cover" />}
       <div className="flex flex-col gap-3 p-4">
         <div>
           <h3 className="text-[16px] font-bold leading-snug">{product.name}</h3>
@@ -454,7 +455,7 @@ function BioRenderer({ title, theme, sections, settings, slug, canAsk, onChat, o
           className={`flex h-24 w-24 items-center justify-center rounded-full border-4 text-[32px] font-extrabold ${t.primary} ${t.line}`}
           aria-hidden
         >
-          {hero?.imageUrl?.startsWith("https://") ? <img src={hero.imageUrl} alt="" className="h-full w-full rounded-full object-cover" /> : initials}
+          {isImageUrl(hero?.imageUrl) ? <img src={imageSrc(hero.imageUrl)} alt="" className="h-full w-full rounded-full object-cover" /> : initials}
         </motion.span>
         <h1 className={`mt-5 break-words text-[26px] font-extrabold leading-tight tracking-tight ${heading}`}>{name}</h1>
         {hero?.badge && <p className={`mt-1 text-[14px] font-semibold ${t.accent}`}>{hero.badge}</p>}

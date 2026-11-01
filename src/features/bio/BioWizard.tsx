@@ -14,6 +14,8 @@ import { normalizePixKey } from "../landing/pix";
 import { parseLinks, recognizeLink } from "./parseLinks";
 import { AUDIENCE_PRESETS, BIO_AUDIENCES, type BioAudience } from "./presets";
 import { useGetMe } from "../../api/queries/useGetMe";
+import { ImageField } from "../uploads/ImageField";
+import { isImageUrl } from "../uploads/image";
 
 const AUDIENCE_ICONS: Record<BioAudience, typeof UserRound> = { creator: Sparkles, seller: ShoppingBag, business: Briefcase };
 
@@ -101,7 +103,6 @@ function fromExpress(s: WizardState, e: ExpressState): WizardState {
   };
 }
 const newKey = () => crypto.randomUUID().slice(0, 6);
-const isHttps = (v: string) => /^https:\/\/\S+$/.test(v.trim());
 
 /** Cada link de produto vira o botão da loja certa pelo domínio. */
 function productFromRow(row: ProductItem & { link: string }, whatsappUrl?: string): ProductItem {
@@ -241,7 +242,7 @@ export function BioWizard({ onLock, onCreated }: BioWizardProps) {
 
   const canContinue = [
     !!s.audience,
-    s.name.trim().length >= 2 && (!s.photoUrl.trim() || isHttps(s.photoUrl)),
+    s.name.trim().length >= 2 && (!s.photoUrl.trim() || isImageUrl(s.photoUrl)),
     pixComplete && productsOk,
     filledFaqs >= 3,
     true,
@@ -310,12 +311,7 @@ export function BioWizard({ onLock, onCreated }: BioWizardProps) {
         <Label htmlFor="bio-tagline">Frase curta (opcional)</Label>
         <textarea id="bio-tagline" className={`${textareaClass} min-h-20`} value={s.tagline} maxLength={400} placeholder={preset.taglinePlaceholder} onChange={(e) => set({ tagline: e.target.value })} />
       </div>
-      <div className="flex flex-col gap-1.5">
-        <Label htmlFor="bio-photo">Foto, por link (opcional)</Label>
-        <input id="bio-photo" className={inputClass} value={s.photoUrl} inputMode="url" autoCapitalize="none" autoCorrect="off" placeholder="https://" onChange={(e) => set({ photoUrl: e.target.value.trim() })} />
-        {s.photoUrl && !isHttps(s.photoUrl) && <span className="text-[12px] text-danger-strong">O endereço da foto precisa começar com https://</span>}
-        <span className="text-[12px] text-text-secondary">Cole o endereço https de uma imagem.</span>
-      </div>
+      <ImageField label="Foto ou logo (opcional)" value={s.photoUrl || undefined} shape="square" hint="Aparece redonda no topo da bio." onChange={(photoUrl) => set({ photoUrl: photoUrl ?? "" })} />
     </div>,
 
     // 2: links
@@ -507,7 +503,7 @@ export function BioWizard({ onLock, onCreated }: BioWizardProps) {
     const merged = fromExpress(s, ex);
     const waOk = recognizeLink(ex.whatsapp)?.kind === "whatsapp";
     const igOk = !ex.instagram.trim() || merged.links.some((l) => l.kind !== "whatsapp");
-    const ready = s.name.trim().length >= 2 && waOk && igOk;
+    const ready = s.name.trim().length >= 2 && waOk && igOk && (!s.photoUrl || isImageUrl(s.photoUrl));
     const picks = EXPRESS_PICKS[audience].map((i) => AUDIENCE_PRESETS[audience].suggestions[i]);
     const goSteps = () => {
       setS({ ...merged, faqs: merged.faqs.map((f) => ({ ...f, hint: picks.find((p) => p.question === f.question)?.hint })), faqsTouched: true });
@@ -546,6 +542,7 @@ export function BioWizard({ onLock, onCreated }: BioWizardProps) {
               </div>
               {!igOk && <span className="text-[12px] text-danger-strong">Use só o @ do perfil, sem espaços.</span>}
             </div>
+            <ImageField label="Foto ou logo (opcional)" value={s.photoUrl || undefined} shape="square" onChange={(photoUrl) => set({ photoUrl: photoUrl ?? "" })} />
 
             <div className="flex flex-col gap-3 rounded-3xl border border-border-ui bg-panel p-3.5">
               <p className="flex gap-2 text-[14px] text-text-secondary">

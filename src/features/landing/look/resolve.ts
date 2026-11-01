@@ -1,4 +1,5 @@
 import type { CSSProperties } from "react";
+import { isUploadedImage } from "../../uploads/image";
 import { FONTS } from "./fonts";
 import { BG_PATTERNS, BG_TYPES, BUTTON_SHAPES, BUTTON_STYLES, FONT_IDS, type Background, type ButtonShape, type ButtonStyle, type FontId, type LandingLook, type ThemeDef } from "./types";
 
@@ -37,7 +38,7 @@ export function cleanBackground(bg: unknown): Background | undefined {
   if (b.type === "pattern") out.pattern = BG_PATTERNS.includes(b.pattern as never) ? b.pattern : "dots";
   if (b.type === "image") {
     const url = typeof b.imageUrl === "string" ? b.imageUrl : "";
-    if (!/^https:\/\/[^\s"'()\\]+$/.test(url) && !/^data:image\/(png|jpe?g|webp);base64,[A-Za-z0-9+/=]+$/.test(url)) return { type: "solid", colors };
+    if (!/^https:\/\/[^\s"'()\\]+$/.test(url) && !isUploadedImage(url)) return { type: "solid", colors };
     out.imageUrl = url;
   }
   return out;

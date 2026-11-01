@@ -21,6 +21,7 @@ import {
 import { landingIcon } from "../icons";
 import { normalizePixKey } from "../pix";
 import { fromLocalInput, scheduleState, toLocalInput } from "../schedule";
+import { ImageField } from "../../uploads/ImageField";
 
 const newId = (prefix: string) => `${prefix}-${crypto.randomUUID().slice(0, 6)}`;
 
@@ -195,8 +196,7 @@ export function SectionEditor({ section, onChange, clicks }: { section: LandingS
           <Field label="Subtítulo" value={d.subheadline} max={MAX.subheadline} multiline onChange={(subheadline) => s({ subheadline })} />
           <Field label="Texto do botão (abre o chat)" required value={d.ctaText} max={MAX.ctaText} onChange={(ctaText) => s({ ctaText, ctaAction: "chat" })} />
           <Field label="Botão secundário (leva aos serviços)" value={d.secondaryCtaText} max={MAX.ctaText} placeholder="Deixe vazio para esconder" onChange={(secondaryCtaText) => s({ secondaryCtaText, secondaryCtaLink: "#servicos" })} />
-          <Field label="Imagem de destaque (https)" value={d.imageUrl} max={1000} placeholder="https://" onChange={(imageUrl) => s({ imageUrl: imageUrl.trim() })} />
-          {d.imageUrl && !d.imageUrl.startsWith("https://") && <span className="text-[12px] text-danger-strong">O endereço da imagem precisa começar com https://</span>}
+          <ImageField label="Imagem de destaque" value={d.imageUrl} shape="wide" onChange={(imageUrl) => s({ imageUrl: imageUrl ?? "" })} />
         </>
       );
     }
@@ -538,7 +538,7 @@ export function ProductFields({ item, update }: { item: ProductItem; update: (pa
     <>
       <Field label="Nome do produto" required value={item.name} max={MAX.productName} onChange={(name) => update({ name })} />
       <Field label="Preço (texto)" value={item.price} max={MAX.productPrice} inputMode="text" placeholder="R$ 129,90" onChange={(price) => update({ price: price || undefined })} />
-      <Field label="Imagem (https)" value={item.imageUrl} max={1000} inputMode="url" placeholder="https://" onChange={(imageUrl) => update({ imageUrl: imageUrl.trim() || undefined })} />
+      <ImageField label="Foto do produto" value={item.imageUrl} shape="wide" onChange={(imageUrl) => update({ imageUrl })} />
       <Field label="Link do Mercado Livre" value={item.mercadoLivreUrl} max={1000} inputMode="url" placeholder="https://www.mercadolivre.com.br/..." onChange={(v) => update({ mercadoLivreUrl: v.trim() || undefined })} />
       {bad(item.mercadoLivreUrl, ["mercadolivre.com.br", "mercadolivre.com"]) && <span className="text-[12px] text-danger-strong">Use um link https de mercadolivre.com.br ou mercadolivre.com.</span>}
       <Field label="Link da Shopee" value={item.shopeeUrl} max={1000} inputMode="url" placeholder="https://shopee.com.br/..." onChange={(v) => update({ shopeeUrl: v.trim() || undefined })} />

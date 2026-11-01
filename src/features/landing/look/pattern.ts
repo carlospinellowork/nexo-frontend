@@ -1,4 +1,5 @@
 import type { CSSProperties } from "react";
+import { imageSrc } from "../../uploads/image";
 import { isHex } from "./resolve";
 import type { Background, BgPattern } from "./types";
 
@@ -42,7 +43,7 @@ export function backgroundStyle(bg: Background): CSSProperties {
     return { backgroundColor: base, backgroundImage: p.image, backgroundSize: `${p.size}px ${p.size}px` };
   }
   if (bg.type === "image" && bg.imageUrl) {
-    return { backgroundColor: base, backgroundImage: `linear-gradient(rgb(0 0 0 / 0.28), rgb(0 0 0 / 0.42)), url(${JSON.stringify(bg.imageUrl)})`, backgroundSize: "cover", backgroundPosition: "center" };
+    return { backgroundColor: base, backgroundImage: `linear-gradient(rgb(0 0 0 / 0.28), rgb(0 0 0 / 0.42)), url(${JSON.stringify(imageSrc(bg.imageUrl))})`, backgroundSize: "cover", backgroundPosition: "center" };
   }
   return { backgroundColor: base };
 }

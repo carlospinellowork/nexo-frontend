@@ -1,5 +1,6 @@
 import type { ReactNode } from "react";
 import { RotateCcw } from "../../../shared/icons";
+import { ImageField } from "../../uploads/ImageField";
 import { Backdrop } from "../look/Backdrop";
 import { FONTS } from "../look/fonts";
 import { patternImage } from "../look/pattern";
@@ -7,7 +8,7 @@ import { buttonClass, isHex, resolveLook } from "../look/resolve";
 import { getTheme } from "../look/themes";
 import { BG_PATTERNS, BUTTON_SHAPES, BUTTON_STYLES, FONT_IDS, type Background, type BgPattern, type ButtonShape, type ButtonStyle, type LandingLook } from "../look/types";
 
-const BG_LABELS: Record<"solid" | "gradient" | "mesh" | "pattern", string> = { solid: "Cor", gradient: "Degradê", mesh: "Malha", pattern: "Textura" };
+const BG_LABELS: Record<"solid" | "gradient" | "mesh" | "pattern" | "image", string> = { solid: "Cor", gradient: "Degradê", mesh: "Malha", pattern: "Textura", image: "Foto" };
 const PATTERN_LABELS: Record<BgPattern, string> = {
   dots: "Bolinhas",
   grid: "Quadriculado",
@@ -24,7 +25,7 @@ const STYLE_LABELS: Record<ButtonStyle, string> = { filled: "Cheio", outline: "C
 const SHAPE_LABELS: Record<ButtonShape, string> = { pill: "Pílula", rounded: "Arredondado", square: "Quadrado" };
 
 /** Quantas cores cada tipo de fundo usa. */
-const COLOR_COUNT = { solid: 1, gradient: 2, mesh: 4, pattern: 2 } as const;
+const COLOR_COUNT = { solid: 1, gradient: 2, mesh: 4, pattern: 2, image: 0 } as const;
 
 const hexOr = (c: string | undefined, fallback: string) => (isHex(c) ? c : fallback);
 
@@ -79,10 +80,12 @@ export function LookEditor({ theme, look, fontHeading, onChange }: LookEditorPro
   const r = resolveLook(def, look, fontHeading);
   const set = (patch: Partial<LandingLook>) => onChange({ ...look, ...patch });
   const bg = r.bg;
-  const bgType = bg.type === "image" ? "solid" : bg.type;
+  // "Foto" escolhida e ainda sem imagem: o fundo segue o do tema, mas a opção fica marcada.
+  const bgType = look?.background?.type === "image" ? "image" : bg.type;
   const fallback = [hexOr(bg.colors[0], "#0A0E1A"), hexOr(def.accent, "#7C5CFF"), hexOr(def.cta.bg, "#EC4899"), hexOr(def.button.bg, "#22D3EE")];
 
   const pickBgType = (type: keyof typeof COLOR_COUNT) => {
+    if (type === "image") return set({ background: { type: "image", colors: ["#111111"], imageUrl: look?.background?.imageUrl } });
     const colors = Array.from({ length: COLOR_COUNT[type] }, (_, i) => hexOr(bg.colors[i], fallback[i]));
     const next: Background = { type, colors, ...(type === "pattern" ? { pattern: bg.pattern ?? "dots" } : {}), ...(type === "gradient" ? { angle: 160 } : {}) };
     set({ background: next });
@@ -97,14 +100,23 @@ export function LookEditor({ theme, look, fontHeading, onChange }: LookEditorPro
   return (
     <div className="flex flex-col gap-5">
       <Section title="Fundo">
-        <div role="radiogroup" aria-label="Tipo de fundo" className="grid grid-cols-4 gap-1.5">
+        <div role="radiogroup" aria-label="Tipo de fundo" className="grid grid-cols-3 gap-1.5 min-[420px]:grid-cols-5">
           {(Object.keys(BG_LABELS) as (keyof typeof BG_LABELS)[]).map((t) => (
             <Chip key={t} active={bgType === t} onClick={() => pickBgType(t)}>
               {BG_LABELS[t]}
             </Chip>
           ))}
         </div>
-        <div className="flex flex-wrap items-center gap-2">
+        {bgType === "image" && (
+          <ImageField
+            label="Foto de fundo"
+            shape="portrait"
+            value={look?.background?.imageUrl}
+            hint="Fica um pouco escurecida para o texto aparecer bem. Foto em pé fica melhor."
+            onChange={(imageUrl) => set({ background: { type: "image", colors: ["#111111"], imageUrl } })}
+          />
+        )}
+        <div className={`flex flex-wrap items-center gap-2 ${bgType === "image" ? "hidden" : ""}`}>
           {Array.from({ length: COLOR_COUNT[bgType] }, (_, i) => (
             <ColorInput key={i} value={hexOr(bg.colors[i], fallback[i])} onChange={(c) => setColor(i, c)} label={bgType === "pattern" && i === 1 ? "Cor do desenho" : `Cor ${i + 1} do fundo`} />
           ))}
