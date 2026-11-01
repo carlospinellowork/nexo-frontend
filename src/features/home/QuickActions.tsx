@@ -1,5 +1,5 @@
 import { Link } from "@tanstack/react-router";
-import { Globe, Link2, type LucideIcon, Play, QrCode, Users } from "lucide-react";
+import { Link2, type LucideIcon, Play, QrCode, Users } from "lucide-react";
 import { gestureFor } from "../../shared/components/ui/gestures";
 import { type Tone, TONES } from "../../shared/components/ui/tones";
 
@@ -13,7 +13,6 @@ interface Action {
 const ACTIONS: Action[] = [
   { to: "/minha-bio", label: "Editar a bio", icon: Link2, tone: "rose" },
   { to: "/qr-codes", label: "Novo QR Code", icon: QrCode, tone: "lagoon" },
-  { to: "/landing-pages", label: "Criar página", icon: Globe, tone: "orange" },
   { to: "/simulate", label: "Testar o bot", icon: Play, tone: "mint" },
   { to: "/leads", label: "Ver contatos", icon: Users, tone: "green" },
 ];
@@ -21,7 +20,7 @@ const ACTIONS: Action[] = [
 /** Atalhos do Início: as ações do dia a dia, com o ícone fazendo o seu gesto no hover. */
 export function QuickActions() {
   return (
-    <nav aria-label="Atalhos" className="grid grid-cols-2 gap-2 sm:grid-cols-3 lg:grid-cols-5">
+    <nav aria-label="Atalhos" className="grid grid-cols-2 gap-2 lg:grid-cols-4">
       {ACTIONS.map(({ to, label, icon: Icon, tone }, i) => (
         <Link
           key={to}

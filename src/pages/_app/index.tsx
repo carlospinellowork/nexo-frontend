@@ -68,16 +68,24 @@ function HomePage() {
     { key: "bot", done: chatCount > 0, title: "Monte a conversa do bot", description: "Mensagens, perguntas e decisões.", to: "/flow-builder" },
     { key: "qr", done: (qrCodes?.length ?? 0) > 0, title: "Crie um QR Code", description: "Para o balcão, a vitrine ou a embalagem.", to: "/qr-codes" },
     { key: "channel", done: channelCount > 0, title: "Conecte um canal", description: "WhatsApp, Instagram, Telegram ou site.", to: "/integrations" },
+    {
+      key: "share",
+      done: (whatsapp?.week ?? 0) > 0 || (clicksWeek ?? 0) > 0,
+      title: "Divulgue o link da bio",
+      description: "Na bio do Instagram, no status e no QR do balcão.",
+      to: "/minha-bio",
+    },
   ];
-  // O objetivo contado no "conhecer você" decide a ordem dos passos.
+  // O objetivo contado no "conhecer você" decide quais passos aparecem e em que ordem. Fluxos e canais
+  // só entram para quem quer resposta automática: para o resto, o caminho é bio → QR → divulgar.
   const ORDER: Record<string, string[]> = {
-    whatsapp: ["bio", "qr", "bot", "channel"],
-    links: ["bio", "qr", "bot", "channel"],
+    whatsapp: ["bio", "qr", "share"],
+    links: ["bio", "share", "qr"],
     autoreply: ["bot", "channel", "bio", "qr"],
-    sources: ["qr", "bio", "bot", "channel"],
+    sources: ["qr", "bio", "share"],
   };
-  const order = ORDER[me?.workspace.profile.goal ?? ""] ?? ["bio", "bot", "qr", "channel"];
-  const steps = [...allSteps].sort((a, b) => order.indexOf(a.key) - order.indexOf(b.key));
+  const order = ORDER[me?.workspace.profile.goal ?? ""] ?? ["bio", "qr", "share"];
+  const steps = allSteps.filter((s) => order.includes(s.key)).sort((a, b) => order.indexOf(a.key) - order.indexOf(b.key));
   const pending = steps.filter((s) => !s.done).length;
   const next = steps.find((s) => !s.done);
 
@@ -129,7 +137,7 @@ function HomePage() {
             <div className="flex flex-col justify-center gap-2 rounded-2xl border border-success/30 bg-success/8 p-4">
               <CheckCircle2 size={22} className="text-success-strong" />
               <p className="font-display text-[18px] font-bold text-text-primary">Tudo configurado</p>
-              <p className="text-[14px] text-text-secondary">Bio, bot, QR Code e canal prontos. Agora é divulgar o link da bio.</p>
+              <p className="text-[14px] text-text-secondary">Tudo no ar e gente chegando. Continue divulgando o link da bio.</p>
             </div>
           )}
         </motion.div>

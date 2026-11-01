@@ -12,26 +12,18 @@ export interface NavGroup {
   /** Sem rótulo: itens soltos no topo do menu. */
   label?: string;
   items: NavItem[];
+  /** Grupo recolhido por padrão: ferramentas para quem já sabe o que quer (não assustam quem está começando). */
+  advanced?: boolean;
 }
 
-/** Menu do painel, agrupado pelo que a pessoa quer fazer. */
+/** Menu do painel, agrupado pelo que a pessoa quer fazer. O essencial fica à vista; o resto, em "Mais ferramentas". */
 export const NAV_GROUPS: NavGroup[] = [
   { items: [{ to: "/", title: "Início", icon: House, tone: "violet" }] },
   {
     label: "Presença",
     items: [
       { to: "/minha-bio", title: "Minha Bio", icon: Link2, tone: "rose" },
-      { to: "/landing-pages", title: "Páginas", icon: Globe, tone: "orange" },
       { to: "/qr-codes", title: "QR Codes", icon: QrCode, tone: "lagoon" },
-    ],
-  },
-  {
-    label: "Assistente",
-    items: [
-      { to: "/flow-builder", title: "Fluxos", icon: GitGraph, tone: "ocean" },
-      { to: "/simulate", title: "Simulador", icon: Play, tone: "mint" },
-      { to: "/chat-builder", title: "Aparência", icon: Paintbrush, tone: "violet" },
-      { to: "/integrations", title: "Canais", icon: Send, tone: "ocean" },
     ],
   },
   {
@@ -39,6 +31,17 @@ export const NAV_GROUPS: NavGroup[] = [
     items: [
       { to: "/leads", title: "Leads", icon: Users, tone: "green" },
       { to: "/results", title: "Resultados", icon: ChartLine, tone: "amber" },
+    ],
+  },
+  {
+    label: "Mais ferramentas",
+    advanced: true,
+    items: [
+      { to: "/landing-pages", title: "Páginas", icon: Globe, tone: "orange" },
+      { to: "/flow-builder", title: "Fluxos", icon: GitGraph, tone: "ocean" },
+      { to: "/simulate", title: "Simulador", icon: Play, tone: "mint" },
+      { to: "/chat-builder", title: "Aparência", icon: Paintbrush, tone: "violet" },
+      { to: "/integrations", title: "Canais", icon: Send, tone: "ocean" },
     ],
   },
 ];
