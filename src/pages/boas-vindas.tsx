@@ -162,7 +162,9 @@ function WelcomePage() {
           : {
               name: name.trim() || undefined,
               avatarColor: color,
-              avatarImage: image,
+              // Só manda a foto se a pessoa escolheu uma agora (data URL) ou tirou a foto (null). A foto que veio do
+              // Google é um link e não volta para o servidor (antes dava "foto de até 120 KB" sem a pessoa ter escolhido nada).
+              avatarImage: image === null ? null : image.startsWith("data:") ? image : undefined,
               ...(canEditBusiness
                 ? {
                     business: {
