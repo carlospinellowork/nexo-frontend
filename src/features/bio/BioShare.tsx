@@ -97,13 +97,21 @@ export function BioShare({ slug, name, showSteps = true }: { slug: string; name:
 
       {showSteps && (
         <div className="rounded-3xl bg-panel p-5 shadow-card">
-          <h3 className="text-[16px] font-bold text-text-primary">Cole na bio das suas redes</h3>
+          <h3 className="text-[16px] font-bold text-text-primary">Coloque o link nas suas redes</h3>
+          <p className="mt-1.5 rounded-xl bg-warning/14 px-3 py-2 text-[13px] leading-snug text-warning-strong">
+            No texto da bio o link não fica clicável (regra do Instagram e do TikTok). Ele precisa ir no campo de links do perfil.
+          </p>
           <ol className="mt-3 flex flex-col gap-3 text-[14px] leading-snug text-text-secondary">
             <li>
-              <strong className="text-text-primary">Instagram:</strong> Editar perfil, Links, Adicionar link externo, cole o endereço e salve.
+              <strong className="text-text-primary">Instagram:</strong> copie o link acima e vá em Editar perfil › Links › Adicionar link externo. Cole o
+              endereço, ponha um título (ex.: &ldquo;Fale comigo&rdquo;) e conclua. Ele aparece clicável logo abaixo da sua bio.
             </li>
             <li>
-              <strong className="text-text-primary">TikTok:</strong> Editar perfil, campo Site (ou Link), cole o endereço e salve.
+              <strong className="text-text-primary">TikTok:</strong> Editar perfil › Site, cole o endereço e salve. O TikTok só mostra esse campo em contas
+              comerciais ou com mais seguidores; se não aparecer, troque para conta comercial nas configurações.
+            </li>
+            <li>
+              <strong className="text-text-primary">WhatsApp:</strong> cole o link no seu status e no recado do perfil.
             </li>
             <li>
               <strong className="text-text-primary">Stories e impressos:</strong> baixe o QR Code e use onde quiser.
