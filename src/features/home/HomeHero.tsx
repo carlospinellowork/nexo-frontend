@@ -16,10 +16,12 @@ interface HomeHeroProps {
   /** Pessoas que o bot transferiu e estão esperando resposta. */
   waiting: number;
   actions?: ReactNode;
+  /** Destaque logo abaixo da saudação (quem foi para o WhatsApp). */
+  children?: ReactNode;
 }
 
 /** Topo do Início: o fundo vivo da marca, a saudação e o resumo do dia com números reais. */
-export function HomeHero({ firstName, today, week, waiting, actions }: HomeHeroProps) {
+export function HomeHero({ firstName, today, week, waiting, actions, children }: HomeHeroProps) {
   const raw = new Date().toLocaleDateString("pt-BR", { weekday: "long", day: "numeric", month: "long" });
   const date = raw.charAt(0).toUpperCase() + raw.slice(1);
   const summary =
@@ -47,6 +49,7 @@ export function HomeHero({ firstName, today, week, waiting, actions }: HomeHeroP
         </div>
         <div className="shrink-0">{actions}</div>
       </div>
+      {children}
       {waiting > 0 && (
         <Link
           to="/leads"

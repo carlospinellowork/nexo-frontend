@@ -6,7 +6,7 @@ import { gestureFor } from "../../shared/components/ui/gestures";
 import { type Tone, TONES } from "../../shared/components/ui/tones";
 
 /** Número que conta até o valor ao aparecer (fica parado para quem pede menos movimento). */
-function CountUp({ value }: { value: number }) {
+export function CountUp({ value }: { value: number }) {
   const reduce = useReducedMotion();
   const [shown, setShown] = useState(reduce ? value : 0);
   useEffect(() => {

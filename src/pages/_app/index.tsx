@@ -10,12 +10,14 @@ import { useGetLandingClicks } from "../../api/queries/useGetLandingClicks";
 import { useGetMe } from "../../api/queries/useGetMe";
 import { useGetQrCodes } from "../../api/queries/useGetQrCodes";
 import { useGetResults } from "../../api/queries/useGetResults";
+import { useGetWhatsappResults } from "../../api/queries/useGetWhatsappResults";
 import { BioHomeCard } from "../../features/bio/BioHomeCard";
 import { ExampleCompanies } from "../../features/examples/ExampleCompanies";
 import { HomeHero } from "../../features/home/HomeHero";
 import { InstallCard } from "../../features/pwa/InstallApp";
 import { QuickActions } from "../../features/home/QuickActions";
 import { StatTile } from "../../features/home/StatTile";
+import { WhatsappPulse } from "../../features/home/WhatsappPulse";
 import { startTour } from "../../features/tour/driver-service";
 import { HelpButton } from "../../features/tour/HelpButton";
 import { authClient } from "../../lib/auth-client";
@@ -42,6 +44,7 @@ function HomePage() {
   const { data: bio } = useGetBio();
   const { data: bioClicks } = useGetLandingClicks(bio?.id);
   const { data: me } = useGetMe();
+  const { data: whatsapp } = useGetWhatsappResults();
 
   useEffect(() => {
     const timer = setTimeout(() => startTour("home"), 700);
@@ -88,7 +91,9 @@ function HomePage() {
             week={convWeek}
             waiting={handoffs?.length ?? 0}
             actions={<HelpButton tourKey="home" screenTitle="Início" />}
-          />
+          >
+            <WhatsappPulse data={whatsapp} hasBio={bio !== null && bio !== undefined} />
+          </HomeHero>
         </motion.div>
 
         <InstallCard />
