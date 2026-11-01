@@ -1,0 +1,3 @@
+import { icon } from "../core";
+
+export const Minus = /* @__PURE__ */ icon("Minus", "<path fill=\"none\" stroke=\"currentColor\" stroke-linecap=\"round\" stroke-width=\"2\" d=\"M8 12h8m5 0a9 9 0 1 1-18 0a9 9 0 0 1 18 0Z\"/>", "<path fill=\"currentColor\" d=\"M12 2c5.523 0 10 4.477 10 10s-4.477 10-10 10S2 17.523 2 12S6.477 2 12 2m-4 9a1 1 0 1 0 0 2h8a1 1 0 1 0 0-2z\"/>");

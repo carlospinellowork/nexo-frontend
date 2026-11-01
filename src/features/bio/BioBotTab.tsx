@@ -1,6 +1,6 @@
 import { useNavigate } from "@tanstack/react-router";
 import { isAxiosError } from "axios";
-import { Bot, ExternalLink, Plus, RefreshCw, TriangleAlert, X } from "lucide-react";
+import { Bot, ExternalLink, Plus, RefreshCw, TriangleAlert, X } from "../../shared/icons";
 import { useState } from "react";
 import { apiErrorMessage } from "../../api/instance";
 import { useRegenerateBioBot } from "../../api/mutations/useBioMutations";

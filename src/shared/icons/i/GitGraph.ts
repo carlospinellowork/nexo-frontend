@@ -1,0 +1,3 @@
+import { icon } from "../core";
+
+export const GitGraph = /* @__PURE__ */ icon("GitGraph", "<path fill=\"none\" stroke=\"currentColor\" stroke-linecap=\"round\" stroke-linejoin=\"round\" stroke-width=\"2\" d=\"M6 16a2 2 0 1 1 0 4a2 2 0 0 1 0-4m0 0V8m0 0a2 2 0 1 1 0-4a2 2 0 0 1 0 4m0 0v1a3 3 0 0 0 3 3h6a3 3 0 0 1 3 3v1m0 0a2 2 0 1 1 0 4a2 2 0 0 1 0-4\"/>", "<path fill=\"currentColor\" d=\"M18 21a2.998 2.998 0 0 0 1-5.825V15a4 4 0 0 0-4-4H9a2 2 0 0 1-2-2v-.174A2.999 2.999 0 0 0 6 3a3 3 0 0 0-1 5.826v6.349A2.998 2.998 0 0 0 6 21a2.998 2.998 0 0 0 1-5.825v-2.711A4 4 0 0 0 9 13h6a2 2 0 0 1 2 2v.175A2.998 2.998 0 0 0 18 21\"/>");

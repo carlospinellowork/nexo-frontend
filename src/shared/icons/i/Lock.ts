@@ -1,0 +1,3 @@
+import { icon } from "../core";
+
+export const Lock = /* @__PURE__ */ icon("Lock", "<path fill=\"none\" stroke=\"currentColor\" stroke-linecap=\"round\" stroke-width=\"2\" d=\"M12 15v2m0-2a1 1 0 1 0 0-2a1 1 0 0 0 0 2Zm5-6V8A5 5 0 0 0 7 8v1zM5 21h14a1 1 0 0 0 1-1V10a1 1 0 0 0-1-1H5a1 1 0 0 0-1 1v10a1 1 0 0 0 1 1Z\"/>", "<path fill=\"currentColor\" d=\"M12 2a6 6 0 0 1 6 6h1a2 2 0 0 1 2 2v10a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V10a2 2 0 0 1 2-2h1a6 6 0 0 1 6-6m-.107 10.005A1.998 1.998 0 0 0 11 15.729V17a1 1 0 1 0 2 0v-1.27a1.997 1.997 0 0 0-.894-3.725a1 1 0 0 0-.213 0M12 4a4 4 0 0 0-4 4h8a4 4 0 0 0-4-4\"/>");

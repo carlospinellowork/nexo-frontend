@@ -1,4 +1,4 @@
-import { Check, Copy, Info, X } from "lucide-react";
+import { Check, Copy, Info, X } from "../../../shared/icons";
 import QRCode from "qrcode";
 import { useEffect, useState } from "react";
 import type { LinkItem } from "../contract";

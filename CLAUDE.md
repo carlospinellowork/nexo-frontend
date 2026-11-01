@@ -26,7 +26,7 @@ src/features/flow/         contract.ts (espelho do backend), nodes/, components/
 src/features/chatBuilder/  aparência do widget e código de instalação
 src/features/integrations/ definição dos canais (channels.ts) e ChannelCard
 src/features/landing/      contract.ts (tipos e limites), LandingRenderer, SectionEditor, ThemePicker, icons.ts
-src/features/tour/         tour guiado (driver.js) e HelpButton; títulos com ícone Lucide
+src/features/tour/         tour guiado (driver.js) e HelpButton; títulos com ícone do `shared/icons`
 src/features/workspaces/   seletor e store (só o id ativo)
 src/shared/                layout, ui (PromptDialog, Toaster/toast, ChatSelect, EmptyState), hooks/useActiveChat
 src/shared/navigation.ts   menu do painel (NAV_GROUPS: Presença, Assistente, Acompanhar); tela nova entra aqui
@@ -74,7 +74,11 @@ src/features/auth/         LoginHero e GoogleButton (aparece só se GET /auth-pr
   `Badge`, `Logo`/`LogoMark`, `ThemeToggleButton`/`ThemeSegmented`, `PromptDialog`, `Toaster`,
   `ChatSelect`, `EmptyState`, `Switch`, e as classes de campo em `styles.ts` (`inputClass`, `selectClass`,
   `textareaClass`). Reutilize-os antes de criar estilos novos.
-- **Ícones: sempre Lucide** (`lucide-react`). Nunca use emoji como ícone, nem na UI nem nos textos padrão.
+- **Ícones: sempre MingCute pelo `src/shared/icons`** (traço arredondado, estilo iPhone). Os nomes seguem os do Lucide
+  (`House`, `Link2`, `QrCode`...); `filled` dá a versão preenchida, usada no item ativo do menu e da barra inferior.
+  Os arquivos em `src/shared/icons` são gerados: para um ícone novo, ponha o nome no `MAP` de `scripts/icons/gen.py`
+  e rode `python3 scripts/icons/gen.py node_modules/@iconify-json/mingcute/icons.json src/shared/icons/index.tsx Nome`.
+  Nunca use emoji como ícone, nem na UI nem nos textos padrão.
 - **Animações: Framer Motion** (`motion/react`). Molas curtas (`stiffness ~400, damping ~30`),
   `whileTap` nos botões e `useReducedMotion` em animações contínuas.
   **Não use `AnimatePresence` com `exit` em volta de `<Outlet />`**: o elemento que sai também

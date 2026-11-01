@@ -1,0 +1,3 @@
+import { icon } from "../core";
+
+export const ListChecks = /* @__PURE__ */ icon("ListChecks", "<path fill=\"currentColor\" d=\"M5 5a.5.5 0 1 1-1 0a.5.5 0 0 1 1 0m0 7a.5.5 0 1 1-1 0a.5.5 0 0 1 1 0m0 7a.5.5 0 1 1-1 0a.5.5 0 0 1 1 0\"/><path fill=\"none\" stroke=\"currentColor\" stroke-linecap=\"round\" stroke-width=\"2\" d=\"M9 5h11M9 12h11M9 19h11M5 5a.5.5 0 1 1-1 0a.5.5 0 0 1 1 0Zm0 7a.5.5 0 1 1-1 0a.5.5 0 0 1 1 0Zm0 7a.5.5 0 1 1-1 0a.5.5 0 0 1 1 0Z\"/>", "<path fill=\"currentColor\" d=\"M4.5 17.5a1.5 1.5 0 1 1 0 3a1.5 1.5 0 0 1 0-3m15.5 0a1.5 1.5 0 0 1 0 3H9a1.5 1.5 0 0 1 0-3zm-15.5-7a1.5 1.5 0 1 1 0 3a1.5 1.5 0 0 1 0-3m15.5 0a1.5 1.5 0 0 1 0 3H9a1.5 1.5 0 0 1 0-3zm-15.5-7a1.5 1.5 0 1 1 0 3a1.5 1.5 0 0 1 0-3m15.5 0a1.5 1.5 0 0 1 0 3H9a1.5 1.5 0 1 1 0-3z\"/>");

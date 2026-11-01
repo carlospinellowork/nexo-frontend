@@ -1,5 +1,5 @@
 import { isAxiosError } from "axios";
-import { Check, Copy, Download, ExternalLink, FileCode2, Info, Loader2, Lock, Pencil, Printer, ShieldAlert, Trash2, TriangleAlert } from "lucide-react";
+import { Check, Copy, Download, ExternalLink, FileCode2, Info, Loader2, Lock, Pencil, Printer, ShieldAlert, Trash2, TriangleAlert } from "../../shared/icons";
 import { useEffect, useState } from "react";
 import { apiErrorMessage } from "../../api/instance";
 import { useDeleteQrCode } from "../../api/mutations/useDeleteQrCode";

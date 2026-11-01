@@ -1,4 +1,4 @@
-import { ArrowLeft, AtSign, Bot, Briefcase, Check, ChevronRight, Info, Link2, ListChecks, MessageCircle, Plus, Rocket, ShoppingBag, Sparkles, Trash2, UserRound, X, Zap } from "lucide-react";
+import { ArrowLeft, AtSign, Bot, Briefcase, Check, ChevronRight, Info, Link2, ListChecks, Plus, Rocket, ShoppingBag, Sparkles, Trash2, UserRound, WhatsApp, X, Zap } from "../../shared/icons";
 import { AnimatePresence, motion, useReducedMotion } from "motion/react";
 import { useState, useEffect, useRef } from "react";
 import { apiErrorMessage } from "../../api/instance";
@@ -531,7 +531,7 @@ export function BioWizard({ onLock, onCreated }: BioWizardProps) {
             <div className="flex flex-col gap-1.5">
               <Label htmlFor="ex-wa">Seu WhatsApp, com DDD</Label>
               <div className="relative">
-                <MessageCircle size={18} className="pointer-events-none absolute left-3.5 top-1/2 -translate-y-1/2 text-[#25D366]" />
+                <WhatsApp size={18} className="pointer-events-none absolute left-3.5 top-1/2 -translate-y-1/2 text-[#25D366]" />
                 <input id="ex-wa" className={`${inputClass} pl-10`} value={ex.whatsapp} inputMode="tel" autoComplete="tel-national" placeholder="11 91234-5678" onChange={(e) => setEx({ ...ex, whatsapp: e.target.value })} />
               </div>
               <span className={`text-[12px] ${ex.whatsapp.trim() && !waOk ? "text-danger-strong" : "text-text-secondary"}`}>

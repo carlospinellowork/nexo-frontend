@@ -1,4 +1,4 @@
-import { ArrowDown, ArrowUp, MousePointerClick, Plus, Star, Trash2, TriangleAlert } from "lucide-react";
+import { ArrowDown, ArrowUp, MousePointerClick, Plus, Star, Trash2, TriangleAlert } from "../../../shared/icons";
 import { type ReactNode, useId, useState } from "react";
 import { inputClass, selectClass, textareaClass } from "../../../shared/components/ui/styles";
 import {

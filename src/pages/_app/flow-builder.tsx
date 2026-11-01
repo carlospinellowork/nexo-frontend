@@ -1,5 +1,5 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
-import { CheckCircle2, FlaskConical, GitGraph, Loader2, Plus, Redo2, Rocket, Save, Undo2 } from "lucide-react";
+import { CheckCircle2, FlaskConical, GitGraph, Loader2, Plus, Redo2, Rocket, Save, Undo2 } from "../../shared/icons";
 import { useCallback, useEffect, useRef } from "react";
 import { apiErrorMessage } from "../../api/instance";
 import { usePublishFlow } from "../../api/mutations/usePublishFlow";

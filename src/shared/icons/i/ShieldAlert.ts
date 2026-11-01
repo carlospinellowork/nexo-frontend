@@ -1,0 +1,3 @@
+import { icon } from "../core";
+
+export const ShieldAlert = /* @__PURE__ */ icon("ShieldAlert", "<path fill=\"none\" stroke=\"currentColor\" stroke-linecap=\"round\" stroke-width=\"2\" d=\"M12 8v4m0 3h.002m-3.58 4.211l3.354 1.677a.5.5 0 0 0 .448 0l3.354-1.677A8 8 0 0 0 20 12.056V6.693a1 1 0 0 0-.649-.936l-7-2.625a1 1 0 0 0-.702 0l-7 2.625A1 1 0 0 0 4 6.693v5.363a8 8 0 0 0 4.422 7.155Z\"/>", "<path fill=\"currentColor\" d=\"M11.298 2.196a2 2 0 0 1 1.404 0l7 2.625A2 2 0 0 1 21 6.694v5.362a9 9 0 0 1-4.975 8.05l-3.354 1.677a1.5 1.5 0 0 1-1.342 0l-3.354-1.677A9 9 0 0 1 3 12.056V6.694A2 2 0 0 1 4.298 4.82zM12 14a1 1 0 0 0 0 2h.002a1 1 0 0 0 0-2zm0-7a1 1 0 0 0-1 1v4a1 1 0 0 0 2 0V8a1 1 0 0 0-1-1\"/>");

@@ -1,4 +1,4 @@
-import { CheckCircle2, ChevronDown, Globe, Instagram, Link2, type LucideIcon, MessageCircle, Music2, Phone, QrCode, Search, ShoppingBag, Sparkles, Star, X, Youtube } from "lucide-react";
+import { CheckCircle2, ChevronDown, Globe, type IconComponent, Instagram, Link2, MessageCircle, Music2, Phone, QrCode, Search, ShoppingBag, Sparkles, Star, WhatsApp, X, Youtube } from "../../../shared/icons";
 import { AnimatePresence, motion, useReducedMotion } from "motion/react";
 import { useId, useRef, useState } from "react";
 import { SealPill } from "../../../shared/components/ui/NexoSeal";
@@ -349,9 +349,9 @@ function PageRenderer({ title, theme, sections, settings, onChat }: LandingRende
   );
 }
 
-const LINK_ICONS: Record<LinkKind, LucideIcon> = {
+const LINK_ICONS: Record<LinkKind, IconComponent> = {
   chat: MessageCircle,
-  whatsapp: Phone,
+  whatsapp: WhatsApp,
   instagram: Instagram,
   tiktok: Music2,
   google: Star,

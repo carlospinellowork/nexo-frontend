@@ -1,5 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { Bot, CheckCircle2, Download, ExternalLink, Headset, Loader2, Mail, Phone, Search, Trash2, Users } from "lucide-react";
+import { Bot, CheckCircle2, Download, ExternalLink, Headset, Loader2, Mail, Phone, Search, Trash2, Users } from "../../shared/icons";
 import { motion } from "motion/react";
 import { useState } from "react";
 import { apiErrorMessage } from "../../api/instance";

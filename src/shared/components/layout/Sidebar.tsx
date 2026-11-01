@@ -1,5 +1,5 @@
 import { Link, useNavigate, useRouterState } from "@tanstack/react-router";
-import { ChevronDown, Gauge, LogOut, SlidersHorizontal } from "lucide-react";
+import { ChevronDown, Gauge, LogOut, SlidersHorizontal } from "../../icons";
 import { AnimatePresence, motion } from "motion/react";
 import { useState } from "react";
 import { useGetMe } from "../../../api/queries/useGetMe";
@@ -59,7 +59,7 @@ function NavLink({
             : "text-text-secondary group-hover:text-text-primary"
         }`}
       >
-        <Icon size={16} strokeWidth={2.2} data-gesture={gestureFor(Icon)} />
+        <Icon size={17} filled={active} data-gesture={gestureFor(Icon)} />
       </span>
       <span className="relative">{title}</span>
     </Link>

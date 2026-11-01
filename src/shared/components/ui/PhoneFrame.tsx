@@ -1,4 +1,4 @@
-import { BatteryFull, Signal, Wifi } from "lucide-react";
+import { BatteryFull, Signal, Wifi } from "../../icons";
 import { motion } from "motion/react";
 import type { ReactNode } from "react";
 

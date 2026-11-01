@@ -1,8 +1,8 @@
-import type { LucideIcon } from "lucide-react";
+import type { IconComponent } from "../../icons";
 import { motion } from "motion/react";
 import type { ReactNode } from "react";
 
-export function EmptyState({ icon: Icon, title, description, children }: { icon: LucideIcon; title: string; description?: string; children?: ReactNode }) {
+export function EmptyState({ icon: Icon, title, description, children }: { icon: IconComponent; title: string; description?: string; children?: ReactNode }) {
   return (
     <div className="flex h-full items-center justify-center p-4 md:p-8">
       <motion.div

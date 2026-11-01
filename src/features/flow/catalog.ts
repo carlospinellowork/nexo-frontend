@@ -6,21 +6,21 @@ import {
   HelpCircle,
   Image,
   ListChecks,
-  type LucideIcon,
+  type IconComponent,
   MessageCircle,
   MessageSquare,
   Play,
   Sparkles,
   Square,
   Zap,
-} from "lucide-react";
+} from "../../shared/icons";
 import { CONDITION_OPERATORS, type NodeDataMap, type NodeType, OPERATORS_WITHOUT_VALUE, QUESTION_VALIDATIONS, WEEKDAYS } from "./contract";
 
 export interface BlockDefinition {
   type: NodeType;
   name: string;
   description: string;
-  icon: LucideIcon;
+  icon: IconComponent;
   /** cor do bloco (variável CSS do tema) */
   color: string;
   group: "Conversa" | "Inteligência" | "Lógica" | "Ações";

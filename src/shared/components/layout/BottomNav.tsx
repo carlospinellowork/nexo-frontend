@@ -1,10 +1,10 @@
 import { Link, useRouterState } from "@tanstack/react-router";
-import { ChartLine, House, Link2, type LucideIcon, Menu, Users } from "lucide-react";
+import { ChartLine, House, Link2, type IconComponent, Menu, Users } from "../../icons";
 import { motion } from "motion/react";
 import { isNavActive } from "../../navigation";
 import { gestureFor } from "../ui/gestures";
 
-const ITEMS: { to: string; label: string; icon: LucideIcon }[] = [
+const ITEMS: { to: string; label: string; icon: IconComponent }[] = [
   { to: "/", label: "Início", icon: House },
   { to: "/minha-bio", label: "Bio", icon: Link2 },
   { to: "/results", label: "Resultados", icon: ChartLine },
@@ -28,7 +28,7 @@ export function BottomNav({ onMore, moreActive }: { onMore: () => void; moreActi
         return (
           <Link key={to} to={to} aria-current={active ? "page" : undefined} className={`${cls} ${active ? "nx-anim-once text-primary" : "text-text-secondary"}`}>
             {active && <motion.span layoutId="bottomnav-active" transition={{ type: "spring", stiffness: 500, damping: 40 }} className="absolute top-[6px] h-[30px] w-12 rounded-full bg-primary/12" />}
-            <Icon size={21} strokeWidth={active ? 2.4 : 2} className="relative" data-gesture={gestureFor(Icon)} />
+            <Icon size={23} filled={active} className="relative" data-gesture={gestureFor(Icon)} />
             <span className="relative">{label}</span>
           </Link>
         );

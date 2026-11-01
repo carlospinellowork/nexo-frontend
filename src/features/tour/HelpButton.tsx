@@ -10,7 +10,7 @@ import {
   Sparkles,
   X,
   Zap,
-} from "lucide-react";
+} from "../../shared/icons";
 import { AnimatePresence, motion } from "motion/react";
 import { useState } from "react";
 import { startTour } from "./driver-service";

@@ -1,5 +1,5 @@
 import { Link } from "@tanstack/react-router";
-import { ArrowRight, Check, Copy, Link2, Loader2, MousePointerClick, Sparkles } from "lucide-react";
+import { ArrowRight, Check, Copy, Link2, Loader2, MousePointerClick, Sparkles } from "../../shared/icons";
 import { useState } from "react";
 import { useGetLandingClicks } from "../../api/queries/useGetLandingClicks";
 import { useGetBio } from "../../api/queries/useGetBio";

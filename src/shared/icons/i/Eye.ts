@@ -1,0 +1,3 @@
+import { icon } from "../core";
+
+export const Eye = /* @__PURE__ */ icon("Eye", "<path fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" d=\"M21 12c0 1.5-4.03 6-9 6s-9-4.5-9-6s4.03-6 9-6s9 4.5 9 6Z\"/><path fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" d=\"M14 12a2 2 0 1 1-4 0a2 2 0 0 1 4 0Z\"/>", "<path fill=\"currentColor\" d=\"M12 5c3.679 0 8.162 2.417 9.73 5.901c.147.328.27.711.27 1.099s-.123.771-.27 1.099C20.162 16.583 15.679 19 12 19s-8.162-2.417-9.73-5.901C2.124 12.77 2 12.388 2 12s.123-.771.27-1.099C3.839 7.417 8.322 5 12 5m0 3a4 4 0 1 0 0 8a4 4 0 0 0 0-8m0 2a2 2 0 1 1 0 4a2 2 0 0 1 0-4\"/>");

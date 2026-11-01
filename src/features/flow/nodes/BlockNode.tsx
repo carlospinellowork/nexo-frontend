@@ -1,5 +1,5 @@
 import { Handle, type NodeProps, Position } from "@xyflow/react";
-import { Plus } from "lucide-react";
+import { Plus } from "../../../shared/icons";
 import { AnimatePresence } from "motion/react";
 import { useState } from "react";
 import { AddBlockMenu } from "../components/AddBlockMenu";

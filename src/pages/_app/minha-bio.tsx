@@ -1,5 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { Link2, Loader2, PartyPopper, Pencil } from "lucide-react";
+import { Link2, Loader2, PartyPopper, Pencil } from "../../shared/icons";
 import { useState } from "react";
 import { useGetBio } from "../../api/queries/useGetBio";
 import { BioEditor } from "../../features/bio/BioEditor";

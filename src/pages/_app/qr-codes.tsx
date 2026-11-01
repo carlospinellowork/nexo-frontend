@@ -1,5 +1,5 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
-import { ChevronRight, Lock, Plus, Printer, QrCode as QrCodeIcon, RefreshCw, ScanLine, Shuffle, TriangleAlert } from "lucide-react";
+import { ChevronRight, Lock, Plus, Printer, QrCode as QrCodeIcon, RefreshCw, ScanLine, Shuffle, TriangleAlert } from "../../shared/icons";
 import { motion, useReducedMotion } from "motion/react";
 import { useEffect, useState } from "react";
 import { useGetQrCodes } from "../../api/queries/useGetQrCodes";

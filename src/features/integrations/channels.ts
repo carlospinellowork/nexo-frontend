@@ -1,4 +1,4 @@
-import { Instagram, type LucideIcon, MessageCircle, Send } from "lucide-react";
+import { Instagram, type IconComponent, MessageCircle, Send } from "../../shared/icons";
 import type { ChannelType } from "../../api/queries/useGetIntegrations";
 
 export interface ChannelField {
@@ -14,7 +14,7 @@ export interface ChannelDefinition {
   type: ChannelType;
   name: string;
   description: string;
-  icon: LucideIcon;
+  icon: IconComponent;
   color: string;
   /** precisa de webhook público da Meta (PUBLIC_API_URL https + app Meta configurado) */
   needsMeta: boolean;

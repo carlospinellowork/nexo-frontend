@@ -1,4 +1,4 @@
-import { Check } from "lucide-react";
+import { Check } from "../../../shared/icons";
 import { LANDING_THEMES, type LandingTheme, THEME_INFO } from "../contract";
 
 /** Escolha do tema da página com amostras das cores. */

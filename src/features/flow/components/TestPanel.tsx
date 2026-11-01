@@ -1,4 +1,4 @@
-import { FlaskConical, RefreshCw, X } from "lucide-react";
+import { FlaskConical, RefreshCw, X } from "../../../shared/icons";
 import { motion } from "motion/react";
 import { useCallback, useEffect, useRef } from "react";
 import type { SimulatorResult } from "../../../api/mutations/useSimulator";

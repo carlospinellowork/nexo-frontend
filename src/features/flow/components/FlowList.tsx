@@ -1,5 +1,5 @@
 import type { Edge, Node } from "@xyflow/react";
-import { ChevronRight, CornerDownRight, Plus, Repeat2 } from "lucide-react";
+import { ChevronRight, CornerDownRight, Plus, Repeat2 } from "../../../shared/icons";
 import { type ReactNode, useState } from "react";
 import { useGetAiStatus } from "../../../api/queries/useGetAiStatus";
 import { Sheet } from "../../../shared/components/ui/Sheet";

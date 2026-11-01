@@ -1,5 +1,5 @@
 import type { Node } from "@xyflow/react";
-import { CheckCircle2, CircleDot, Route } from "lucide-react";
+import { CheckCircle2, CircleDot, Route } from "../../../shared/icons";
 import { AnimatePresence, motion } from "motion/react";
 import { BLOCKS } from "../catalog";
 import type { NodeType } from "../contract";

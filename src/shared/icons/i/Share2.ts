@@ -1,0 +1,3 @@
+import { icon } from "../core";
+
+export const Share2 = /* @__PURE__ */ icon("Share2", "<path fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" d=\"m16.407 6.81l-6 3.145m0 4.089l6 3.145M11 12a4 4 0 1 1-8 0a4 4 0 0 1 8 0Zm10-6.5a2.5 2.5 0 1 1-5 0a2.5 2.5 0 0 1 5 0Zm0 13a2.5 2.5 0 1 1-5 0a2.5 2.5 0 0 1 5 0Z\"/>", "<path fill=\"currentColor\" fill-rule=\"evenodd\" d=\"M15 5.5a3.5 3.5 0 1 1 1.136 2.581l-4.401 2.308c.172.505.265 1.047.265 1.611c0 .563-.093 1.105-.265 1.61l4.402 2.308a3.5 3.5 0 1 1-1.03 1.719l-4.384-2.299a5 5 0 1 1 0-6.677l4.384-2.298A3.5 3.5 0 0 1 15 5.5\" clip-rule=\"evenodd\"/>");

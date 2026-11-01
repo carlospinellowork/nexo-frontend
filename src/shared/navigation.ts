@@ -1,10 +1,10 @@
-import { ChartLine, GitGraph, Globe, House, Link2, type LucideIcon, Paintbrush, Play, QrCode, Send, Users } from "lucide-react";
+import { ChartLine, GitGraph, Globe, House, Link2, type IconComponent, Paintbrush, Play, QrCode, Send, Users } from "./icons";
 import type { Tone } from "./components/ui/tones";
 
 export interface NavItem {
   to: string;
   title: string;
-  icon: LucideIcon;
+  icon: IconComponent;
   tone: Tone;
 }
 

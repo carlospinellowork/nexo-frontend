@@ -1,5 +1,5 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
-import { Bot, ExternalLink, Globe, Loader2, Pencil, Plus, Sparkles, Trash2 } from "lucide-react";
+import { Bot, ExternalLink, Globe, Loader2, Pencil, Plus, Sparkles, Trash2 } from "../../shared/icons";
 import { motion } from "motion/react";
 import { useEffect, useState } from "react";
 import { apiErrorMessage } from "../../api/instance";

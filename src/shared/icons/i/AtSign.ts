@@ -1,0 +1,3 @@
+import { icon } from "../core";
+
+export const AtSign = /* @__PURE__ */ icon("AtSign", "<path fill=\"none\" stroke=\"currentColor\" stroke-linecap=\"round\" stroke-width=\"2\" d=\"M16 20.065A9 9 0 1 1 12 3c6-.001 9.5 4.999 9 9.499c-.276 2.485-1.5 3.25-2 3.5c-2 1-3.27-.38-3-2l.5-5m-4.462 7C9.828 16 8 14.21 8 12s1.821-4 4.03-4c2.542 0 4.477 2.339 3.952 4.826c-.39 1.85-2.053 3.174-3.944 3.174Z\"/>", "<path fill=\"none\" stroke=\"currentColor\" stroke-linecap=\"round\" stroke-width=\"3\" d=\"m16.5 9l-.5 5c-.27 1.62 1 3 3 2c.5-.25 1.724-1.015 2-3.5C21.5 8 18 3 12 3a9 9 0 1 0 2.966 17.5M12.038 16C9.828 16 8 14.21 8 12s1.821-4 4.03-4c2.542 0 4.477 2.339 3.952 4.826c-.39 1.85-2.053 3.174-3.944 3.174Z\"/>");

@@ -1,4 +1,4 @@
-import { CheckCircle2, ChevronDown, Plug, TriangleAlert, Unplug } from "lucide-react";
+import { CheckCircle2, ChevronDown, Plug, TriangleAlert, Unplug } from "../../../shared/icons";
 import { AnimatePresence, motion } from "motion/react";
 import { type FormEvent, useState } from "react";
 import { apiErrorMessage } from "../../../api/instance";

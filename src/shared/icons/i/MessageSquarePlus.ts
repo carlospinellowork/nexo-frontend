@@ -1,0 +1,3 @@
+import { icon } from "../core";
+
+export const MessageSquarePlus = /* @__PURE__ */ icon("MessageSquarePlus", "<path fill=\"none\" stroke=\"currentColor\" stroke-linecap=\"round\" stroke-linejoin=\"round\" stroke-width=\"2\" d=\"M18 7a2 2 0 0 0-2-2H5a2 2 0 0 0-2 2v7a2 2 0 0 0 2 2h.5a.5.5 0 0 1 .5.5v2a.25.25 0 0 0 .4.2l.1-.075M14.638 18H11a2 2 0 0 1-2-2v-4a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v4a2 2 0 0 1-2 2h-.5a.5.5 0 0 0-.5.5v1.466a.25.25 0 0 1-.41.192l-2.312-1.926a1 1 0 0 0-.64-.232\"/>", "<path fill=\"currentColor\" d=\"M19 10a3 3 0 0 1 3 3v3a3 3 0 0 1-3 3v.966c0 1.06-1.236 1.639-2.05.96L14.638 19H12a3 3 0 0 1-3-3v-3a3 3 0 0 1 3-3zm-3-6a3 3 0 0 1 3 3v1h-8a4 4 0 0 0-4 4v4c0 1.044.4 1.995 1.056 2.707L7 19.5c-.824.618-2 .03-2-1V17a3 3 0 0 1-3-3V7a3 3 0 0 1 3-3z\"/>");

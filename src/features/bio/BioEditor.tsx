@@ -1,4 +1,4 @@
-import { ArrowDown, ArrowUp, Bot, CheckCircle2, ExternalLink, GripVertical, Instagram, Link2, MessageCircle, Music2, Pencil, Phone, Plus, QrCode, Rocket, Save, Settings2, ShoppingBag, Smartphone, Star, Trash2, UserRound, Youtube, Globe, type LucideIcon } from "lucide-react";
+import { ArrowDown, ArrowUp, Bot, CheckCircle2, ExternalLink, Globe, GripVertical, type IconComponent, Instagram, Link2, MessageCircle, Music2, Pencil, Plus, QrCode, Rocket, Save, Settings2, ShoppingBag, Smartphone, Star, Trash2, UserRound, WhatsApp, Youtube } from "../../shared/icons";
 import { Reorder, useDragControls } from "motion/react";
 import { useEffect, useRef, useState } from "react";
 import { apiErrorMessage } from "../../api/instance";
@@ -29,13 +29,13 @@ interface Draft {
 const toDraft = (p: LandingPageRecord): Draft => ({ title: p.title, theme: p.theme, sections: p.sections, settings: p.settings });
 const newId = (prefix: string) => `${prefix}-${crypto.randomUUID().slice(0, 6)}`;
 
-const KIND_ICONS: Record<LinkKind, LucideIcon> = { chat: MessageCircle, whatsapp: Phone, instagram: Instagram, tiktok: Music2, google: Star, site: Globe, link: Link2, pix: QrCode, youtube: Youtube };
+const KIND_ICONS: Record<LinkKind, IconComponent> = { chat: MessageCircle, whatsapp: WhatsApp, instagram: Instagram, tiktok: Music2, google: Star, site: Globe, link: Link2, pix: QrCode, youtube: Youtube };
 
 type ClickMap = Record<string, { last7: number; last30: number }>;
 
 interface RowProps {
   id: string;
-  icon: LucideIcon;
+  icon: IconComponent;
   title: string;
   subtitle?: string;
   schedule: { startsAt?: string; endsAt?: string };

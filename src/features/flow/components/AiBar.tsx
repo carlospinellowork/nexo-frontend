@@ -1,4 +1,4 @@
-import { ArrowUp, Loader2, Sparkles } from "lucide-react";
+import { ArrowUp, Loader2, Sparkles } from "../../../shared/icons";
 import { motion } from "motion/react";
 import { type FormEvent, useState } from "react";
 import { apiErrorMessage } from "../../../api/instance";

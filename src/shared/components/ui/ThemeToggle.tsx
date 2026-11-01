@@ -1,4 +1,4 @@
-import { Monitor, Moon, Sun } from "lucide-react";
+import { Monitor, Moon, Sun } from "../../icons";
 import { AnimatePresence, motion } from "motion/react";
 import { useThemeStore } from "../../../features/theme/theme-store";
 import { Segmented } from "./Segmented";

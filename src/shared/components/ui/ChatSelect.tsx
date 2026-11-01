@@ -1,4 +1,4 @@
-import { MessagesSquare } from "lucide-react";
+import { MessagesSquare } from "../../icons";
 import type { Chat } from "../../../api/queries/useGetChats";
 
 const CHEVRON =

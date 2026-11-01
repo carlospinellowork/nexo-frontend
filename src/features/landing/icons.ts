@@ -23,12 +23,12 @@ import {
   Utensils,
   Wrench,
   Zap,
-  type LucideIcon,
-} from "lucide-react";
+  type IconComponent,
+} from "../../shared/icons";
 import type { LandingIcon } from "./contract";
 
 /** Ícones que os serviços da landing page podem usar (mesma lista do contrato). */
-export const LANDING_ICON_COMPONENTS: Record<LandingIcon, LucideIcon> = {
+export const LANDING_ICON_COMPONENTS: Record<LandingIcon, IconComponent> = {
   Sparkles,
   Zap,
   ShieldCheck,
@@ -55,4 +55,4 @@ export const LANDING_ICON_COMPONENTS: Record<LandingIcon, LucideIcon> = {
   Dumbbell,
 };
 
-export const landingIcon = (name: string): LucideIcon => LANDING_ICON_COMPONENTS[name as LandingIcon] ?? Sparkles;
+export const landingIcon = (name: string): IconComponent => LANDING_ICON_COMPONENTS[name as LandingIcon] ?? Sparkles;

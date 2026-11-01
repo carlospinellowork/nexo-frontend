@@ -1,0 +1,3 @@
+import { icon } from "../core";
+
+export const Printer = /* @__PURE__ */ icon("Printer", "<path fill=\"none\" stroke=\"currentColor\" stroke-linecap=\"round\" stroke-linejoin=\"round\" stroke-width=\"2\" d=\"M17 18h3a1 1 0 0 0 1-1v-7a2 2 0 0 0-2-2H5a2 2 0 0 0-2 2v7a1 1 0 0 0 1 1h3m8-7h2M7 4h10v4H7zm0 11h10v6H7z\"/>", "<path fill=\"currentColor\" d=\"M16 16a1 1 0 0 1 1 1v4a1 1 0 0 1-1 1H8a1 1 0 0 1-1-1v-4a1 1 0 0 1 1-1zm3-9a3 3 0 0 1 3 3v7a2 2 0 0 1-2 2h-1v-3a2 2 0 0 0-2-2H7a2 2 0 0 0-2 2v3H4a2 2 0 0 1-2-2v-7a3 3 0 0 1 3-3zm-4 2a1 1 0 1 0 0 2h2a1 1 0 1 0 0-2zm2-7a1 1 0 0 1 1 1v2H6V3a1 1 0 0 1 1-1z\"/>");

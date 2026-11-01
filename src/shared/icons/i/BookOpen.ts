@@ -1,0 +1,3 @@
+import { icon } from "../core";
+
+export const BookOpen = /* @__PURE__ */ icon("BookOpen", "<path fill=\"none\" stroke=\"currentColor\" stroke-linecap=\"round\" stroke-linejoin=\"round\" stroke-width=\"2\" d=\"m19 17l-.553 1.106a2 2 0 0 0 0 1.788L19 21H7a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11a1 1 0 0 1 1 1zm0 4H7.01a2 2 0 1 1 0-4H19m0 0h-2m-7-9h4\"/>", "<path fill=\"currentColor\" fill-rule=\"evenodd\" d=\"M4 5a3 3 0 0 1 3-3h11a2 2 0 0 1 2 2v12.99c0 .168-.038.322-.113.472l-.545 1.09a1 1 0 0 0 0 .895l.543 1.088A1 1 0 0 1 19 22H7a3 3 0 0 1-3-3zm3 13h10.408a3 3 0 0 0 0 2H7a1 1 0 1 1 0-2m3-11a1 1 0 0 0 0 2h4a1 1 0 1 0 0-2z\" clip-rule=\"evenodd\"/>");

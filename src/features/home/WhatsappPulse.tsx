@@ -3,8 +3,8 @@ import {
   ArrowDownRight,
   ArrowRight,
   ArrowUpRight,
-  MessageCircle,
-} from "lucide-react";
+  WhatsApp,
+} from "../../shared/icons";
 import { motion, useReducedMotion } from "motion/react";
 import type { WhatsappResults } from "../../api/queries/useGetWhatsappResults";
 import { CountUp } from "./StatTile";
@@ -35,7 +35,7 @@ export function WhatsappPulse({
     <div className="relative mt-4 flex flex-col gap-3 rounded-2xl border border-white/20 bg-white/10 p-3.5 backdrop-blur-xl sm:flex-row sm:items-end sm:justify-between md:p-4">
       <div className="flex min-w-0 items-center gap-3">
         <span className="grid h-11 w-11 shrink-0 place-items-center rounded-[14px] bg-[#25D366] text-white shadow-[0_8px_20px_rgb(37_211_102/0.4)]">
-          <MessageCircle size={22} data-gesture="ring" />
+          <WhatsApp size={24} data-gesture="ring" />
         </span>
         <div className="flex min-w-0 flex-col">
           <span className="flex flex-wrap items-center gap-x-2 gap-y-1">

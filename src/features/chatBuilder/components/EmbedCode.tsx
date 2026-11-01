@@ -1,4 +1,4 @@
-import { Check, Code2, Copy } from "lucide-react";
+import { Check, Code2, Copy } from "../../../shared/icons";
 import { AnimatePresence, motion } from "motion/react";
 import { useState } from "react";
 import { API_ORIGIN } from "../../../api/instance";

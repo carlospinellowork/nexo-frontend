@@ -1,5 +1,5 @@
 import { createFileRoute, Outlet, useNavigate, useRouterState } from "@tanstack/react-router";
-import { X } from "lucide-react";
+import { X } from "../../shared/icons";
 import { motion } from "motion/react";
 import { useEffect, useState } from "react";
 import { useGetMe } from "../../api/queries/useGetMe";

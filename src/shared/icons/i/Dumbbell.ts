@@ -1,0 +1,3 @@
+import { icon } from "../core";
+
+export const Dumbbell = /* @__PURE__ */ icon("Dumbbell", "<path fill=\"none\" stroke=\"currentColor\" stroke-linecap=\"round\" stroke-linejoin=\"round\" stroke-width=\"2\" d=\"M6 8v8m0-8v8m0-8a3 3 0 0 0-3 3v2a3 3 0 0 0 3 3m0-8a2 2 0 0 1 2-2a1 1 0 0 1 1 1v10a1 1 0 0 1-1 1a2 2 0 0 1-2-2m12-8v8m0-8v8m0-8a3 3 0 0 1 3 3v2a3 3 0 0 1-3 3m0-8a2 2 0 0 0-2-2a1 1 0 0 0-1 1v10a1 1 0 0 0 1 1a2 2 0 0 0 2-2m-9-4h6\"/>", "<path fill=\"currentColor\" fill-rule=\"evenodd\" d=\"M2 13a4 4 0 0 0 3.14 3.907A3 3 0 0 0 8 19a2 2 0 0 0 2-2v-4h4v4a2 2 0 0 0 2 2c1.34 0 2.476-.88 2.86-2.093A4 4 0 0 0 22 13v-2a4 4 0 0 0-3.14-3.907A3 3 0 0 0 16 5a2 2 0 0 0-2 2v4h-4V7a2 2 0 0 0-2-2c-1.34 0-2.476.88-2.86 2.093A4 4 0 0 0 2 11z\" clip-rule=\"evenodd\"/>");

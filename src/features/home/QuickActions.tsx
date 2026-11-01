@@ -1,12 +1,12 @@
 import { Link } from "@tanstack/react-router";
-import { Link2, type LucideIcon, Play, QrCode, Users } from "lucide-react";
+import { Link2, type IconComponent, Play, QrCode, Users } from "../../shared/icons";
 import { gestureFor } from "../../shared/components/ui/gestures";
 import { type Tone, TONES } from "../../shared/components/ui/tones";
 
 interface Action {
   to: string;
   label: string;
-  icon: LucideIcon;
+  icon: IconComponent;
   tone: Tone;
 }
 

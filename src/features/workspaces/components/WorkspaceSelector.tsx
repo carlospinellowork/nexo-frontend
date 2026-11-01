@@ -1,5 +1,5 @@
 import { useQueryClient } from "@tanstack/react-query";
-import { Building2, Check, ChevronsUpDown, Plus } from "lucide-react";
+import { Building2, Check, ChevronsUpDown, Plus } from "../../../shared/icons";
 import { AnimatePresence, motion } from "motion/react";
 import { useEffect, useState } from "react";
 import { apiErrorMessage } from "../../../api/instance";

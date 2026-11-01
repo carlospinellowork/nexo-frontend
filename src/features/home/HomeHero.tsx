@@ -1,5 +1,5 @@
 import { Link } from "@tanstack/react-router";
-import { ArrowRight, Headset } from "lucide-react";
+import { ArrowRight, Headset } from "../../shared/icons";
 import type { ReactNode } from "react";
 import { MeshBackground } from "../auth/components/MeshBackground";
 

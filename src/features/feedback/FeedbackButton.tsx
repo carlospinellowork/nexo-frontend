@@ -1,5 +1,5 @@
 import { useRouterState } from "@tanstack/react-router";
-import { MessageSquareHeart } from "lucide-react";
+import { MessageSquareHeart } from "../../shared/icons";
 import { type FormEvent, useState } from "react";
 import { apiErrorMessage } from "../../api/instance";
 import { useSendFeedback } from "../../api/mutations/useSendFeedback";

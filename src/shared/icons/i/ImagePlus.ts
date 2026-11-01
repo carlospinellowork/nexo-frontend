@@ -1,0 +1,3 @@
+import { icon } from "../core";
+
+export const ImagePlus = /* @__PURE__ */ icon("ImagePlus", "<path fill=\"currentColor\" d=\"M8 8.5a.5.5 0 1 1-1 0a.5.5 0 0 1 1 0\"/><path fill=\"none\" stroke=\"currentColor\" stroke-linecap=\"round\" stroke-linejoin=\"round\" stroke-width=\"2\" d=\"m21 16.1l-5.879-5.878L5.343 20M8 8.5a.5.5 0 1 1-1 0a.5.5 0 0 1 1 0M4 20h16a1 1 0 0 0 1-1V5a1 1 0 0 0-1-1H4a1 1 0 0 0-1 1v14a1 1 0 0 0 1 1\"/>", "<path fill=\"currentColor\" fill-rule=\"evenodd\" d=\"M2 5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2zm18 8.686l-4.172-4.171a1 1 0 0 0-1.414 0L4.93 19H4V5h16zM6 8.5a1.5 1.5 0 1 1 3 0a1.5 1.5 0 0 1-3 0\" clip-rule=\"evenodd\"/>");

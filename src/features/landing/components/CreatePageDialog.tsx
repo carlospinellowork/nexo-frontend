@@ -1,4 +1,4 @@
-import { LayoutTemplate, Link2, PanelsTopLeft, Sparkles } from "lucide-react";
+import { LayoutTemplate, Link2, PanelsTopLeft, Sparkles } from "../../../shared/icons";
 import { type FormEvent, useEffect, useState } from "react";
 import type { CreateLandingPagePayload } from "../../../api/mutations/useCreateLandingPage";
 import { useGetAiStatus } from "../../../api/queries/useGetAiStatus";

@@ -1,5 +1,5 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { ArrowRight, CheckCircle2, Circle, MessageCircle, MousePointerClick, QrCode, Users } from "lucide-react";
+import { ArrowRight, CheckCircle2, Circle, MessageCircle, MousePointerClick, QrCode, Users } from "../../shared/icons";
 import { motion } from "motion/react";
 import { useEffect } from "react";
 import { useGetBio } from "../../api/queries/useGetBio";

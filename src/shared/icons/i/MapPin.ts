@@ -1,0 +1,3 @@
+import { icon } from "../core";
+
+export const MapPin = /* @__PURE__ */ icon("MapPin", "<path fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" d=\"M15 11a3 3 0 1 1-6 0a3 3 0 0 1 6 0Z\"/><path fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" d=\"M20 11c0 5.396-5.896 9.108-7.565 10.05a.87.87 0 0 1-.87 0C9.895 20.108 4 16.396 4 11a8 8 0 1 1 16 0Z\"/>", "<path fill=\"currentColor\" d=\"M12 2a9 9 0 0 1 9 9c0 3.074-1.676 5.59-3.441 7.395c-1.776 1.815-3.759 3.033-4.632 3.526a1.87 1.87 0 0 1-1.854 0c-.873-.493-2.856-1.71-4.632-3.526C4.676 16.589 3 14.074 3 11a9 9 0 0 1 9-9m0 6a3 3 0 1 0 0 6a3 3 0 0 0 0-6\"/>");

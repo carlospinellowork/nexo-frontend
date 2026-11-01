@@ -1,5 +1,5 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
-import { ArrowRight, ChevronDown, Code2, Globe, Info, Link2, Loader2, type LucideIcon, MessageCircle, Plus, QrCode, Wrench } from "lucide-react";
+import { ArrowRight, ChevronDown, Code2, Globe, Info, Link2, Loader2, type IconComponent, MessageCircle, Plus, QrCode, Wrench } from "../../shared/icons";
 import { AnimatePresence, motion } from "motion/react";
 import { useState } from "react";
 import { useGetChannelStatus } from "../../api/queries/useGetChannelStatus";
@@ -20,7 +20,7 @@ interface Ready {
   to: string;
   title: string;
   text: string;
-  icon: LucideIcon;
+  icon: IconComponent;
 }
 
 // Nível 1 (docs/ESTRATEGIA-CANAIS.md): funciona na hora, sem conta de API nem custo por mensagem.

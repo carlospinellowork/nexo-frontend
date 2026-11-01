@@ -1,4 +1,4 @@
-import { Loader2 } from "lucide-react";
+import { Loader2 } from "../../../shared/icons";
 import { motion } from "motion/react";
 
 /**

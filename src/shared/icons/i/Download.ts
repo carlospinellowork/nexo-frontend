@@ -1,0 +1,3 @@
+import { icon } from "../core";
+
+export const Download = /* @__PURE__ */ icon("Download", "<path fill=\"none\" stroke=\"currentColor\" stroke-linecap=\"round\" stroke-linejoin=\"round\" stroke-width=\"2\" d=\"M20 16v4a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1v-4m8-13v12m-4.243-3.586L12 15.657l4.243-4.243\"/>", "<path fill=\"none\" stroke=\"currentColor\" stroke-linecap=\"round\" stroke-linejoin=\"round\" stroke-width=\"3\" d=\"M20 16v4a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1v-4m8-13v12m-4.243-3.586L12 15.657l4.243-4.243\"/>");

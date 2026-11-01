@@ -1,4 +1,4 @@
-import { Bell, BellOff, BellRing, X } from "lucide-react";
+import { Bell, BellOff, BellRing, X } from "../../shared/icons";
 import { useState } from "react";
 import { apiErrorMessage } from "../../api/instance";
 import { Button } from "../../shared/components/ui/Button";
@@ -61,7 +61,7 @@ export function PushMenuItem() {
       className="nx-anim flex h-11 w-full items-center gap-2.5 rounded-xl px-2.5 text-[14px] font-medium text-text-primary transition-colors hover:bg-panel-hover disabled:opacity-60 md:h-9"
     >
       {on ? <Bell size={17} className="text-primary" data-gesture="ring" /> : <BellOff size={17} className="text-text-secondary" />}
-      <span className="flex-1 text-left">Avisos do WhatsApp</span>
+      <span className="flex-1 text-left">Avisos</span>
       <span className={`rounded-full px-2 py-0.5 text-[11.5px] font-bold ${on ? "bg-success/14 text-success-strong" : "bg-text-secondary/10 text-text-secondary"}`}>{on ? "ligados" : "desligados"}</span>
     </button>
   );

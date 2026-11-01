@@ -1,4 +1,4 @@
-import { ArrowUp, Mail, MessageCircle, Sparkles, X } from "lucide-react";
+import { ArrowUp, Mail, MessageCircle, Sparkles, X } from "../../../shared/icons";
 import { AnimatePresence, motion } from "motion/react";
 import { useState } from "react";
 import { useChatBuilderStore } from "../store/chat-builder-store";

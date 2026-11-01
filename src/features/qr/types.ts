@@ -1,4 +1,4 @@
-import { Globe, Instagram, Link, Link2, type LucideIcon, MessageCircle, Star, Wifi } from "lucide-react";
+import { Globe, Instagram, Link, Link2, type IconComponent, MessageCircle, Star, Wifi } from "../../shared/icons";
 
 /**
  * QR Codes do workspace (espelho do formato de `nexo-backend/src/domain/qr/contract.ts` e do
@@ -52,7 +52,7 @@ export interface QrKindInfo {
   title: string;
   /** Explicação curta no seletor de tipo. */
   description: string;
-  icon: LucideIcon;
+  icon: IconComponent;
   /** Nome sugerido quando a pessoa não dá um. */
   defaultLabel: string;
   /** Título sugerido do cartão para imprimir. */

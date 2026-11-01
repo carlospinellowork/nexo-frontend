@@ -1,4 +1,4 @@
-import { Download, Plus, Share, Smartphone, X } from "lucide-react";
+import { Download, Plus, Share, Smartphone, X } from "../../shared/icons";
 import { useState } from "react";
 import { Button } from "../../shared/components/ui/Button";
 import { Sheet } from "../../shared/components/ui/Sheet";

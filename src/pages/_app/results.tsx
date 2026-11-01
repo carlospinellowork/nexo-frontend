@@ -1,5 +1,5 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { ChartLine, CheckCircle2, Headset, Loader2, MessagesSquare, TriangleAlert, Users } from "lucide-react";
+import { ChartLine, CheckCircle2, Headset, Loader2, MessagesSquare, TriangleAlert, Users } from "../../shared/icons";
 import { useState } from "react";
 import { useGetResults } from "../../api/queries/useGetResults";
 import { DailyBars } from "../../features/insights/DailyBars";

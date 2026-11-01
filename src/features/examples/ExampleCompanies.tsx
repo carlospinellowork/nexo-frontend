@@ -1,5 +1,5 @@
 import { useNavigate } from "@tanstack/react-router";
-import { ExternalLink, GitGraph, Loader2, Scissors, Sparkles } from "lucide-react";
+import { ExternalLink, GitGraph, Loader2, Scissors, Sparkles } from "../../shared/icons";
 import { useState } from "react";
 import { apiErrorMessage } from "../../api/instance";
 import { type ExampleResult, type ExampleTemplate, useCreateExample } from "../../api/mutations/useCreateExample";

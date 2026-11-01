@@ -1,0 +1,3 @@
+import { icon } from "../core";
+
+export const SlidersHorizontal = /* @__PURE__ */ icon("SlidersHorizontal", "<path fill=\"none\" stroke=\"currentColor\" stroke-linecap=\"round\" stroke-width=\"2\" d=\"M18 6a2 2 0 1 1-4 0m4 0a2 2 0 1 0-4 0m4 0h2m-6 0H4m14 12a2 2 0 1 1-4 0m4 0a2 2 0 1 0-4 0m4 0h2m-6 0H4m6-6a2 2 0 1 1-4 0m4 0a2 2 0 1 0-4 0m4 0h10M6 12H4\"/>", "<path fill=\"currentColor\" fill-rule=\"evenodd\" d=\"M13.17 5a3.001 3.001 0 0 1 5.66 0H20a1 1 0 1 1 0 2h-1.17a3.001 3.001 0 0 1-5.66 0H4a1 1 0 0 1 0-2zm-8 6a3.001 3.001 0 0 1 5.66 0H20a1 1 0 1 1 0 2h-9.17a3.001 3.001 0 0 1-5.66 0H4a1 1 0 1 1 0-2zm8 6a3.001 3.001 0 0 1 5.66 0H20a1 1 0 1 1 0 2h-1.17a3.001 3.001 0 0 1-5.66 0H4a1 1 0 1 1 0-2z\" clip-rule=\"evenodd\"/>");

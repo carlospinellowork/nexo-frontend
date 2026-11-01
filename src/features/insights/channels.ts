@@ -1,7 +1,7 @@
-import { Globe, Instagram, type LucideIcon, MessageCircle, Send } from "lucide-react";
+import { Globe, Instagram, type IconComponent, MessageCircle, Send } from "../../shared/icons";
 
 /** Nome e ícone de cada canal de origem de uma conversa. */
-export const CHANNEL_INFO: Record<string, { label: string; icon: LucideIcon }> = {
+export const CHANNEL_INFO: Record<string, { label: string; icon: IconComponent }> = {
   web: { label: "Site", icon: Globe },
   whatsapp: { label: "WhatsApp", icon: MessageCircle },
   instagram: { label: "Instagram", icon: Instagram },

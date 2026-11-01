@@ -14,7 +14,7 @@ import {
   Globe,
   House,
   Link2,
-  type LucideIcon,
+  type IconComponent,
   MessageCircle,
   Paintbrush,
   Play,
@@ -30,7 +30,7 @@ import {
   Upload,
   Users,
   Wand2,
-} from "lucide-react";
+} from "../../icons";
 
 /**
  * Gesto de cada ícone no hover (o CSS está em index.css, seção "Ícones animados"):
@@ -39,7 +39,7 @@ import {
  */
 export type Gesture = "ring" | "pop" | "nudge" | "twinkle" | "spin" | "lift" | "scan" | "tilt";
 
-const GESTURES = new Map<LucideIcon, Gesture>([
+const GESTURES = new Map<IconComponent, Gesture>([
   [Bell, "ring"],
   [BellRing, "ring"],
   [Sparkles, "twinkle"],
@@ -73,4 +73,4 @@ const GESTURES = new Map<LucideIcon, Gesture>([
 ]);
 
 /** Gesto padrão do ícone; ícones sem gesto definido fazem o "pop". */
-export const gestureFor = (icon: LucideIcon): Gesture => GESTURES.get(icon) ?? "pop";
+export const gestureFor = (icon: IconComponent): Gesture => GESTURES.get(icon) ?? "pop";

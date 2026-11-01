@@ -1,5 +1,5 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
-import { ArrowRight, Lock, Mail, User } from "lucide-react";
+import { ArrowRight, Lock, Mail, User } from "../shared/icons";
 import { AnimatePresence, motion, useAnimationControls } from "motion/react";
 import { type FormEvent, useEffect, useState } from "react";
 import { useGetAuthProviders } from "../api/queries/useGetAuthProviders";

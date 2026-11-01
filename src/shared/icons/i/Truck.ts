@@ -1,0 +1,3 @@
+import { icon } from "../core";
+
+export const Truck = /* @__PURE__ */ icon("Truck", "<path fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" d=\"M16 8V6a1 1 0 0 0-1-1H4a1 1 0 0 0-1 1v9a1 1 0 0 0 1 1h1.5M16 8v7.5M16 8h2.52a1 1 0 0 1 .78.375l1.48 1.851a1 1 0 0 1 .22.625V15a1 1 0 0 1-1 1h-1.5m-3 0h-7m.5 1a2 2 0 1 1-4 0a2 2 0 0 1 4 0Zm10 0a2 2 0 1 1-4 0a2 2 0 0 1 4 0Z\"/>", "<path fill=\"currentColor\" d=\"M15 4a2 2 0 0 1 2 2v1h1.52a2 2 0 0 1 1.561.751l1.48 1.85a2 2 0 0 1 .439 1.25V15a2 2 0 0 1-2 2h-1a3 3 0 1 1-6 0h-3a3 3 0 1 1-6 0a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2zM7 16a1 1 0 1 0 0 2a1 1 0 0 0 0-2m9 0a1 1 0 1 0 0 2a1 1 0 0 0 0-2m1-3h3v-2.15L18.52 9H17z\"/>");

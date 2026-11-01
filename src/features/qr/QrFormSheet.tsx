@@ -1,6 +1,6 @@
 import { Link as RouterLink } from "@tanstack/react-router";
 import { isAxiosError } from "axios";
-import { ArrowRight, Eye, EyeOff, Info, KeyRound, Lock, TriangleAlert } from "lucide-react";
+import { ArrowRight, Eye, EyeOff, Info, KeyRound, Lock, TriangleAlert } from "../../shared/icons";
 import { motion, useReducedMotion } from "motion/react";
 import { type FormEvent, type ReactNode, useEffect, useMemo, useState } from "react";
 import { apiErrorMessage } from "../../api/instance";

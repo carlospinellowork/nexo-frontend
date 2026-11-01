@@ -8,19 +8,19 @@ import {
   ChartLine,
   Check,
   Globe,
+  type IconComponent,
   ImagePlus,
   Instagram,
   Link2,
-  type LucideIcon,
-  MessageCircle,
   Music2,
   Package,
   ShoppingBag,
   ShoppingCart,
   Store,
   Trash2,
+  WhatsApp,
   Youtube,
-} from "lucide-react";
+} from "../shared/icons";
 import { AnimatePresence, motion, useReducedMotion } from "motion/react";
 import { type ChangeEvent, type ReactNode, useEffect, useRef, useState } from "react";
 import { apiErrorMessage } from "../api/instance";
@@ -42,7 +42,7 @@ export const Route = createFileRoute("/boas-vindas")({
   component: WelcomePage,
 });
 
-const AUDIENCES: { value: Audience; title: string; text: string; icon: LucideIcon }[] = [
+const AUDIENCES: { value: Audience; title: string; text: string; icon: IconComponent }[] = [
   { value: "creator", title: "Crio conteúdo", text: "Instagram, TikTok ou YouTube", icon: Camera },
   { value: "seller", title: "Vendo produtos", text: "Marketplace, Instagram ou WhatsApp", icon: Package },
   { value: "business", title: "Tenho um negócio", text: "Loja, salão, clínica, restaurante...", icon: Briefcase },
@@ -54,19 +54,19 @@ const SEGMENTS: Record<Audience, string[]> = {
   business: ["Barbearia", "Salão de beleza", "Restaurante", "Clínica", "Academia", "Pet shop", "Estética", "Loja"],
 };
 
-const PRESENCES: { value: Presence; label: string; icon: LucideIcon }[] = [
+const PRESENCES: { value: Presence; label: string; icon: IconComponent }[] = [
   { value: "instagram", label: "Instagram", icon: Instagram },
   { value: "tiktok", label: "TikTok", icon: Music2 },
   { value: "youtube", label: "YouTube", icon: Youtube },
-  { value: "whatsapp", label: "WhatsApp", icon: MessageCircle },
+  { value: "whatsapp", label: "WhatsApp", icon: WhatsApp },
   { value: "mercadolivre", label: "Mercado Livre", icon: ShoppingBag },
   { value: "shopee", label: "Shopee", icon: ShoppingCart },
   { value: "store", label: "Loja física", icon: Store },
   { value: "site", label: "Site próprio", icon: Globe },
 ];
 
-const GOALS: { value: Goal; title: string; icon: LucideIcon }[] = [
-  { value: "whatsapp", title: "Receber mais contatos no WhatsApp", icon: MessageCircle },
+const GOALS: { value: Goal; title: string; icon: IconComponent }[] = [
+  { value: "whatsapp", title: "Receber mais contatos no WhatsApp", icon: WhatsApp },
   { value: "links", title: "Juntar meus links num lugar só", icon: Link2 },
   { value: "autoreply", title: "Responder clientes na hora, sozinho", icon: Bot },
   { value: "sources", title: "Saber de onde vêm meus clientes", icon: ChartLine },
@@ -75,7 +75,7 @@ const GOALS: { value: Goal; title: string; icon: LucideIcon }[] = [
 const BRAND_LABEL: Record<Audience, string> = { creator: "Seu nome de criador ou @", seller: "Nome da sua loja", business: "Nome do negócio" };
 
 /** Cartão de escolha (uma opção ou várias), com o mesmo visual em todos os passos. */
-function Choice({ selected, onClick, icon: Icon, title, text }: { selected: boolean; onClick: () => void; icon: LucideIcon; title: string; text?: string }) {
+function Choice({ selected, onClick, icon: Icon, title, text }: { selected: boolean; onClick: () => void; icon: IconComponent; title: string; text?: string }) {
   return (
     <button
       type="button"

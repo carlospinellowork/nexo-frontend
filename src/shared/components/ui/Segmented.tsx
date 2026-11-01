@@ -1,9 +1,9 @@
-import type { LucideIcon } from "lucide-react";
+import type { IconComponent } from "../../icons";
 import { motion } from "motion/react";
 import { useId } from "react";
 
 interface SegmentedProps<T extends string> {
-  options: { value: T; label: string; icon?: LucideIcon }[];
+  options: { value: T; label: string; icon?: IconComponent }[];
   value: T;
   onChange: (value: T) => void;
   label: string;

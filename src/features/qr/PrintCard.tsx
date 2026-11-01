@@ -1,4 +1,4 @@
-import { ScanLine } from "lucide-react";
+import { ScanLine } from "../../shared/icons";
 import { createPortal } from "react-dom";
 
 interface PrintCardProps {

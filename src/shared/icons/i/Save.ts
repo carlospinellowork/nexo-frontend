@@ -1,0 +1,3 @@
+import { icon } from "../core";
+
+export const Save = /* @__PURE__ */ icon("Save", "<path fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" d=\"M8 20v-6a1 1 0 0 1 1-1h5a1 1 0 0 1 1 1v6M9 4v3.5a.5.5 0 0 0 .5.5h4a.5.5 0 0 0 .5-.5V4m1.586 0H5a1 1 0 0 0-1 1v14a1 1 0 0 0 1 1h13a1 1 0 0 0 1-1V7.414a1 1 0 0 0-.293-.707l-2.414-2.414A1 1 0 0 0 15.586 4Z\"/>", "<path fill=\"currentColor\" d=\"M8 6.5A1.5 1.5 0 0 0 9.5 8h4A1.5 1.5 0 0 0 15 6.5V3h.586A2 2 0 0 1 17 3.586L19.414 6A2 2 0 0 1 20 7.414V19a2 2 0 0 1-2 2h-2v-7a2 2 0 0 0-2-2H9a2 2 0 0 0-2 2v7H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h3zM14 21H9v-7h5zM13 3v3h-3V3z\"/>");

@@ -1,4 +1,4 @@
-import { ArrowDown, ArrowUp, Plus, Trash2, TriangleAlert, X } from "lucide-react";
+import { ArrowDown, ArrowUp, Plus, Trash2, TriangleAlert, X } from "../../../shared/icons";
 import { motion } from "motion/react";
 import type { ReactNode } from "react";
 import { useGetAiStatus } from "../../../api/queries/useGetAiStatus";

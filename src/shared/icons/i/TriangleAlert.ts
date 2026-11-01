@@ -1,0 +1,3 @@
+import { icon } from "../core";
+
+export const TriangleAlert = /* @__PURE__ */ icon("TriangleAlert", "<path fill=\"none\" stroke=\"currentColor\" stroke-linecap=\"round\" stroke-width=\"2\" d=\"M12 7v6m0 3h.002M21 12a9 9 0 1 1-18 0a9 9 0 0 1 18 0Z\"/>", "<path fill=\"currentColor\" d=\"M12 2c5.523 0 10 4.477 10 10s-4.477 10-10 10S2 17.523 2 12S6.477 2 12 2m0 13a1 1 0 1 0 0 2h.002a1 1 0 0 0 0-2zm0-9a1 1 0 0 0-1 1v6a1 1 0 1 0 2 0V7a1 1 0 0 0-1-1\"/>");

@@ -1,5 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { Check, Loader2, Minus, ShieldOff } from "lucide-react";
+import { Check, Loader2, Minus, ShieldOff } from "../../shared/icons";
 import { useGetMe } from "../../api/queries/useGetMe";
 import { type AdminAccount, useGetAdminOverview } from "../../api/queries/useGetAdminOverview";
 import { Header } from "../../shared/components/layout/Header";

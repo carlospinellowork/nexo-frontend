@@ -1,4 +1,4 @@
-import { Loader2, type LucideIcon } from "lucide-react";
+import { Loader2, type IconComponent } from "../../icons";
 import { type HTMLMotionProps, motion } from "motion/react";
 import type { ReactNode } from "react";
 import { type Gesture, gestureFor } from "./gestures";
@@ -30,7 +30,7 @@ const SIZES: Record<Size, string> = {
 interface ButtonProps extends Omit<HTMLMotionProps<"button">, "children"> {
   variant?: Variant;
   size?: Size;
-  icon?: LucideIcon;
+  icon?: IconComponent;
   /** Gesto do ícone no hover. Sem ele, usa o gesto padrão daquele ícone (gestures.ts). */
   gesture?: Gesture;
   loading?: boolean;
@@ -59,7 +59,7 @@ export function Button({ variant = "primary", size = "md", icon: Icon, gesture, 
 }
 
 interface IconButtonProps extends Omit<HTMLMotionProps<"button">, "children"> {
-  icon: LucideIcon;
+  icon: IconComponent;
   label: string;
   variant?: "outline" | "ghost";
   size?: number;

@@ -1,0 +1,3 @@
+import { icon } from "../core";
+
+export const HelpCircle = /* @__PURE__ */ icon("HelpCircle", "<path fill=\"none\" stroke=\"currentColor\" stroke-linecap=\"round\" stroke-linejoin=\"round\" stroke-width=\"2\" d=\"M12 17h.002m-2.627-6.875a2.625 2.625 0 1 1 3.601 2.438c-.512.205-.976.635-.976 1.187V14m9-2a9 9 0 1 1-18 0a9 9 0 0 1 18 0\"/>", "<path fill=\"currentColor\" d=\"M12 2c5.523 0 10 4.477 10 10s-4.477 10-10 10S2 17.523 2 12S6.477 2 12 2m0 14a1 1 0 1 0 0 2h.002a1 1 0 0 0 0-2zm0-9.5a3.625 3.625 0 0 0-3.625 3.625a1 1 0 1 0 2 0a1.625 1.625 0 1 1 2.23 1.509c-.675.27-1.605.963-1.605 2.116V14a1 1 0 1 0 2 0v-.246a.2.2 0 0 1 .043-.063a.8.8 0 0 1 .306-.2A3.626 3.626 0 0 0 12 6.5\"/>");

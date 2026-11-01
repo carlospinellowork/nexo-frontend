@@ -20,7 +20,7 @@ import {
   Settings2,
   Smartphone,
   Sparkles,
-} from "lucide-react";
+} from "../../shared/icons";
 import { AnimatePresence, motion } from "motion/react";
 import QRCode from "qrcode";
 import { type FormEvent, useCallback, useEffect, useRef, useState } from "react";

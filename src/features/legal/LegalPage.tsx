@@ -1,5 +1,5 @@
 import { Link } from "@tanstack/react-router";
-import { ArrowLeft } from "lucide-react";
+import { ArrowLeft } from "../../shared/icons";
 import { Logo } from "../../shared/components/ui/Logo";
 import { LEGAL, type LegalSection } from "./content";
 

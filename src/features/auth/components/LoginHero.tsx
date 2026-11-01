@@ -1,11 +1,11 @@
-import { CalendarCheck, Globe, type LucideIcon, MessageCircle, Sparkles, UserPlus } from "lucide-react";
+import { CalendarCheck, Globe, type IconComponent, MessageCircle, Sparkles, UserPlus } from "../../../shared/icons";
 import { AnimatePresence, motion, useReducedMotion } from "motion/react";
 import { useEffect, useState } from "react";
 import { Logo } from "../../../shared/components/ui/Logo";
 import { MeshBackground } from "./MeshBackground";
 
 interface LiveEvent {
-  icon: LucideIcon;
+  icon: IconComponent;
   title: string;
   detail: string;
   tone: "primary" | "accent";

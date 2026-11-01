@@ -15,8 +15,8 @@ import {
   Sparkles,
   Variable,
   Workflow,
-  type LucideIcon,
-} from "lucide-react";
+  type IconComponent,
+} from "../../shared/icons";
 import { createElement } from "react";
 import { renderToStaticMarkup } from "react-dom/server";
 import { useTourStore, type TourKey } from "./tour-store";
@@ -24,7 +24,7 @@ import { useTourStore, type TourKey } from "./tour-store";
 /** Passo do tour com um ícone Lucide ao lado do título. */
 interface TourStep {
   element: string;
-  icon: LucideIcon;
+  icon: IconComponent;
   title: string;
   description: string;
   side?: "top" | "right" | "bottom" | "left";
@@ -186,7 +186,7 @@ export const TOUR_STEPS: Record<TourKey, TourStep[]> = {
 };
 
 /** O driver.js aceita HTML no título: o ícone entra como SVG do Lucide. */
-const iconTitle = (Icon: LucideIcon, title: string) =>
+const iconTitle = (Icon: IconComponent, title: string) =>
   `<span class="nx-tour-title">${renderToStaticMarkup(createElement(Icon, { size: 17, strokeWidth: 2.2 }))}<span>${title}</span></span>`;
 
 export function startTour(tourKey: TourKey, force = false) {

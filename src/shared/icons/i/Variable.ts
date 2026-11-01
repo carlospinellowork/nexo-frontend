@@ -1,0 +1,3 @@
+import { icon } from "../core";
+
+export const Variable = /* @__PURE__ */ icon("Variable", "<path fill=\"none\" stroke=\"currentColor\" stroke-linecap=\"round\" stroke-width=\"2\" d=\"M8 4H7a2 2 0 0 0-2 2v3.99a2 2 0 0 1-2 2M3 12c1.1.005 2 .9 2 2v4a2 2 0 0 0 2 2h1m8 0h1a2 2 0 0 0 2-2v-4c0-1.1.9-1.995 2-2m-5-8h1a2 2 0 0 1 2 2v3.99a2 2 0 0 0 2 2\"/>", "<path fill=\"none\" stroke=\"currentColor\" stroke-linecap=\"round\" stroke-width=\"3\" d=\"M8 4H7a2 2 0 0 0-2 2v3.99a2 2 0 0 1-2 2M3 12c1.1.005 2 .9 2 2v4a2 2 0 0 0 2 2h1m8 0h1a2 2 0 0 0 2-2v-4c0-1.1.9-1.995 2-2m-5-8h1a2 2 0 0 1 2 2v3.99a2 2 0 0 0 2 2\"/>");

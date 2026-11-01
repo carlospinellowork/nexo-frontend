@@ -1,4 +1,4 @@
-import { ArrowUp, Headset, MessageCircle, RotateCcw } from "lucide-react";
+import { ArrowUp, Headset, RotateCcw, WhatsApp } from "../../../shared/icons";
 import { AnimatePresence, motion } from "motion/react";
 import { type FormEvent, useEffect, useRef, useState } from "react";
 import type { OutboundMessage } from "../../../api/mutations/useSimulator";
@@ -69,7 +69,7 @@ function BotContent({
           rel="noreferrer"
           className="inline-flex w-fit items-center gap-2 rounded-2xl bg-[#25D366] px-4 py-2.5 text-[14px] font-bold text-white shadow-[0_6px_16px_rgb(37_211_102/0.35)]"
         >
-          <MessageCircle size={16} />
+          <WhatsApp size={16} />
           {message.label}
         </a>
       </div>

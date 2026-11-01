@@ -1,4 +1,4 @@
-import { AlignLeft, AlignRight, Circle, Mail, MessageCircle, Sparkles, Square, SquareDot } from "lucide-react";
+import { AlignLeft, AlignRight, Circle, Mail, MessageCircle, Sparkles, Square, SquareDot } from "../../../shared/icons";
 import type { ReactNode } from "react";
 import { Segmented } from "../../../shared/components/ui/Segmented";
 import { inputClass } from "../../../shared/components/ui/styles";

@@ -1,5 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { Globe, Loader2 } from "lucide-react";
+import { Globe, Loader2 } from "../../shared/icons";
 import { useEffect } from "react";
 import { API_ORIGIN } from "../../api/instance";
 import { useGetPublicLandingPage } from "../../api/queries/useGetPublicLandingPage";

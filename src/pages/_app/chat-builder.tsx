@@ -1,5 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { CheckCircle2, Eye, Loader2, MessageSquarePlus, Pencil, Plus, Save } from "lucide-react";
+import { CheckCircle2, Eye, Loader2, MessageSquarePlus, Pencil, Plus, Save } from "../../shared/icons";
 import { useEffect, useState } from "react";
 import { apiErrorMessage } from "../../api/instance";
 import { usePatchChatSettings } from "../../api/mutations/usePatchChatSettings";

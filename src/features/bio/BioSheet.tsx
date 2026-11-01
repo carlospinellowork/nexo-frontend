@@ -1,4 +1,4 @@
-import { X } from "lucide-react";
+import { X } from "../../shared/icons";
 import { motion } from "motion/react";
 import { type ReactNode, useEffect } from "react";
 

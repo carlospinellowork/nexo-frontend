@@ -1,5 +1,5 @@
 import { Link } from "@tanstack/react-router";
-import { ArrowDownRight, ArrowUpRight, type LucideIcon } from "lucide-react";
+import { ArrowDownRight, ArrowUpRight, type IconComponent } from "../../shared/icons";
 import { animate, motion, useReducedMotion } from "motion/react";
 import { useEffect, useId, useState } from "react";
 import { gestureFor } from "../../shared/components/ui/gestures";
@@ -57,7 +57,7 @@ function Sparkline({ points, tone }: { points: number[]; tone: Tone }) {
 interface StatTileProps {
   label: string;
   value: number | undefined;
-  icon: LucideIcon;
+  icon: IconComponent;
   tone: Tone;
   to: string;
   /** Valor da semana anterior, para a variação. */

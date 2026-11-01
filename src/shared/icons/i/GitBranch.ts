@@ -1,0 +1,3 @@
+import { icon } from "../core";
+
+export const GitBranch = /* @__PURE__ */ icon("GitBranch", "<path fill=\"none\" stroke=\"currentColor\" stroke-linecap=\"round\" stroke-linejoin=\"round\" stroke-width=\"2\" d=\"M6 8a2 2 0 1 0 0-4a2 2 0 0 0 0 4m0 0v8m0 0a2 2 0 1 0 0 4a2 2 0 0 0 0-4m12-8a2 2 0 1 0 0-4a2 2 0 0 0 0 4m0 0v1a3 3 0 0 1-3 3H9a3 3 0 0 0-3 3\"/>", "<path fill=\"currentColor\" d=\"M18 3a2.998 2.998 0 0 1 1 5.825V9a4 4 0 0 1-4 4H9a2 2 0 0 0-2 2v.174A2.998 2.998 0 0 1 6 21a3 3 0 0 1-1-5.826V8.825A2.998 2.998 0 0 1 6 3a2.998 2.998 0 0 1 1 5.825v2.711A4 4 0 0 1 9 11h6a2 2 0 0 0 2-2v-.175A2.998 2.998 0 0 1 18 3\"/>");

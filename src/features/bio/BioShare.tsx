@@ -1,5 +1,5 @@
 import { Link } from "@tanstack/react-router";
-import { ArrowRight, Check, Copy, Download, ExternalLink, QrCode, Share2 } from "lucide-react";
+import { ArrowRight, Check, Copy, Download, ExternalLink, QrCode, Share2 } from "../../shared/icons";
 import QRCode from "qrcode";
 import { useEffect, useState } from "react";
 import { Button } from "../../shared/components/ui/Button";

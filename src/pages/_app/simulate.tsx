@@ -1,5 +1,5 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
-import { ArrowLeft, Play, Plus, Variable } from "lucide-react";
+import { ArrowLeft, Play, Plus, Variable } from "../../shared/icons";
 import { motion } from "motion/react";
 import { useCallback, useEffect, useRef } from "react";
 import type { SimulatorResult } from "../../api/mutations/useSimulator";

@@ -1,0 +1,3 @@
+import { icon } from "../core";
+
+export const Code2 = /* @__PURE__ */ icon("Code2", "<path fill=\"none\" stroke=\"currentColor\" stroke-linecap=\"round\" stroke-linejoin=\"round\" stroke-width=\"2\" d=\"M14.216 4.106L9.784 19.894M6.5 7.757L2.257 12L6.5 16.243m11-8.486L21.743 12L17.5 16.243\"/>", "<path fill=\"none\" stroke=\"currentColor\" stroke-linecap=\"round\" stroke-linejoin=\"round\" stroke-width=\"3\" d=\"M14.216 4.106L9.784 19.894M6.5 7.757L2.257 12L6.5 16.243m11-8.486L21.743 12L17.5 16.243\"/>");

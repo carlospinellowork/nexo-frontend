@@ -1,0 +1,3 @@
+import { icon } from "../core";
+
+export const Pencil = /* @__PURE__ */ icon("Pencil", "<path fill=\"none\" stroke=\"currentColor\" stroke-linecap=\"round\" stroke-linejoin=\"round\" stroke-width=\"2\" d=\"m12.17 6.17l-7.88 7.881a1 1 0 0 0-.294.707v5.243H9.24a1 1 0 0 0 .707-.293l7.88-7.88M12.17 6.17l2.433-2.433a1 1 0 0 1 1.414 0L20.26 7.98a1 1 0 0 1 0 1.414l-2.433 2.433M12.17 6.17l5.657 5.657\"/>", "<path fill=\"currentColor\" d=\"m17.827 13.241l-7.173 7.174A2 2 0 0 1 9.239 21H4.006a1.01 1.01 0 0 1-1.01-1.011v-5.232a2 2 0 0 1 .586-1.414l7.174-7.174zm-3.931-10.21a2 2 0 0 1 2.828 0l4.243 4.241a2 2 0 0 1 0 2.83l-1.726 1.725l-7.07-7.071z\"/>");
