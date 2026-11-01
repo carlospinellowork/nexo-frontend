@@ -6,6 +6,7 @@ import { useGetMe } from "../../../api/queries/useGetMe";
 import { UserAvatar } from "../../../features/profile/UserAvatar";
 import { FeedbackButton } from "../../../features/feedback/FeedbackButton";
 import { InstallMenuItem } from "../../../features/pwa/InstallApp";
+import { PushMenuItem } from "../../../features/push/PushPrompt";
 import { WorkspaceSelector } from "../../../features/workspaces/components/WorkspaceSelector";
 import { authClient } from "../../../lib/auth-client";
 import { isNavActive, type NavGroup, type NavItem } from "../../navigation";
@@ -216,6 +217,7 @@ export function Sidebar({
 
       <div className="mt-auto flex flex-col gap-2">
         <FeedbackButton />
+        <PushMenuItem />
         <InstallMenuItem onDone={onNavigate} />
         <WorkspaceSelector />
         <ThemeSegmented />

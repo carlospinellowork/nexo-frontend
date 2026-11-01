@@ -83,7 +83,7 @@ export function InstallCard() {
       </span>
       <span className="flex min-w-0 flex-1 flex-col">
         <span className="text-[14px] font-semibold text-text-primary">Nexo na tela inicial</span>
-        <span className="text-[12.5px] text-text-secondary">Abre em tela cheia, como um app.</span>
+        <span className="text-[12.5px] text-text-secondary">Abre como app e avisa quando chega cliente.</span>
       </span>
       <Button size="sm" onClick={async () => ((await pwa.install()) === "ios" ? setSteps(true) : undefined)}>
         Instalar

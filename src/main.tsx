@@ -6,10 +6,12 @@ import "./index.css";
 import { routeTree } from "./routeTree.gen";
 import { useThemeStore, watchSystemTheme } from "./features/theme/theme-store";
 import { Toaster } from "./shared/components/ui/Toast";
+import { registerServiceWorker } from "./features/push/usePush";
 
 // Aplica o tema salvo (ou o do sistema) e acompanha mudanças do sistema.
 useThemeStore.getState().setPreference(useThemeStore.getState().preference);
 watchSystemTheme();
+registerServiceWorker();
 
 const queryClient = new QueryClient({
   defaultOptions: {
