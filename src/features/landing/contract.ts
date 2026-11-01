@@ -3,8 +3,13 @@
  * O backend valida (Zod); aqui ficam os tipos e os limites usados nos campos do editor.
  */
 
-export const LANDING_THEMES = ["modern-blue", "espresso-champagne", "midnight-dark", "clean-slate"] as const;
-export type LandingTheme = (typeof LANDING_THEMES)[number];
+import { getTheme, THEME_IDS, THEMES } from "./look/themes";
+import type { LandingLook } from "./look/types";
+import { bgIsDark, cleanBackground } from "./look/resolve";
+
+/** Id de um tema (ver look/themes.ts; a API valida a mesma lista). */
+export type LandingTheme = string;
+export const LANDING_THEMES: readonly LandingTheme[] = THEME_IDS;
 
 export const SECTION_TYPES = ["hero", "services", "features", "testimonials", "faq", "cta", "footer", "links", "products"] as const;
 export type SectionType = (typeof SECTION_TYPES)[number];
@@ -199,6 +204,8 @@ export interface LandingPageSettings {
   seoTitle?: string;
   seoDescription?: string;
   fontHeading: "inter" | "serif" | "outfit";
+  /** O que o dono mudou por cima do tema na bio ("Personalizar"). */
+  look?: LandingLook;
   /** page = landing page completa; bio = link na bio */
   layout?: "page" | "bio";
   /** Selo "feito com Nexo" na bio. Hoje sempre aparece; planos futuros poderão desligar. */
@@ -219,22 +226,18 @@ export const SECTION_LABELS: Record<SectionType, string> = {
   products: "Produtos",
 };
 
-export const THEME_INFO: Record<LandingTheme, { name: string; description: string; colors: [string, string, string] }> = {
-  "espresso-champagne": { name: "Espresso e Champagne", description: "Luxo e alto padrão", colors: ["#140F0D", "#E6C687", "#F5EBE1"] },
-  "modern-blue": { name: "Azul moderno", description: "Serviços e comércio", colors: ["#0A0E1A", "#0A6CFF", "#FFFFFF"] },
-  "midnight-dark": { name: "Meia-noite", description: "Tecnologia", colors: ["#090D16", "#7C5CFF", "#E2E8F0"] },
-  "clean-slate": { name: "Claro e sóbrio", description: "Saúde, educação, consultorias", colors: ["#F8FAFC", "#0F172A", "#475569"] },
-};
+/** Nome, descrição e três cores de amostra de cada tema. */
+export const THEME_INFO: Record<LandingTheme, { name: string; description: string; colors: [string, string, string] }> = Object.fromEntries(
+  THEMES.map((t) => [t.id, { name: t.name, description: t.description, colors: [t.bg.colors[0], t.cta.bg.startsWith("#") ? t.cta.bg : t.accent, t.text] }]),
+);
+
+const pageBg = (theme: LandingTheme, look?: LandingLook) => cleanBackground(look?.background) ?? getTheme(theme).bg;
 
 /** Cor de fundo do tema (a faixa da barra de status do celular de prévia). */
-export const themeBg = (theme: LandingTheme) => THEME_INFO[theme].colors[0];
+export const themeBg = (theme: LandingTheme, look?: LandingLook) => pageBg(theme, look).colors[0];
 
 /** Tema com fundo escuro (a barra de status do celular de prévia fica clara). */
-export function themeIsDark(theme: LandingTheme): boolean {
-  const hex = THEME_INFO[theme].colors[0].replace("#", "");
-  const [r, g, b] = [0, 2, 4].map((i) => parseInt(hex.slice(i, i + 2), 16) / 255);
-  return 0.2126 * r + 0.7152 * g + 0.0722 * b < 0.45;
-}
+export const themeIsDark = (theme: LandingTheme, look?: LandingLook): boolean => bgIsDark(pageBg(theme, look));
 
 export const SLUG_REGEX = /^[a-z0-9]+(?:-[a-z0-9]+)*$/;
 

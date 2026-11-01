@@ -297,9 +297,24 @@ h1, h2, h3, .font-display {
  * Páginas e bios dos clientes (LandingRenderer) continuam na Inter: a fonte do painel não muda a cara
  * da página de ninguém. O título "clássico" (font-serif) segue valendo por cima disto.
  */
-.nx-landing,
-.nx-landing :where(h1, h2, h3, .font-display) {
+.nx-landing {
   font-family: var(--font-inter);
+}
+/* Títulos da página: a letra do tema (ou a escolhida em "Personalizar"), via --t-heading. */
+.nx-landing :where(h1, h2, h3, .font-display) {
+  font-family: var(--t-heading, var(--font-inter));
+}
+
+/* Fundo em malha das bios: manchas de cor que flutuam devagar. */
+@keyframes nx-mesh-float-a { 50% { transform: translate(12%, 10%) scale(1.15); } }
+@keyframes nx-mesh-float-b { 50% { transform: translate(-14%, -8%) scale(0.9); } }
+@keyframes nx-mesh-float-c { 50% { transform: translate(10%, -12%) scale(1.1); } }
+.nx-mesh-a { animation: nx-mesh-float-a 16s ease-in-out infinite; }
+.nx-mesh-b { animation: nx-mesh-float-b 19s ease-in-out infinite; }
+.nx-mesh-c { animation: nx-mesh-float-c 22s ease-in-out infinite; }
+.nx-mesh-still span { animation: none; }
+@media (prefers-reduced-motion: reduce) {
+  .nx-mesh-a, .nx-mesh-b, .nx-mesh-c { animation: none; }
 }
 
 /* ---------- Botão principal: volume, brilho que atravessa no hover e o fio amarelo do Nexo ---------- */

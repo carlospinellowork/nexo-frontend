@@ -1,4 +1,4 @@
-import { ArrowDown, ArrowUp, Bot, CheckCircle2, ExternalLink, Globe, GripVertical, type IconComponent, Instagram, Link2, MessageCircle, Music2, Pencil, Plus, QrCode, Rocket, Save, Settings2, ShoppingBag, Smartphone, Star, Trash2, UserRound, WhatsApp, Youtube } from "../../shared/icons";
+import { ArrowDown, ArrowUp, Bot, CheckCircle2, ExternalLink, Globe, GripVertical, type IconComponent, Instagram, Link2, MessageCircle, Music2, Pencil, Plus, QrCode, Rocket, Save, ChevronDown, Paintbrush, ShoppingBag, Smartphone, Star, Trash2, UserRound, WhatsApp, Youtube } from "../../shared/icons";
 import { Reorder, useDragControls } from "motion/react";
 import { useEffect, useRef, useState } from "react";
 import { apiErrorMessage } from "../../api/instance";
@@ -8,10 +8,10 @@ import { useGetLandingClicks } from "../../api/queries/useGetLandingClicks";
 import { Badge } from "../../shared/components/ui/Badge";
 import { Button } from "../../shared/components/ui/Button";
 import { PhoneFrame } from "../../shared/components/ui/PhoneFrame";
-import { Segmented } from "../../shared/components/ui/Segmented";
 import { toast } from "../../shared/components/ui/toast-store";
 import { type BioTarget, LandingRenderer } from "../landing/components/LandingRenderer";
 import { ClickCount, Field, LinkFields, ProductFields, ScheduleBadge } from "../landing/components/SectionEditor";
+import { LookEditor } from "../landing/components/LookEditor";
 import { ThemePicker } from "../landing/components/ThemePicker";
 import { type LandingPageRecord, type LandingPageSettings, type LandingSection, type LandingTheme, type LinkItem, type LinkKind, MAX, type ProductItem, themeBg, themeIsDark } from "../landing/contract";
 import { BioBotTab } from "./BioBotTab";
@@ -200,7 +200,7 @@ export function BioEditor({ page }: { page: LandingPageRecord }) {
   const tabs = [
     { value: "items", label: "Itens", icon: Pencil },
     { value: "bot", label: "Bot", icon: Bot },
-    { value: "page", label: "Página", icon: Settings2 },
+    { value: "page", label: "Visual", icon: Paintbrush },
   ] as const;
 
 
@@ -323,21 +323,19 @@ export function BioEditor({ page }: { page: LandingPageRecord }) {
               <div className="flex flex-col gap-5">
                 <div className="flex flex-col gap-2">
                   <span className="text-[13px] font-semibold text-text-secondary">Tema</span>
-                  <ThemePicker value={draft.theme} onChange={(theme) => change({ theme })} columns={1} />
+                  <ThemePicker value={draft.theme} onChange={(theme) => change({ theme, settings: { ...draft.settings, look: undefined, fontHeading: "inter" } })} />
                 </div>
-                <div className="flex flex-col gap-2">
-                  <span className="text-[13px] font-semibold text-text-secondary">Letra dos títulos</span>
-                  <Segmented
-                    label="Letra dos títulos"
-                    fullWidth
-                    value={draft.settings.fontHeading === "serif" ? "serif" : "inter"}
-                    onChange={(fontHeading) => change({ settings: { ...draft.settings, fontHeading } })}
-                    options={[
-                      { value: "inter", label: "Moderna" },
-                      { value: "serif", label: "Clássica" },
-                    ]}
-                  />
-                </div>
+                <details className="group rounded-2xl border border-border-ui bg-panel" open={Boolean(draft.settings.look)}>
+                  <summary className="flex min-h-12 cursor-pointer list-none items-center gap-2 px-3.5 text-[14px] font-semibold text-text-primary">
+                    <Paintbrush size={17} className="text-primary" data-gesture="tilt" />
+                    <span className="flex-1">Personalizar</span>
+                    <span className="text-[12.5px] font-medium text-text-secondary">fundo, botões, cores e letra</span>
+                    <ChevronDown size={16} className="text-text-secondary transition-transform group-open:rotate-180" />
+                  </summary>
+                  <div className="border-t border-border-ui p-3.5">
+                    <LookEditor theme={draft.theme} look={draft.settings.look} fontHeading={draft.settings.fontHeading} onChange={(look) => change({ settings: { ...draft.settings, look } })} />
+                  </div>
+                </details>
                 <div className="flex flex-col gap-2">
                   <span className="text-[13px] font-semibold text-text-secondary">Compartilhar</span>
                   {!page.publishedAt && <p className="text-[12px] text-warning-strong">Publique a bio para o endereço funcionar.</p>}
@@ -349,7 +347,7 @@ export function BioEditor({ page }: { page: LandingPageRecord }) {
         </aside>
 
         <div className={`${pane === "preview" ? "flex" : "hidden"} min-w-0 flex-1 items-center justify-center bg-bg-start p-3 md:flex md:p-6`}>
-          <PhoneFrame statusTone={themeIsDark(draft.theme) ? "light" : "dark"} statusBg={themeBg(draft.theme)} label="Prévia da bio">
+          <PhoneFrame statusTone={themeIsDark(draft.theme, draft.settings.look) ? "light" : "dark"} statusBg={themeBg(draft.theme, draft.settings.look)} label="Prévia da bio">
               <LandingRenderer
                 title={draft.title}
                 theme={draft.theme}

@@ -425,7 +425,7 @@ function LandingBuilderPage() {
               <div className="flex flex-col gap-5">
                 <div className="flex flex-col gap-1.5">
                   <span className="text-[13px] font-semibold text-text-secondary">Tema</span>
-                  <ThemePicker value={draft.theme} columns={1} onChange={(theme) => change({ theme })} />
+                  <ThemePicker value={draft.theme} flat onChange={(theme) => change({ theme })} />
                 </div>
                 <div className="flex flex-col gap-1.5">
                   <span className="text-[13px] font-semibold text-text-secondary">Fonte dos títulos</span>

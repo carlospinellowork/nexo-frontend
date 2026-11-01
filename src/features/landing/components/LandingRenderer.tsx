@@ -1,67 +1,18 @@
 import { CheckCircle2, ChevronDown, Globe, type IconComponent, Instagram, Link2, MessageCircle, Music2, Phone, QrCode, Search, ShoppingBag, Sparkles, Star, WhatsApp, X, Youtube } from "../../../shared/icons";
 import { AnimatePresence, motion, useReducedMotion } from "motion/react";
-import { useId, useRef, useState } from "react";
+import { useEffect, useId, useRef, useState } from "react";
 import { SealPill } from "../../../shared/components/ui/NexoSeal";
 import type { HeroData, LandingPageSettings, LandingSection, LandingTheme, LinkItem, LinkKind, ProductItem } from "../contract";
 import { landingIcon } from "../icons";
 import { fold } from "../schedule";
 import { PixDialog } from "./PixDialog";
+import { Backdrop } from "../look/Backdrop";
+import { loadFont } from "../look/fonts";
+import { buttonClass, PALETTE, type Palette, resolveLook } from "../look/resolve";
+import { getTheme } from "../look/themes";
+import type { ButtonShape, ButtonStyle } from "../look/types";
 
-// As páginas dos clientes têm paletas próprias (não seguem o tema do painel).
-const THEMES: Record<
-  LandingTheme,
-  { page: string; header: string; muted: string; accent: string; card: string; badge: string; primary: string; secondary: string; line: string; star: string }
-> = {
-  "espresso-champagne": {
-    page: "bg-[#140F0D] text-[#F5EBE1]",
-    header: "bg-[#140F0D]/85 border-[#2E221D]",
-    muted: "text-[#C5B5A5]",
-    accent: "text-[#E6C687]",
-    card: "bg-[#1E1714] border-[#332621]",
-    badge: "bg-[#2A201B] text-[#E6C687] border-[#44332B]",
-    primary: "bg-[#E6C687] text-[#140F0D] hover:bg-[#D4B475] shadow-lg shadow-[#E6C687]/15",
-    secondary: "bg-[#241B17] text-[#F5EBE1] border-[#3E2F28] hover:bg-[#2F231E]",
-    line: "border-[#2E221D] divide-[#2E221D]",
-    star: "text-[#E6C687]",
-  },
-  "midnight-dark": {
-    page: "bg-[#090D16] text-slate-100",
-    header: "bg-[#090D16]/85 border-slate-800",
-    muted: "text-slate-400",
-    accent: "text-[#A78BFA]",
-    card: "bg-[#0F172A] border-slate-800",
-    badge: "bg-[#7C5CFF]/15 text-[#C4B5FD] border-[#7C5CFF]/30",
-    primary: "bg-gradient-to-r from-[#0A6CFF] to-[#7C5CFF] text-white hover:brightness-110 shadow-lg shadow-[#7C5CFF]/25",
-    secondary: "bg-slate-900 text-slate-200 border-slate-800 hover:bg-slate-800",
-    line: "border-slate-800 divide-slate-800",
-    star: "text-[#A78BFA]",
-  },
-  "clean-slate": {
-    page: "bg-[#F8FAFC] text-slate-900",
-    header: "bg-[#F8FAFC]/85 border-slate-200",
-    muted: "text-slate-600",
-    accent: "text-slate-900",
-    card: "bg-white border-slate-200 shadow-sm",
-    badge: "bg-slate-100 text-slate-700 border-slate-200",
-    primary: "bg-slate-900 text-white hover:bg-slate-800 shadow-md",
-    secondary: "bg-white text-slate-800 border-slate-300 hover:bg-slate-50",
-    line: "border-slate-200 divide-slate-200",
-    star: "text-amber-500",
-  },
-  "modern-blue": {
-    page: "bg-[#0A0E1A] text-white",
-    header: "bg-[#0A0E1A]/85 border-slate-800",
-    muted: "text-slate-300",
-    accent: "text-[#60A5FA]",
-    card: "bg-[#121829] border-slate-800",
-    badge: "bg-[#0A6CFF]/15 text-[#93C5FD] border-[#0A6CFF]/30",
-    primary: "bg-[#0A6CFF] text-white hover:bg-[#085AD4] shadow-lg shadow-[#0A6CFF]/25",
-    secondary: "bg-[#182035] text-white border-slate-700 hover:bg-[#202B48]",
-    line: "border-slate-800 divide-slate-800",
-    star: "text-amber-400",
-  },
-};
-
+// As páginas dos clientes têm paletas próprias (não seguem o tema do painel): ver ../look.
 interface LandingRendererProps {
   title: string;
   theme: LandingTheme;
@@ -89,8 +40,10 @@ export type BioTarget = { type: "profile" } | { type: "link"; id: string } | { t
  * no editor mostra o layout de celular mesmo numa tela grande.
  */
 function PageRenderer({ title, theme, sections, settings, onChat }: LandingRendererProps) {
-  const t = THEMES[theme] ?? THEMES["modern-blue"];
-  const heading = settings?.fontHeading === "serif" ? "font-serif" : "";
+  const t = PALETTE;
+  // A landing page completa usa só as cores do tema (a letra é a Moderna ou a Clássica do editor).
+  const look = resolveLook(getTheme(theme), { font: settings?.fontHeading === "serif" ? "serif" : "inter" });
+  const heading = "font-display";
   const rootRef = useRef<HTMLDivElement>(null);
   const [openFaq, setOpenFaq] = useState<string | null>(null);
 
@@ -116,7 +69,7 @@ function PageRenderer({ title, theme, sections, settings, onChat }: LandingRende
   const hasServices = visible.some((s) => s.type === "services");
 
   return (
-    <div ref={rootRef} className={`nx-landing @container min-h-full w-full ${t.page}`}>
+    <div ref={rootRef} className={`nx-landing @container min-h-full w-full ${t.page}`} style={look.vars}>
       <header className={`sticky top-0 z-30 border-b backdrop-blur-lg ${t.header}`}>
         <div className="mx-auto flex max-w-6xl items-center justify-between gap-4 px-5 py-3.5 @2xl:px-6">
           <span className={`truncate text-lg font-bold tracking-tight ${heading}`}>{title}</span>
@@ -305,7 +258,7 @@ function PageRenderer({ title, theme, sections, settings, onChat }: LandingRende
               return (
                 <section key={section.id} className="mx-auto flex w-full max-w-md flex-col gap-3 px-5">
                   {section.data.items.map((item) => (
-                    <LinkButton key={item.id} item={item} t={t} onChat={onChat} onPix={() => undefined} />
+                    <LinkButton key={item.id} item={item} t={t} look={{ style: "filled", shape: "rounded" }} onChat={onChat} onPix={() => undefined} />
                   ))}
                 </section>
               );
@@ -361,7 +314,6 @@ const LINK_ICONS: Record<LinkKind, IconComponent> = {
   youtube: Youtube,
 };
 
-type Palette = (typeof THEMES)[LandingTheme];
 
 /** Endereço do WhatsApp com a mensagem pronta (wa.me/<numero>?text=...). */
 const whatsappLink = (url: string, message?: string) => (message?.trim() ? `${url}?text=${encodeURIComponent(message.trim())}` : url);
@@ -369,15 +321,16 @@ const whatsappLink = (url: string, message?: string) => (message?.trim() ? `${ur
 interface LinkButtonProps {
   item: LinkItem;
   t: Palette;
+  look: { style: ButtonStyle; shape: ButtonShape };
   onChat: () => void;
   onPix: (item: LinkItem) => void;
   onClick?: (id: string) => void;
   primary?: boolean;
 }
 
-function LinkButton({ item, t, onChat, onPix, onClick, primary }: LinkButtonProps) {
+function LinkButton({ item, look, onChat, onPix, onClick, primary }: LinkButtonProps) {
   const Icon = LINK_ICONS[item.kind] ?? Link2;
-  const className = `flex min-h-[52px] w-full items-center gap-3 rounded-2xl border px-5 py-3.5 text-left text-[16px] font-semibold transition-transform hover:scale-[1.02] active:scale-[0.98] ${primary ? t.primary : t.secondary}`;
+  const className = `flex min-h-[52px] w-full items-center gap-3 px-5 py-3.5 text-left text-[16px] font-semibold transition-[transform,box-shadow] hover:scale-[1.02] active:scale-[0.98] ${buttonClass(look.style, look.shape, primary)}`;
   const content = (
     <>
       <Icon size={20} className="shrink-0" />
@@ -448,8 +401,11 @@ const SITE_URL: string = import.meta.env.VITE_SITE_URL ?? "https://nexo.app";
 
 /** Link na bio: coluna estreita para o celular, com busca, links, produtos, Pix e o bot. */
 function BioRenderer({ title, theme, sections, settings, slug, canAsk, onChat, onAsk, onItemClick, onEditSelect, editSelectedId }: LandingRendererProps) {
-  const t = THEMES[theme] ?? THEMES["modern-blue"];
-  const heading = settings?.fontHeading === "serif" ? "font-serif" : "";
+  const t = PALETTE;
+  const look = resolveLook(getTheme(theme), settings?.look, settings?.fontHeading);
+  const buttons = { style: look.buttonStyle, shape: look.buttonShape };
+  const heading = "font-display";
+  useEffect(() => loadFont(look.font), [look.font]);
   const reduceMotion = useReducedMotion();
   const [query, setQuery] = useState("");
   const [pix, setPix] = useState<LinkItem | null>(null);
@@ -487,7 +443,8 @@ function BioRenderer({ title, theme, sections, settings, slug, canAsk, onChat, o
   const ring = (id: string) => (onEditSelect ? `rounded-2xl transition-shadow ${editSelectedId === id ? "ring-2 ring-[#FFC400]" : "hover:ring-2 hover:ring-white/30"}` : "");
 
   return (
-    <div className={`nx-landing @container min-h-full w-full ${t.page}`}>
+    <div className={`nx-landing @container relative isolate min-h-full w-full ${t.page}`} style={look.vars}>
+      <Backdrop bg={look.bg} />
       <div className="mx-auto flex min-h-full max-w-[460px] flex-col items-center px-4 pb-8 pt-12 text-center">
         <div className={`flex w-full flex-col items-center ${ring("profile")}`} {...pick({ type: "profile" })}>
         <motion.span
@@ -533,7 +490,7 @@ function BioRenderer({ title, theme, sections, settings, slug, canAsk, onChat, o
         <div className="mt-5 flex w-full flex-col gap-3">
           {shownLinks.map((item, i) => (
             <motion.div key={item.id} initial={reduceMotion ? false : { opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: words.length ? 0 : 0.1 + i * 0.06 }} className={ring(item.id)} {...pick({ type: "link", id: item.id })}>
-              <LinkButton item={item} t={t} onChat={onChat} onPix={setPix} onClick={onItemClick} primary={!words.length && i === firstChat} />
+              <LinkButton item={item} t={t} look={buttons} onChat={onChat} onPix={setPix} onClick={onItemClick} primary={!words.length && i === firstChat} />
             </motion.div>
           ))}
 

@@ -492,7 +492,7 @@ export function BioWizard({ onLock, onCreated }: BioWizardProps) {
     // 4: tema e publicar
     <div key="theme" className="flex flex-col gap-4">
       <h1 className="text-[26px] font-extrabold leading-tight tracking-tight text-text-primary">Escolha o visual</h1>
-      <ThemePicker value={s.theme} onChange={(theme) => set({ theme })} columns={1} />
+      <ThemePicker value={s.theme} onChange={(theme) => set({ theme })} />
       <PhoneFrame size="sm" inert statusTone={themeIsDark(s.theme) ? "light" : "dark"} statusBg={themeBg(s.theme)} label="Prévia da bio">
         <LandingRenderer title={s.name || "Sua bio"} theme={s.theme} sections={previewSections(s)} settings={{ showChatWidget: true, fontHeading: "inter", layout: "bio", showBadge: true }} onChat={() => undefined} />
       </PhoneFrame>
