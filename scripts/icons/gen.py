@@ -40,11 +40,9 @@ MAP = {
  'MessageCircleQuestion':'question-2','Mic':'mic','Repeat':'repeat','Scale':'balance','Shirt':'t-shirt','Tag':'tag','ThumbsUp':'thumb-up',
  'TicketPercent':'ticket',
  # extras úteis
- 'WhatsApp':'whatsapp','Spotify':'spotify','Telegram':'telegram','Facebook':'facebook','Palette':'palette',
+ 'WhatsApp':'whatsapp','TikTok':'tiktok','XSocial':'social-x','Spotify':'spotify','Telegram':'telegram','Facebook':'facebook','Palette':'palette',
 }
 names = set(MAP)
-missing = [n for n, v in MAP.items() if f'{v}-line' not in D or f'{v}-fill' not in D]
-if missing: sys.exit('faltando: ' + ', '.join(f'{n}->{MAP[n]}' for n in missing))
 def body(k):
     b = D[k]['body']
     # Tira o retângulo transparente de 24x24 que a MingCute usa como moldura.
@@ -57,6 +55,10 @@ wanted = {n for n in (sys.argv[3].split(',') if len(sys.argv) > 3 else []) if n}
 unknown = wanted - names
 if unknown: sys.exit('sem correspondência no MAP: ' + ', '.join(sorted(unknown)))
 used = sorted(existing | wanted | {'WhatsApp','Spotify','Telegram','Facebook','Palette'})
+# Só os novos são gerados (os que já existem ficam como estão: a MingCute pode ter mudado o nome de algum).
+new = [n for n in used if n not in existing]
+missing = [n for n in new if f'{MAP[n]}-line' not in D or f'{MAP[n]}-fill' not in D]
+if missing: sys.exit('faltando: ' + ', '.join(f'{n}->{MAP[n]}' for n in missing))
 head = """/**
  * Ícones do Nexo: MingCute Icon (https://www.mingcute.com, licença Apache 2.0), com traço arredondado no estilo
  * dos ícones do iPhone. Cada ícone tem o contorno (padrão) e o preenchido (`filled`), usado no item ativo do menu.
@@ -107,7 +109,8 @@ core=head.replace('function icon(', 'export function icon(')
 open(os.path.join(base,'core.tsx'),'w').write(core)
 idx=['/* Gerado: um arquivo por ícone (em ./i) para cada tela levar só os ícones que usa. */','export type { IconComponent, IconProps } from "./core";']
 for n in used:
+  if n in new:
     open(os.path.join(base,'i',n+'.ts'),'w').write(f'import {{ icon }} from "../core";\n\nexport const {n} = /* @__PURE__ */ icon("{n}", {json.dumps(body(MAP[n]+"-line"))}, {json.dumps(body(MAP[n]+"-fill"))});\n')
-    idx.append(f'export {{ {n} }} from "./i/{n}";')
+  idx.append(f'export {{ {n} }} from "./i/{n}";')
 open(sys.argv[2].replace('.tsx','.ts'),'w').write('\n'.join(idx)+'\n')
 print(len(used), 'ícones')

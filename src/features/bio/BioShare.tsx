@@ -1,5 +1,5 @@
 import { Link } from "@tanstack/react-router";
-import { ArrowRight, Check, Copy, Download, ExternalLink, Instagram, QrCode, Share2 } from "../../shared/icons";
+import { ArrowRight, Check, ChevronRight, Copy, Download, ExternalLink, QrCode, Share2 } from "../../shared/icons";
 import QRCode from "qrcode";
 import { useEffect, useState } from "react";
 import { Button } from "../../shared/components/ui/Button";
@@ -7,14 +7,20 @@ import { TONES } from "../../shared/components/ui/tones";
 import { toast } from "../../shared/components/ui/toast-store";
 
 import { bioUrl } from "./bioUrl";
-import { InstagramGuide } from "./InstagramGuide";
+import { SocialGuide } from "./SocialGuide";
+import { NETWORK_IDS, NETWORKS, type SocialNetwork } from "./socialNetworks";
 
 /** Link, QR Code, compartilhar e o passo a passo para colar na bio das redes. */
 export function BioShare({ slug, name, showSteps = true }: { slug: string; name: string; showSteps?: boolean }) {
   const url = bioUrl(slug);
   const [qr, setQr] = useState("");
   const [copied, setCopied] = useState(false);
-  const [igGuide, setIgGuide] = useState(false);
+  const [guide, setGuide] = useState<SocialNetwork | null>(null);
+  const [lastGuide, setLastGuide] = useState<SocialNetwork>("instagram");
+  const openGuide = (n: SocialNetwork) => {
+    setLastGuide(n);
+    setGuide(n);
+  };
   const canShare = typeof navigator !== "undefined" && typeof navigator.share === "function";
 
   useEffect(() => {
@@ -81,10 +87,10 @@ export function BioShare({ slug, name, showSteps = true }: { slug: string; name:
             Baixar QR Code (PNG)
           </Button>
         )}
-        <Button variant="gold" size="lg" icon={Instagram} onClick={() => setIgGuide(true)} className="w-full">
-          Colocar no Instagram, passo a passo
+        <Button variant="gold" size="lg" icon={Share2} onClick={() => openGuide("instagram")} className="w-full">
+          Colocar nas redes, passo a passo
         </Button>
-        <InstagramGuide url={url} open={igGuide} onClose={() => setIgGuide(false)} />
+        <SocialGuide url={url} network={guide ?? lastGuide} open={guide !== null} onClose={() => setGuide(null)} />
         <Link
           to="/qr-codes"
           search={{ novo: "bio" }}
@@ -107,22 +113,30 @@ export function BioShare({ slug, name, showSteps = true }: { slug: string; name:
           <p className="mt-1.5 rounded-xl bg-warning/14 px-3 py-2 text-[13px] leading-snug text-warning-strong">
             No texto da bio o link não fica clicável (regra do Instagram e do TikTok). Ele precisa ir no campo de links do perfil.
           </p>
-          <ol className="mt-3 flex flex-col gap-3 text-[14px] leading-snug text-text-secondary">
-            <li>
-              <strong className="text-text-primary">Instagram:</strong> copie o link acima e vá em Editar perfil › Links › Adicionar link externo. Cole o
-              endereço, ponha um título (ex.: &ldquo;Fale comigo&rdquo;) e conclua. Ele aparece clicável logo abaixo da sua bio.
-            </li>
-            <li>
-              <strong className="text-text-primary">TikTok:</strong> Editar perfil › Site, cole o endereço e salve. O TikTok só mostra esse campo em contas
-              comerciais ou com mais seguidores; se não aparecer, troque para conta comercial nas configurações.
-            </li>
-            <li>
-              <strong className="text-text-primary">WhatsApp:</strong> cole o link no seu status e no recado do perfil.
-            </li>
-            <li>
-              <strong className="text-text-primary">Stories e impressos:</strong> baixe o QR Code e use onde quiser.
-            </li>
-          </ol>
+          <ul className="mt-3 flex flex-col gap-1.5">
+            {NETWORK_IDS.map((id) => {
+              const n = NETWORKS[id];
+              return (
+                <li key={id}>
+                  <button
+                    type="button"
+                    onClick={() => openGuide(id)}
+                    className="flex min-h-11 w-full items-center gap-3 rounded-2xl bg-panel-2 px-3.5 py-2 text-left transition-colors hover:bg-panel-hover"
+                  >
+                    <span className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-xl ${TONES.lagoon.chip}`}>
+                      <n.icon size={18} />
+                    </span>
+                    <span className="min-w-0 flex-1 text-[14px] font-semibold text-text-primary">{n.label}</span>
+                    <span className="text-[12.5px] text-text-secondary">Passo a passo</span>
+                    <ChevronRight size={16} className="shrink-0 text-text-secondary" />
+                  </button>
+                </li>
+              );
+            })}
+          </ul>
+          <p className="mt-3 text-[13px] leading-snug text-text-secondary">
+            <strong className="text-text-primary">Stories e impressos:</strong> baixe o QR Code e use onde quiser.
+          </p>
         </div>
       )}
     </div>
