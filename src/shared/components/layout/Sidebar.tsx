@@ -12,6 +12,8 @@ import { authClient } from "../../../lib/auth-client";
 import { isNavActive, type NavGroup, type NavItem } from "../../navigation";
 import { Logo } from "../ui/Logo";
 import { ThemeSegmented } from "../ui/ThemeToggle";
+import { ProLock } from "../../../features/plan/ProBadge";
+import { isProRoute } from "../../../features/plan/plan";
 import { gestureFor } from "../ui/gestures";
 
 const ADVANCED_KEY = "nexo:nav-advanced";
@@ -62,6 +64,7 @@ function NavLink({
         <Icon size={17} filled={active} data-gesture={gestureFor(Icon)} />
       </span>
       <span className="relative">{title}</span>
+      {isProRoute(to) && <span className="relative ml-auto"><ProLock /></span>}
     </Link>
   );
 }

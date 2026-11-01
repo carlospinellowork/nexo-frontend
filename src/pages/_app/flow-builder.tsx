@@ -19,6 +19,7 @@ import { toast } from "../../shared/components/ui/toast-store";
 import { useActiveChat } from "../../shared/hooks/useActiveChat";
 import { useIsMobile } from "../../shared/hooks/useIsMobile";
 import { HelpButton } from "../../features/tour/HelpButton";
+import { ProBadge } from "../../features/plan/ProBadge";
 import { startTour } from "../../features/tour/driver-service";
 
 export const Route = createFileRoute("/_app/flow-builder")({
@@ -127,7 +128,7 @@ function FlowBuilderPage() {
       <Header
         title={chat?.name ?? "Fluxos"}
         subtitle="Monte a conversa do seu assistente"
-        badge={status}
+        badge={<span className="flex items-center gap-2">{status}<ProBadge className="hidden sm:inline-flex" /></span>}
         actions={
           <div id="tour-flow-actions" className="flex items-center gap-2">
             <ChatSelect label="Chat" chats={chats} value={chatId} onChange={changeChat} />

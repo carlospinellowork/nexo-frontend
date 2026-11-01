@@ -14,6 +14,7 @@ import { Header } from "../../shared/components/layout/Header";
 import { Badge } from "../../shared/components/ui/Badge";
 import { Button, IconButton } from "../../shared/components/ui/Button";
 import { EmptyState } from "../../shared/components/ui/EmptyState";
+import { ProBadge } from "../../features/plan/ProBadge";
 import { toast } from "../../shared/components/ui/toast-store";
 
 export const Route = createFileRoute("/_app/landing-pages")({
@@ -67,6 +68,7 @@ function LandingPagesPage() {
     <div className="flex h-full flex-col">
       <Header
         title="Landing pages"
+        badge={<ProBadge />}
         subtitle="Páginas de venda escritas pela IA, com o seu bot atendendo"
         actions={
           <div className="flex items-center gap-2">

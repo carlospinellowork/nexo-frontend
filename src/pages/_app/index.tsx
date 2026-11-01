@@ -22,6 +22,7 @@ import { WhatsappPulse } from "../../features/home/WhatsappPulse";
 import { startTour } from "../../features/tour/driver-service";
 import { HelpButton } from "../../features/tour/HelpButton";
 import { authClient } from "../../lib/auth-client";
+import { TrialBanner } from "../../features/plan/TrialBanner";
 import { useActiveChat } from "../../shared/hooks/useActiveChat";
 
 export const Route = createFileRoute("/_app/")({
@@ -106,6 +107,9 @@ function HomePage() {
           </HomeHero>
         </motion.div>
 
+        <motion.div variants={item}>
+          <TrialBanner />
+        </motion.div>
         <InstallCard />
         <PushCard />
 
