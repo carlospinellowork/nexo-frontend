@@ -4,21 +4,21 @@ import { Backdrop } from "../look/Backdrop";
 import { FONTS, loadFont } from "../look/fonts";
 import { buttonClass, resolveLook } from "../look/resolve";
 import { THEMES } from "../look/themes";
-import { CATEGORY_LABELS, THEME_CATEGORIES, type FontId, type ThemeCategory, type ThemeDef } from "../look/types";
+import { CATEGORY_LABELS, THEME_CATEGORIES, type FontId, type LandingLook, type ThemeCategory, type ThemeDef } from "../look/types";
 
 /** Miniatura de um tema: o fundo, a foto, o nome na letra do tema e três botões no estilo dele. */
-export function ThemeThumb({ theme, flat = false }: { theme: ThemeDef; flat?: boolean }) {
-  const look = resolveLook(theme);
+export function ThemeThumb({ theme, flat = false, custom, label }: { theme: ThemeDef; flat?: boolean; custom?: LandingLook; label?: string }) {
+  const look = resolveLook(theme, custom);
   const bg = flat ? { type: "solid" as const, colors: [theme.bg.colors[0]] } : look.bg;
   return (
     <span className="relative isolate flex aspect-[4/5] w-full flex-col items-center gap-1.5 overflow-hidden rounded-[14px] px-3 pt-4" style={look.vars} aria-hidden>
       <Backdrop bg={bg} animate={false} />
       <span className="h-7 w-7 shrink-0 rounded-full [background:var(--t-cta)]" />
-      <span className="max-w-full truncate text-[13px] font-bold leading-tight text-[var(--t-text)]" style={{ fontFamily: FONTS[theme.font].family }}>
-        {theme.name}
+      <span className="max-w-full truncate text-[13px] font-bold leading-tight text-[var(--t-text)]" style={{ fontFamily: FONTS[look.font].family }}>
+        {label ?? theme.name}
       </span>
       {[true, false, false].map((primary, i) => (
-        <span key={i} className={`h-[15px] w-full shrink-0 ${buttonClass(theme.button.style, theme.button.shape, primary)} !shadow-none ${theme.button.style === "hard" ? "!border-[1.5px]" : ""}`} />
+        <span key={i} className={`h-[15px] w-full shrink-0 ${buttonClass(look.buttonStyle, look.buttonShape, primary)} !shadow-none ${look.buttonStyle === "hard" ? "!border-[1.5px]" : ""}`} />
       ))}
     </span>
   );

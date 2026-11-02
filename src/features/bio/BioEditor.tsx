@@ -13,6 +13,7 @@ import { type BioTarget, LandingRenderer } from "../landing/components/LandingRe
 import { ClickCount, Field, LinkFields, ProductFields, ScheduleBadge } from "../landing/components/SectionEditor";
 import { LookEditor } from "../landing/components/LookEditor";
 import { ThemePicker } from "../landing/components/ThemePicker";
+import { PhotoTheme } from "../landing/look/PhotoTheme";
 import { type LandingPageRecord, type LandingPageSettings, type LandingSection, type LandingTheme, type LinkItem, type LinkKind, MAX, type ProductItem, themeBg, themeIsDark } from "../landing/contract";
 import { BioBotTab } from "./BioBotTab";
 import { BioSheet } from "./BioSheet";
@@ -338,6 +339,15 @@ export function BioEditor({ page, openInstagram = false }: { page: LandingPageRe
 
             {tab === "page" && (
               <div className="flex flex-col gap-5">
+                <PhotoTheme
+                  photoUrl={hero?.data.imageUrl}
+                  current={draft.settings.look}
+                  onApply={(theme, look) => change({ theme, settings: { ...draft.settings, look, fontHeading: "inter" } })}
+                  onAddPhoto={() => {
+                    setTab("items");
+                    setSelection({ type: "profile" });
+                  }}
+                />
                 <div className="flex flex-col gap-2">
                   <span className="text-[13px] font-semibold text-text-secondary">Tema</span>
                   <ThemePicker value={draft.theme} onChange={(theme) => change({ theme, settings: { ...draft.settings, look: undefined, fontHeading: "inter" } })} />
