@@ -1,4 +1,4 @@
-import { ArrowLeft, AtSign, Bot, Briefcase, Check, ChevronRight, Info, Link2, ListChecks, Plus, Rocket, ShoppingBag, Sparkles, Trash2, UserRound, WhatsApp, X, Zap } from "../../shared/icons";
+import { ArrowLeft, AtSign, Bot, Briefcase, Check, ChevronRight, Info, Link2, ListChecks, Plus, Rocket, ShoppingBag, Shuffle, Smartphone, Sparkles, Trash2, UserRound, WhatsApp, X, Zap } from "../../shared/icons";
 import { AnimatePresence, motion, useReducedMotion } from "motion/react";
 import { useState, useEffect, useRef } from "react";
 import { apiErrorMessage } from "../../api/instance";
@@ -16,6 +16,9 @@ import { AUDIENCE_PRESETS, BIO_AUDIENCES, type BioAudience } from "./presets";
 import { BIO_KITS, KITS, type BioKit, applyKitToLinks, detectKit, presetFor } from "./kits";
 import { ThemeThumb } from "../landing/components/ThemePicker";
 import { getTheme } from "../landing/look/themes";
+import type { LandingLook } from "../landing/look/types";
+import { PhotoTheme } from "../landing/look/PhotoTheme";
+import { Sheet } from "../../shared/components/ui/Sheet";
 import { useGetMe } from "../../api/queries/useGetMe";
 import { ImageField } from "../uploads/ImageField";
 import { isImageUrl } from "../uploads/image";
@@ -47,6 +50,8 @@ interface WizardState {
   faqs: FaqRow[];
   faqsTouched: boolean;
   theme: LandingTheme;
+  /** Visual por cima do tema (vem do "Tema da sua foto"). */
+  look?: LandingLook;
 }
 
 const INITIAL: WizardState = {
@@ -167,6 +172,7 @@ function buildPayload(s: WizardState) {
     tagline: s.tagline.trim() || undefined,
     photoUrl: s.photoUrl.trim() || undefined,
     theme: s.theme,
+    ...(s.look ? { look: s.look } : {}),
     links,
     products,
     faqs: s.faqs.filter((f) => f.question.trim() && f.answer.trim()).map((f) => ({ question: f.question.trim(), answer: f.answer.trim() })),
@@ -182,6 +188,164 @@ function previewSections(s: WizardState): LandingSection[] {
   ];
   if (p.products.length) out.push({ id: "p", type: "products", enabled: true, data: { title: "Produtos", items: p.products } });
   return out;
+}
+
+/** A conversa do bot com as perguntas do dono: mostra a pergunta da vez sendo respondida. */
+function ChatPreview({ name, faqs, current, compact = false }: { name: string; faqs: FaqRow[]; current?: number; compact?: boolean }) {
+  const asked = current !== undefined ? faqs[current] : undefined;
+  const options = faqs.filter((f) => f.question.trim()).slice(0, 6);
+  if (compact) {
+    return (
+      <div className="flex flex-col gap-2 bg-[#F3F1FA] p-3 text-[14px] leading-snug">
+        <span className="max-w-[85%] self-end rounded-2xl rounded-br-md bg-primary px-3 py-2 text-white">{asked?.question || "Pergunta"}</span>
+        <span className={`max-w-[85%] self-start whitespace-pre-wrap rounded-2xl rounded-bl-md px-3 py-2 shadow-sm ${asked?.answer.trim() ? "bg-white text-[#16122B]" : "border border-dashed border-primary/40 bg-white/60 text-[#635D7D]"}`}>
+          {asked?.answer.trim() || "A sua resposta aparece aqui."}
+        </span>
+      </div>
+    );
+  }
+  return (
+    <div className="flex h-full flex-col gap-2.5 bg-[#F3F1FA] px-3 pb-4 pt-12 text-[13.5px] leading-snug">
+      <div className="flex items-center gap-2 pb-1">
+        <span className="flex h-8 w-8 items-center justify-center rounded-full bg-primary text-white">
+          <Bot size={16} />
+        </span>
+        <span className="flex flex-col leading-tight">
+          <span className="text-[13px] font-bold text-[#16122B]">{name || "Sua bio"}</span>
+          <span className="text-[11px] text-[#635D7D]">assistente, responde na hora</span>
+        </span>
+      </div>
+      <span className="max-w-[85%] self-start rounded-2xl rounded-bl-md bg-white px-3 py-2 text-[#16122B] shadow-sm">Oi! Como posso te ajudar? Escolha uma pergunta ou escreva a sua.</span>
+      <div className="flex flex-col gap-1.5 self-start">
+        {options.map((f) => (
+          <span key={f.key} className={`w-fit rounded-full border px-3 py-1.5 text-[12.5px] font-semibold ${f === asked ? "border-primary bg-primary text-white" : "border-primary/30 bg-white text-primary"}`}>
+            {f.question}
+          </span>
+        ))}
+      </div>
+      {asked?.question.trim() && (
+        <>
+          <span className="max-w-[85%] self-end rounded-2xl rounded-br-md bg-primary px-3 py-2 text-white">{asked.question}</span>
+          <span className={`max-w-[85%] self-start whitespace-pre-wrap rounded-2xl rounded-bl-md px-3 py-2 shadow-sm ${asked.answer.trim() ? "bg-white text-[#16122B]" : "border border-dashed border-primary/40 bg-white/60 text-[#635D7D]"}`}>
+            {asked.answer.trim() || "A sua resposta aparece aqui."}
+          </span>
+        </>
+      )}
+    </div>
+  );
+}
+
+/** Uma pergunta por tela: a pessoa só escreve a resposta (ou troca a pergunta por outra sugestão). */
+function QuestionPage({ index, total, faq, suggestions, onChange, name }: { index: number; total: number; faq: FaqRow; suggestions: { question: string; hint: string }[]; onChange: (patch: Partial<FaqRow>) => void; name: string }) {
+  const [swap, setSwap] = useState(false);
+  return (
+    <div className="flex flex-col gap-4">
+      <div className="flex items-center gap-1.5" aria-hidden>
+        {Array.from({ length: total }, (_, i) => (
+          <span key={i} className={`h-1.5 rounded-full transition-all ${i === index ? "w-6 bg-primary" : i < index ? "w-1.5 bg-primary/50" : "w-1.5 bg-text-secondary/25"}`} />
+        ))}
+        <span className="ml-1.5 text-[13px] font-semibold text-text-secondary">
+          Pergunta {index + 1} de {total}
+        </span>
+      </div>
+      <label htmlFor="faq-question" className="sr-only">
+        Pergunta
+      </label>
+      <textarea
+        id="faq-question"
+        rows={2}
+        className="w-full resize-none rounded-xl bg-transparent px-1 text-[24px] font-extrabold leading-tight tracking-tight text-text-primary outline-none placeholder:text-text-secondary/50 focus:bg-panel-2"
+        value={faq.question}
+        maxLength={120}
+        placeholder="Escreva a pergunta"
+        onChange={(e) => onChange({ question: e.target.value.replace(/\n/g, " ") })}
+      />
+      <div className="flex flex-col gap-1.5">
+        <label htmlFor="faq-answer" className="text-[13px] font-semibold text-text-secondary">
+          Como você responderia?
+        </label>
+        <textarea
+          id="faq-answer"
+          autoFocus
+          className={`${textareaClass} min-h-32 text-[16px]`}
+          value={faq.answer}
+          maxLength={600}
+          placeholder={faq.hint ? `Ex.: ${faq.hint}` : "Escreva a resposta, do jeito que você responderia no WhatsApp"}
+          onChange={(e) => onChange({ answer: e.target.value })}
+        />
+      </div>
+      <div className="flex flex-col gap-2 lg:hidden">
+        <span className="text-[13px] font-semibold text-text-secondary">Assim o bot responde</span>
+        <div className="overflow-hidden rounded-2xl border border-border-ui">
+          <ChatPreview name={name} faqs={[faq]} current={0} compact />
+        </div>
+      </div>
+      {suggestions.length > 0 && (
+        <div className="flex flex-col gap-2">
+          <button type="button" onClick={() => setSwap(!swap)} aria-expanded={swap} className="flex min-h-11 w-fit items-center gap-1.5 text-[14px] font-semibold text-primary-strong">
+            <Shuffle size={16} /> Trocar por outra pergunta
+          </button>
+          {swap && (
+            <div className="flex flex-wrap gap-2">
+              {suggestions.slice(0, 5).map((x) => (
+                <button
+                  key={x.question}
+                  type="button"
+                  onClick={() => {
+                    onChange({ question: x.question, hint: x.hint, answer: "" });
+                    setSwap(false);
+                  }}
+                  className="flex min-h-11 items-center rounded-full border border-border-ui bg-panel-2 px-3.5 text-left text-[14px] font-medium text-text-primary hover:bg-panel-hover"
+                >
+                  {x.question}
+                </button>
+              ))}
+            </div>
+          )}
+        </div>
+      )}
+    </div>
+  );
+}
+
+const BIO_SETTINGS = { showChatWidget: true, fontHeading: "inter", layout: "bio", showBadge: true } as const;
+
+/** A bio como vai ficar, em tamanho real (celular: o próprio aparelho é a moldura). */
+function RealPreview({ s, sections, className = "", zoom }: { s: WizardState; sections: LandingSection[]; className?: string; zoom?: number }) {
+  return (
+    <div className={`overflow-y-auto overscroll-contain rounded-3xl border border-border-ui shadow-card [scrollbar-width:none] ${className}`} aria-label="Prévia da bio" inert style={zoom ? { zoom } : undefined}>
+      <LandingRenderer title={s.name || "Sua bio"} theme={s.theme} sections={sections} settings={{ ...BIO_SETTINGS, look: s.look }} onChat={() => undefined} />
+    </div>
+  );
+}
+
+/** Computador: prévia ao vivo ao lado dos passos, como no editor. */
+function SidePreview({ s, sections, chat }: { s: WizardState; sections: LandingSection[]; chat?: { faqs: FaqRow[]; current?: number } }) {
+  return (
+    <div className="hidden min-w-0 flex-1 flex-col items-center justify-center gap-3 overflow-y-auto bg-bg-start p-6 lg:flex">
+      <span className="flex items-center gap-1.5 text-[13px] font-semibold text-text-secondary">
+        <span className="h-2 w-2 animate-pulse rounded-full bg-success" aria-hidden /> {chat ? "Conversa com o bot, ao vivo" : "Prévia ao vivo"}
+      </span>
+      {chat ? (
+        <PhoneFrame inert statusTone="dark" statusBg="#F3F1FA" label="Prévia da conversa com o bot">
+          <ChatPreview name={s.name} faqs={chat.faqs} current={chat.current} />
+        </PhoneFrame>
+      ) : (
+        <PhoneFrame inert statusTone={themeIsDark(s.theme, s.look) ? "light" : "dark"} statusBg={themeBg(s.theme, s.look)} label="Prévia da bio">
+          <LandingRenderer title={s.name || "Sua bio"} theme={s.theme} sections={sections} settings={{ ...BIO_SETTINGS, look: s.look }} onChat={() => undefined} />
+        </PhoneFrame>
+      )}
+    </div>
+  );
+}
+
+/** Celular: a prévia em tela cheia, num toque. */
+function PreviewSheet({ open, onClose, s, sections }: { open: boolean; onClose: () => void; s: WizardState; sections: LandingSection[] }) {
+  return (
+    <Sheet open={open} title="Assim vai ficar" onClose={onClose} footer={<Button size="lg" className="w-full" onClick={onClose}>Voltar a editar</Button>}>
+      <RealPreview s={s} sections={sections} className="h-[64dvh]" />
+    </Sheet>
+  );
 }
 
 /** Os temas que combinam com o kit, antes da galeria completa. */
@@ -221,6 +385,9 @@ export function BioWizard({ onLock, onCreated }: BioWizardProps) {
   const reduce = useReducedMotion();
   const { mutateAsync: createBio, isPending } = useCreateBio();
   const [step, setStep] = useState(0);
+  /** Pergunta da vez no passo das perguntas (igual ao total = resumo). */
+  const [qi, setQi] = useState(0);
+  const [previewOpen, setPreviewOpen] = useState(false);
   const [s, setS] = useState<WizardState>(INITIAL);
   const set = (patch: Partial<WizardState>) => setS((cur) => ({ ...cur, ...patch }));
   const preset = presetFor(s.kit, s.audience);
@@ -289,7 +456,7 @@ export function BioWizard({ onLock, onCreated }: BioWizardProps) {
     !!s.audience,
     s.name.trim().length >= 2 && (!s.photoUrl.trim() || isImageUrl(s.photoUrl)),
     pixComplete && productsOk,
-    filledFaqs >= 3,
+    qi < s.faqs.length || filledFaqs >= 3,
     true,
   ][step];
 
@@ -305,9 +472,24 @@ export function BioWizard({ onLock, onCreated }: BioWizardProps) {
 
   const next = () => {
     if (step === 2 && s.linksText.trim()) addLinks();
+    if (step === 2) {
+      // Começa pela primeira pergunta sem resposta (a de contato do kit já vem respondida).
+      const first = s.faqs.findIndex((f) => !f.answer.trim());
+      setQi(first === -1 ? s.faqs.length : first);
+    }
+    if (step === 3 && qi < s.faqs.length) {
+      setQi(qi + 1);
+      return;
+    }
     if (step === STEP_TITLES.length - 1) void publish();
     else setStep(step + 1);
   };
+  const back = () => {
+    if (step === 3 && qi > 0) setQi(qi - 1);
+    else setStep(Math.max(0, step - 1));
+  };
+  const onQuestion = step === 3 && qi < s.faqs.length;
+  const nextLabel = (isLast: boolean) => (isLast ? "Publicar minha bio" : onQuestion ? (s.faqs[qi]?.answer.trim() ? (qi === s.faqs.length - 1 ? "Ver resumo" : "Próxima pergunta") : "Pular esta pergunta") : "Continuar");
 
   const body = [
     // 0: público
@@ -501,68 +683,94 @@ export function BioWizard({ onLock, onCreated }: BioWizardProps) {
       )}
     </div>,
 
-    // 3: perguntas
-    <div key="faq" className="flex flex-col gap-4">
-      <h1 className="text-[26px] font-extrabold leading-tight tracking-tight text-text-primary">O que seus seguidores mais perguntam?</h1>
-      <p className="flex gap-2 text-[15px] text-text-secondary">
-        <Bot size={18} className="mt-0.5 shrink-0 text-primary" />
-        Escreva de 3 a 5 perguntas com a resposta. O Nexo monta o bot que responde por você, a qualquer hora.
-      </p>
-      {s.faqs.map((f, i) => (
-        <div key={f.key} className="flex flex-col gap-2 rounded-3xl border border-border-ui bg-panel p-3">
-          <div className="flex items-center gap-1">
-            <input aria-label={`Pergunta ${i + 1}`} className={inputClass} value={f.question} maxLength={120} placeholder="Pergunta" onChange={(e) => set({ faqsTouched: true, faqs: s.faqs.map((x) => (x.key === f.key ? { ...x, question: e.target.value } : x)) })} />
-            <button type="button" aria-label={`Remover pergunta ${i + 1}`} onClick={() => set({ faqsTouched: true, faqs: s.faqs.filter((x) => x.key !== f.key) })} className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl text-text-secondary hover:bg-danger/12 hover:text-danger">
-              <X size={18} />
-            </button>
-          </div>
-          <textarea
-            aria-label={`Resposta ${i + 1}`}
-            className={`${textareaClass} min-h-20`}
-            value={f.answer}
-            maxLength={600}
-            placeholder={f.hint ? `Ex.: ${f.hint}` : "Escreva a resposta"}
-            onChange={(e) => set({ faqsTouched: true, faqs: s.faqs.map((x) => (x.key === f.key ? { ...x, answer: e.target.value } : x)) })}
-          />
-        </div>
-      ))}
-      {s.faqs.length < 5 && (
-        <div className="flex flex-col gap-2">
-          <span className="text-[13px] font-semibold text-text-secondary">Toque para adicionar uma sugestão</span>
-          <div className="flex flex-wrap gap-2">
-            {preset.suggestions
-              .filter((x) => !s.faqs.some((f) => f.question === x.question))
-              .map((x) => (
-                <button
-                  key={x.question}
-                  type="button"
-                  onClick={() => set({ faqsTouched: true, faqs: [...s.faqs, { key: newKey(), question: x.question, answer: "", hint: x.hint }] })}
-                  className="flex min-h-11 items-center gap-1.5 rounded-full border border-border-ui bg-panel-2 px-3.5 text-left text-[14px] font-medium text-text-primary hover:bg-panel-hover"
-                >
-                  <Plus size={14} className="shrink-0 text-primary" />
-                  {x.question}
+    // 3: perguntas, uma por tela, e no fim o resumo
+    qi < s.faqs.length ? (
+      <QuestionPage
+        key={`faq-${qi}`}
+        index={qi}
+        total={s.faqs.length}
+        faq={s.faqs[qi]}
+        suggestions={preset.suggestions.filter((x) => !s.faqs.some((f) => f.question === x.question))}
+        onChange={(patch) => set({ faqsTouched: true, faqs: s.faqs.map((x, i) => (i === qi ? { ...x, ...patch } : x)) })}
+        name={s.name}
+      />
+    ) : (
+      <div key="faq-review" className="flex flex-col gap-4">
+        <h1 className="text-[26px] font-extrabold leading-tight tracking-tight text-text-primary">Suas perguntas</h1>
+        <p className="-mt-2 flex gap-2 text-[15px] text-text-secondary">
+          <Bot size={18} className="mt-0.5 shrink-0 text-primary" />O bot responde estas perguntas sozinho, a qualquer hora. Toque numa para mudar.
+        </p>
+        <ul className="flex flex-col gap-2">
+          {s.faqs.map((f, i) => {
+            const done = !!f.question.trim() && !!f.answer.trim();
+            return (
+              <li key={f.key} className="flex items-center gap-1 rounded-2xl border border-border-ui bg-panel p-1.5 pl-3">
+                <button type="button" onClick={() => setQi(i)} className="flex min-h-12 min-w-0 flex-1 items-center gap-3 text-left">
+                  <span className={`flex h-7 w-7 shrink-0 items-center justify-center rounded-full ${done ? "bg-success text-white" : "bg-warning/18 text-warning-strong"}`}>{done ? <Check size={15} /> : <Info size={15} />}</span>
+                  <span className="flex min-w-0 flex-col">
+                    <span className="truncate text-[15px] font-semibold text-text-primary">{f.question || "Pergunta sem texto"}</span>
+                    <span className={`truncate text-[13px] ${done ? "text-text-secondary" : "font-semibold text-warning-strong"}`}>{done ? f.answer : "Falta a resposta"}</span>
+                  </span>
                 </button>
-              ))}
-            <button type="button" onClick={() => set({ faqsTouched: true, faqs: [...s.faqs, { key: newKey(), question: "", answer: "" }] })} className="flex min-h-11 items-center gap-1.5 rounded-full border border-dashed border-border-ui px-3.5 text-[14px] font-semibold text-primary-strong">
-              <Plus size={14} /> Outra pergunta
-            </button>
+                <button type="button" aria-label={`Remover ${f.question || "pergunta"}`} onClick={() => set({ faqsTouched: true, faqs: s.faqs.filter((x) => x.key !== f.key) })} className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl text-text-secondary hover:bg-danger/12 hover:text-danger">
+                  <X size={18} />
+                </button>
+              </li>
+            );
+          })}
+        </ul>
+        {s.faqs.length < 6 && (
+          <div className="flex flex-col gap-2">
+            <span className="text-[13px] font-semibold text-text-secondary">Quer que o bot responda mais alguma?</span>
+            <div className="flex flex-wrap gap-2">
+              {preset.suggestions
+                .filter((x) => !s.faqs.some((f) => f.question === x.question))
+                .slice(0, 4)
+                .map((x) => (
+                  <button
+                    key={x.question}
+                    type="button"
+                    onClick={() => {
+                      set({ faqsTouched: true, faqs: [...s.faqs, { key: newKey(), question: x.question, answer: "", hint: x.hint }] });
+                      setQi(s.faqs.length);
+                    }}
+                    className="flex min-h-11 items-center gap-1.5 rounded-full border border-border-ui bg-panel-2 px-3.5 text-left text-[14px] font-medium text-text-primary hover:bg-panel-hover"
+                  >
+                    <Plus size={14} className="shrink-0 text-primary" />
+                    {x.question}
+                  </button>
+                ))}
+              <button
+                type="button"
+                onClick={() => {
+                  set({ faqsTouched: true, faqs: [...s.faqs, { key: newKey(), question: "", answer: "" }] });
+                  setQi(s.faqs.length);
+                }}
+                className="flex min-h-11 items-center gap-1.5 rounded-full border border-dashed border-border-ui px-3.5 text-[14px] font-semibold text-primary-strong"
+              >
+                <Plus size={14} /> Escrever outra
+              </button>
+            </div>
           </div>
-        </div>
-      )}
-      <p className="text-[13px] text-text-secondary">
-        {filledFaqs < 3 ? `Faltam ${3 - filledFaqs} com pergunta e resposta preenchidas.` : `${filledFaqs} perguntas prontas.`}
-      </p>
-    </div>,
+        )}
+        <p className={`text-[13px] ${filledFaqs < 3 ? "font-semibold text-warning-strong" : "text-text-secondary"}`}>
+          {filledFaqs < 3 ? `Responda pelo menos ${3 - filledFaqs} a mais para o bot ficar útil.` : `${filledFaqs} perguntas prontas.`}
+        </p>
+      </div>
+    ),
 
     // 4: tema e publicar
     <div key="theme" className="flex flex-col gap-4">
       <h1 className="text-[26px] font-extrabold leading-tight tracking-tight text-text-primary">Escolha o visual</h1>
-      {s.kit && <KitThemes kit={s.kit} value={s.theme} onChange={(theme) => set({ theme })} />}
-      <ThemePicker value={s.theme} onChange={(theme) => set({ theme })} />
-      <PhoneFrame size="sm" inert statusTone={themeIsDark(s.theme) ? "light" : "dark"} statusBg={themeBg(s.theme)} label="Prévia da bio">
-        <LandingRenderer title={s.name || "Sua bio"} theme={s.theme} sections={previewSections(s)} settings={{ showChatWidget: true, fontHeading: "inter", layout: "bio", showBadge: true }} onChat={() => undefined} />
-      </PhoneFrame>
-      <p className="text-[13px] leading-snug text-text-secondary">Ao publicar, a sua bio e o bot vão ao ar na hora. Dá para mudar tudo depois.</p>
+      <p className="-mt-2 text-[15px] text-text-secondary">Toque num tema e veja na hora como fica. Dá para mudar tudo depois.</p>
+      {/* Celular: a prévia fica presa em cima, em tamanho real, e os temas passam por baixo. */}
+      <div className="sticky -top-6 z-10 -mx-4 bg-bg-start/95 px-4 pb-3 pt-2 backdrop-blur-xl lg:hidden">
+        <RealPreview s={s} sections={previewSections(s)} className="h-[56dvh]" zoom={0.72} />
+      </div>
+      <PhotoTheme photoUrl={s.photoUrl || undefined} current={s.look} onApply={(theme, look) => set({ theme, look })} onAddPhoto={() => setStep(1)} />
+      {s.kit && <KitThemes kit={s.kit} value={s.look ? "" : s.theme} onChange={(theme) => set({ theme, look: undefined })} />}
+      <ThemePicker value={s.look ? "" : s.theme} onChange={(theme) => set({ theme, look: undefined })} />
+      <p className="text-[13px] leading-snug text-text-secondary">Ao publicar, a sua bio e o bot vão ao ar na hora.</p>
     </div>,
   ];
 
@@ -585,7 +793,8 @@ export function BioWizard({ onLock, onCreated }: BioWizardProps) {
       setStep(1);
     };
     return (
-      <div className="flex h-full flex-col">
+      <div className="flex h-full min-h-0">
+      <div className="flex h-full min-w-0 flex-1 flex-col lg:max-w-[600px] lg:border-r lg:border-border-ui">
         <div className="min-h-0 flex-1 overflow-y-auto">
           <div className="mx-auto flex w-full max-w-xl flex-col gap-4 px-4 py-6">
             <span className="flex w-fit items-center gap-1.5 rounded-full bg-primary/12 px-2.5 py-1 text-[12.5px] font-bold text-primary-strong">
@@ -664,11 +873,9 @@ export function BioWizard({ onLock, onCreated }: BioWizardProps) {
               ))}
             </div>
 
-            <div className="flex flex-col items-center gap-2">
+            <div className="flex flex-col gap-2 lg:hidden">
               <span className="text-[13px] font-semibold text-text-secondary">Assim vai ficar</span>
-              <PhoneFrame size="sm" inert statusTone={themeIsDark(s.theme) ? "light" : "dark"} statusBg={themeBg(s.theme)} label="Prévia da bio">
-                <LandingRenderer title={s.name || "Sua bio"} theme={s.theme} sections={previewSections(merged)} settings={{ showChatWidget: true, fontHeading: "inter", layout: "bio", showBadge: true }} onChat={() => undefined} />
-              </PhoneFrame>
+              <RealPreview s={s} sections={previewSections(merged)} className="h-[70dvh]" />
             </div>
           </div>
         </div>
@@ -683,16 +890,19 @@ export function BioWizard({ onLock, onCreated }: BioWizardProps) {
           </div>
         </div>
       </div>
+        <SidePreview s={s} sections={previewSections(merged)} />
+      </div>
     );
   }
 
   return (
-    <div className="flex h-full flex-col">
+    <div className="flex h-full min-h-0">
+    <div className="flex h-full min-w-0 flex-1 flex-col lg:max-w-[600px] lg:border-r lg:border-border-ui">
       <div className="shrink-0 border-b border-border-ui bg-panel/80 px-4 pb-3 pt-3 backdrop-blur-xl">
         <div className="mx-auto flex w-full max-w-xl items-center gap-2">
           <button
             type="button"
-            onClick={() => setStep(Math.max(0, step - 1))}
+            onClick={back}
             disabled={step === 0}
             aria-label="Voltar"
             className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl text-text-primary hover:bg-panel-hover disabled:opacity-30"
@@ -701,7 +911,7 @@ export function BioWizard({ onLock, onCreated }: BioWizardProps) {
           </button>
           <div className="flex min-w-0 flex-1 flex-col gap-1.5">
             <div className="flex items-center justify-between text-[12px] font-semibold text-text-secondary">
-              <span>{STEP_TITLES[step]}</span>
+              <span>{onQuestion ? `${STEP_TITLES[step]} · ${qi + 1} de ${s.faqs.length}` : STEP_TITLES[step]}</span>
               <span>
                 Passo {step + 1} de {STEP_TITLES.length}
               </span>
@@ -715,7 +925,7 @@ export function BioWizard({ onLock, onCreated }: BioWizardProps) {
 
       <div ref={scroller} className="min-h-0 flex-1 overflow-y-auto">
         <AnimatePresence mode="wait" initial={false}>
-          <motion.div key={step} initial={reduce ? false : { opacity: 0, x: 16 }} animate={{ opacity: 1, x: 0 }} exit={reduce ? undefined : { opacity: 0, x: -16 }} transition={{ duration: 0.16 }} className="mx-auto w-full max-w-xl px-4 py-6">
+          <motion.div key={step === 3 ? `3-${qi}` : step} initial={reduce ? false : { opacity: 0, x: 16 }} animate={{ opacity: 1, x: 0 }} exit={reduce ? undefined : { opacity: 0, x: -16 }} transition={{ duration: 0.16 }} className="mx-auto w-full max-w-xl px-4 py-6">
             {body[step]}
           </motion.div>
         </AnimatePresence>
@@ -723,13 +933,21 @@ export function BioWizard({ onLock, onCreated }: BioWizardProps) {
 
       {step > 0 && (
         <div className="shrink-0 border-t border-border-ui bg-panel px-4 pb-[max(0.75rem,env(safe-area-inset-bottom))] pt-3">
-          <div className="mx-auto w-full max-w-xl">
-            <Button size="lg" icon={last ? Rocket : undefined} onClick={next} disabled={!canContinue} loading={isPending} className="w-full">
-              {last ? "Publicar minha bio" : "Continuar"}
+          <div className="mx-auto flex w-full max-w-xl gap-2">
+            {step !== 3 && step !== 4 && (
+              <Button size="lg" variant="secondary" icon={Smartphone} onClick={() => setPreviewOpen(true)} aria-label="Ver prévia" className="shrink-0 lg:hidden">
+                Prévia
+              </Button>
+            )}
+            <Button size="lg" variant={onQuestion && !s.faqs[qi]?.answer.trim() ? "secondary" : "primary"} icon={last ? Rocket : undefined} onClick={next} disabled={!canContinue} loading={isPending} className="min-w-0 flex-1">
+              {nextLabel(last)}
             </Button>
           </div>
         </div>
       )}
+    </div>
+      {step === 3 ? <SidePreview s={s} sections={previewSections(s)} chat={{ faqs: s.faqs, current: qi < s.faqs.length ? qi : undefined }} /> : <SidePreview s={s} sections={previewSections(s)} />}
+      <PreviewSheet open={previewOpen} onClose={() => setPreviewOpen(false)} s={s} sections={previewSections(s)} />
     </div>
   );
 }

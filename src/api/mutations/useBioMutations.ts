@@ -2,6 +2,7 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import type { BioKit } from "../../features/bio/kits";
 import type { BioAudience, BioFaq } from "../../features/bio/presets";
 import type { LandingPageRecord, LandingTheme, LinkItem, ProductItem } from "../../features/landing/contract";
+import type { LandingLook } from "../../features/landing/look/types";
 import { api } from "../instance";
 
 export interface CreateBioPayload {
@@ -12,6 +13,7 @@ export interface CreateBioPayload {
   tagline?: string;
   photoUrl?: string;
   theme: LandingTheme;
+  look?: LandingLook;
   links: LinkItem[];
   products: ProductItem[];
   faqs: { question: string; answer: string }[];
