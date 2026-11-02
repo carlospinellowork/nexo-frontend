@@ -1,10 +1,12 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
+import type { BioKit } from "../../features/bio/kits";
 import type { BioAudience, BioFaq } from "../../features/bio/presets";
 import type { LandingPageRecord, LandingTheme, LinkItem, ProductItem } from "../../features/landing/contract";
 import { api } from "../instance";
 
 export interface CreateBioPayload {
   audience: BioAudience;
+  kit?: BioKit;
   name: string;
   handle?: string;
   tagline?: string;

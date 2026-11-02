@@ -211,7 +211,7 @@ export interface LandingPageSettings {
   /** Selo "feito com Nexo" na bio. Hoje sempre aparece; planos futuros poderão desligar. */
   showBadge?: boolean;
   /** Assistente da bio (gerido pelo servidor). */
-  bio?: { audience: "creator" | "seller" | "business"; faqs: { id: string; question: string; answer: string }[]; flowSignature?: string };
+  bio?: { audience: "creator" | "seller" | "business"; kit?: "beleza" | "comida" | "artista" | "influencer" | "saude"; faqs: { id: string; question: string; answer: string }[]; flowSignature?: string };
 }
 
 export const SECTION_LABELS: Record<SectionType, string> = {

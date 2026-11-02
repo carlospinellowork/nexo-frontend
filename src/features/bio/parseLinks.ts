@@ -49,6 +49,12 @@ export function recognizeLink(raw: string): LinkItem | null {
   }
   if (isHost(host, "instagram.com")) return make("instagram", "Instagram");
   if (isHost(host, "tiktok.com")) return make("tiktok", "TikTok");
+  // Plataformas de música (kit Artista): o botão já diz onde ouvir.
+  if (isHost(host, "spotify.com") || isHost(host, "spotify.link")) return make("link", "Ouça no Spotify");
+  if (isHost(host, "music.youtube.com")) return make("youtube", "Ouça no YouTube Music");
+  if (isHost(host, "deezer.com") || isHost(host, "deezer.page.link")) return make("link", "Ouça no Deezer");
+  if (isHost(host, "music.apple.com")) return make("link", "Ouça no Apple Music");
+  if (isHost(host, "soundcloud.com")) return make("link", "Ouça no SoundCloud");
   if (isHost(host, "youtube.com") || isHost(host, "youtu.be")) return make("youtube", "YouTube");
   if (isHost(host, "mercadolivre.com.br") || isHost(host, "mercadolivre.com")) return make("link", "Mercado Livre");
   if (isHost(host, "shopee.com.br")) return make("link", "Shopee");

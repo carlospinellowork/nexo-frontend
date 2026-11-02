@@ -40,7 +40,7 @@ MAP = {
  'MessageCircleQuestion':'question-2','Mic':'mic','Repeat':'repeat','Scale':'balance','Shirt':'t-shirt','Tag':'tag','ThumbsUp':'thumb-up',
  'TicketPercent':'ticket',
  # extras úteis
- 'WhatsApp':'whatsapp','TikTok':'tiktok','XSocial':'social-x','Spotify':'spotify','Telegram':'telegram','Facebook':'facebook','Palette':'palette',
+ 'WhatsApp':'whatsapp','TikTok':'tiktok','Lipstick':'lipstick','UserStar':'user-star','XSocial':'social-x','Spotify':'spotify','Telegram':'telegram','Facebook':'facebook','Palette':'palette',
 }
 names = set(MAP)
 def body(k):

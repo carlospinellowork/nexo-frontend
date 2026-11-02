@@ -13,6 +13,9 @@ import { type LandingPageRecord, type LandingSection, type LandingTheme, type Li
 import { normalizePixKey } from "../landing/pix";
 import { parseLinks, recognizeLink } from "./parseLinks";
 import { AUDIENCE_PRESETS, BIO_AUDIENCES, type BioAudience } from "./presets";
+import { BIO_KITS, KITS, type BioKit, applyKitToLinks, detectKit, presetFor } from "./kits";
+import { ThemeThumb } from "../landing/components/ThemePicker";
+import { getTheme } from "../landing/look/themes";
 import { useGetMe } from "../../api/queries/useGetMe";
 import { ImageField } from "../uploads/ImageField";
 import { isImageUrl } from "../uploads/image";
@@ -28,6 +31,7 @@ interface FaqRow {
 
 interface WizardState {
   audience: BioAudience | null;
+  kit: BioKit | null;
   name: string;
   handle: string;
   tagline: string;
@@ -47,6 +51,7 @@ interface WizardState {
 
 const INITIAL: WizardState = {
   audience: null,
+  kit: null,
   name: "",
   handle: "",
   tagline: "",
@@ -78,6 +83,18 @@ const CONTACT_FAQ: Record<BioAudience, { question: string; answer: string }> = {
 /** As duas perguntas mais comuns de cada público (índices em AUDIENCE_PRESETS[...].suggestions). */
 const EXPRESS_PICKS: Record<BioAudience, number[]> = { business: [0, 3], seller: [0, 1], creator: [0, 2] };
 
+const contactOf = (s: Pick<WizardState, "kit" | "audience">) => (s.kit ? KITS[s.kit].contact : CONTACT_FAQ[s.audience ?? "business"]);
+const picksOf = (s: Pick<WizardState, "kit" | "audience">) => {
+  const preset = presetFor(s.kit, s.audience);
+  return (s.kit ? KITS[s.kit].expressPicks : EXPRESS_PICKS[s.audience ?? "business"]).map((i) => preset.suggestions[i]);
+};
+/** Primeiras perguntas do passo a passo: com kit, a de contato já vem respondida. */
+const startFaqs = (kit: BioKit | null, audience: BioAudience) => {
+  const p = presetFor(kit, audience);
+  const contact = kit ? [{ key: newKey(), question: KITS[kit].contact.question, answer: KITS[kit].contact.answer }] : [];
+  return [...contact, ...p.suggestions.slice(0, 3).map((x) => ({ key: newKey(), question: x.question, answer: "", hint: x.hint }))];
+};
+
 interface ExpressState {
   whatsapp: string;
   instagram: string;
@@ -86,16 +103,15 @@ interface ExpressState {
 
 /** Monta o estado completo do assistente a partir da tela rápida. */
 function fromExpress(s: WizardState, e: ExpressState): WizardState {
-  const audience = s.audience ?? "business";
   const wa = recognizeLink(e.whatsapp);
   const handle = e.instagram.trim().replace(/^@?/, "@");
   const ig = e.instagram.trim() ? recognizeLink(/\//.test(e.instagram.trim()) ? e.instagram.trim() : handle) : null;
-  const picks = EXPRESS_PICKS[audience].map((i) => AUDIENCE_PRESETS[audience].suggestions[i]);
-  const contact = CONTACT_FAQ[audience];
+  const picks = picksOf(s);
+  const contact = contactOf(s);
   return {
     ...s,
     handle: s.handle || (ig?.kind === "instagram" ? handle : ""),
-    links: [wa, ig].filter((l): l is LinkItem => l !== null),
+    links: applyKitToLinks([wa, ig].filter((l): l is LinkItem => l !== null), s.kit),
     faqs: [
       { key: "contact", question: contact.question, answer: contact.answer },
       ...picks.map((p, i) => ({ key: `q${i}`, question: p.question, answer: e.answers[i]?.trim() ?? "" })),
@@ -135,15 +151,17 @@ const productLinkOk = (link: string) => {
 };
 
 function buildPayload(s: WizardState) {
-  const preset = AUDIENCE_PRESETS[s.audience ?? "business"];
-  const links: LinkItem[] = [...s.links];
+  const preset = presetFor(s.kit, s.audience);
+  const links: LinkItem[] = applyKitToLinks([...s.links], s.kit);
   if (s.pixOn && s.pixKey.trim()) {
     links.push({ id: `lnk-${newKey()}`, kind: "pix", label: preset.pixLabel, pixKey: s.pixKey.trim(), pixName: s.pixName.trim(), pixCity: s.pixCity.trim() });
   }
   const whatsappUrl = s.links.find((l) => l.kind === "whatsapp")?.url;
+  // Produtos do Nexo levam ao WhatsApp com a mensagem padrão; o kit muda só o botão principal.
   const products = s.products.filter((p) => p.name.trim()).map((p) => productFromRow(p, whatsappUrl));
   return {
     audience: s.audience ?? "business",
+    ...(s.kit ? { kit: s.kit } : {}),
     name: s.name.trim(),
     handle: s.handle.trim() ? `@${s.handle.trim().replace(/^@/, "")}` : undefined,
     tagline: s.tagline.trim() || undefined,
@@ -164,6 +182,24 @@ function previewSections(s: WizardState): LandingSection[] {
   ];
   if (p.products.length) out.push({ id: "p", type: "products", enabled: true, data: { title: "Produtos", items: p.products } });
   return out;
+}
+
+/** Os temas que combinam com o kit, antes da galeria completa. */
+function KitThemes({ kit, value, onChange }: { kit: BioKit; value: string; onChange: (theme: string) => void }) {
+  return (
+    <div className="flex flex-col gap-2">
+      <span className="text-[13px] font-semibold text-text-secondary">Combinam com {KITS[kit].title.toLowerCase()}</span>
+      <div className="grid grid-cols-4 gap-2">
+        {KITS[kit].themes.map((t) => (
+          <button key={t} type="button" aria-pressed={value === t} aria-label={`Tema ${getTheme(t).name}`} onClick={() => onChange(t)} className={`rounded-[16px] p-[2px] ${value === t ? "ring-2 ring-primary" : "ring-1 ring-border-ui hover:ring-primary/50"}`}>
+            <ThemeThumb theme={getTheme(t)} label="" />
+            <span className="block truncate px-1 pb-1 pt-1.5 text-center text-[12px] font-semibold text-text-primary">{getTheme(t).name}</span>
+          </button>
+        ))}
+      </div>
+      <span className="mt-1 text-[13px] font-semibold text-text-secondary">Todos os temas</span>
+    </div>
+  );
 }
 
 function Label({ children, htmlFor }: { children: string; htmlFor: string }) {
@@ -187,9 +223,14 @@ export function BioWizard({ onLock, onCreated }: BioWizardProps) {
   const [step, setStep] = useState(0);
   const [s, setS] = useState<WizardState>(INITIAL);
   const set = (patch: Partial<WizardState>) => setS((cur) => ({ ...cur, ...patch }));
-  const preset = AUDIENCE_PRESETS[s.audience ?? "business"];
+  const preset = presetFor(s.kit, s.audience);
   const { data: me } = useGetMe();
   const prefilled = useRef(false);
+  const scroller = useRef<HTMLDivElement>(null);
+  // Cada passo abre do começo (senão o passo novo herda a rolagem do anterior).
+  useEffect(() => {
+    scroller.current?.scrollTo({ top: 0 });
+  }, [step]);
   /** null enquanto não sabemos se a pessoa já fez o "conhecer você"; aí decide entre a tela rápida e o passo a passo. */
   const [express, setExpress] = useState<boolean | null>(null);
   const [ex, setEx] = useState<ExpressState>({ whatsapp: "", instagram: "", answers: ["", ""] });
@@ -205,11 +246,13 @@ export function BioWizard({ onLock, onCreated }: BioWizardProps) {
     if (isHandle) setEx((cur) => ({ ...cur, instagram: cur.instagram || brand }));
     setS((cur) => {
       const audience = cur.audience ?? p.audience ?? null;
-      const ap = audience ? AUDIENCE_PRESETS[audience] : null;
+      const kit = cur.kit ?? (cur.audience ? null : detectKit(p.segment, p.audience));
+      const ap = audience ? presetFor(kit, audience) : null;
       return {
         ...cur,
-        audience,
-        ...(ap && !cur.audience ? { theme: ap.defaultTheme, faqs: cur.faqsTouched ? cur.faqs : ap.suggestions.slice(0, 3).map((x) => ({ key: newKey(), question: x.question, answer: "", hint: x.hint })) } : {}),
+        audience: kit ? KITS[kit].audience : audience,
+        kit,
+        ...(ap && audience && !cur.audience ? { theme: ap.defaultTheme, faqs: cur.faqsTouched ? cur.faqs : startFaqs(kit, audience) } : {}),
         name: cur.name || (isHandle ? me.user.name ?? "" : brand || me.user.name || ""),
         handle: cur.handle || (isHandle ? brand : ""),
         pixCity: cur.pixCity || (p.city ?? "").slice(0, 15),
@@ -217,13 +260,15 @@ export function BioWizard({ onLock, onCreated }: BioWizardProps) {
     });
   }, [me]);
 
+  const choose = (kit: BioKit | null, audience: BioAudience) => {
+    set({ kit, audience, theme: presetFor(kit, audience).defaultTheme, ...(s.faqsTouched ? {} : { faqs: startFaqs(kit, audience) }) });
+  };
   const pickAudience = (audience: BioAudience) => {
-    const p = AUDIENCE_PRESETS[audience];
-    set({
-      audience,
-      theme: p.defaultTheme,
-      ...(s.faqsTouched ? {} : { faqs: p.suggestions.slice(0, 3).map((x) => ({ key: newKey(), question: x.question, answer: "", hint: x.hint })) }),
-    });
+    choose(null, audience);
+    setStep(1);
+  };
+  const pickKit = (kit: BioKit) => {
+    choose(kit, KITS[kit].audience);
     setStep(1);
   };
 
@@ -232,7 +277,7 @@ export function BioWizard({ onLock, onCreated }: BioWizardProps) {
     const { found, unknown } = parseLinks(s.linksText);
     const existing = new Set(s.links.map((l) => l.url));
     const fresh = found.filter((l) => !existing.has(l.url)).slice(0, 11 - s.links.length);
-    set({ links: [...s.links, ...fresh], unknown, linksText: unknown.length ? unknown.join("\n") : "" });
+    set({ links: applyKitToLinks([...s.links, ...fresh], s.kit), unknown, linksText: unknown.length ? unknown.join("\n") : "" });
   };
 
   const pixKeyOk = !s.pixOn || !s.pixKey.trim() || normalizePixKey(s.pixKey) !== "";
@@ -267,20 +312,44 @@ export function BioWizard({ onLock, onCreated }: BioWizardProps) {
   const body = [
     // 0: público
     <div key="aud" className="flex flex-col gap-3">
-      <h1 className="text-[26px] font-extrabold leading-tight tracking-tight text-text-primary">Você é...</h1>
-      <p className="text-[15px] text-text-secondary">Escolha o ponto de partida. Você pode mudar tudo depois.</p>
-      <div className="mt-2 flex flex-col gap-3">
+      <h1 className="text-[26px] font-extrabold leading-tight tracking-tight text-text-primary">O que você faz?</h1>
+      <p className="text-[15px] text-text-secondary">Cada kit já vem com o botão do WhatsApp certo, as perguntas do seu público e temas que combinam. Dá para mudar tudo depois.</p>
+      <div className="mt-2 grid grid-cols-1 gap-2.5 min-[420px]:grid-cols-2">
+        {BIO_KITS.map((id) => {
+          const k = KITS[id];
+          const active = s.kit === id;
+          return (
+            <button
+              key={id}
+              type="button"
+              onClick={() => pickKit(id)}
+              aria-pressed={active}
+              className={`flex min-h-[72px] items-center gap-3 rounded-3xl border p-3.5 text-left transition-colors ${active ? "border-primary bg-primary/8 ring-4 ring-primary/12" : "border-border-ui bg-panel hover:bg-panel-hover"}`}
+            >
+              <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl bg-primary/12 text-primary">
+                <k.icon size={22} />
+              </span>
+              <span className="flex min-w-0 flex-1 flex-col">
+                <span className="text-[16px] font-bold text-text-primary">{k.title}</span>
+                <span className="text-[13px] leading-snug text-text-secondary">{k.description}</span>
+              </span>
+            </button>
+          );
+        })}
+      </div>
+      <span className="mt-3 text-[13px] font-semibold text-text-secondary">Outro tipo</span>
+      <div className="flex flex-col gap-2.5">
         {BIO_AUDIENCES.map((a) => {
           const Icon = AUDIENCE_ICONS[a];
           const p = AUDIENCE_PRESETS[a];
-          const active = s.audience === a;
+          const active = !s.kit && s.audience === a;
           return (
             <button
               key={a}
               type="button"
               onClick={() => pickAudience(a)}
               aria-pressed={active}
-              className={`flex min-h-[76px] items-center gap-4 rounded-3xl border p-4 text-left transition-colors ${active ? "border-primary bg-primary/8 ring-4 ring-primary/12" : "border-border-ui bg-panel hover:bg-panel-hover"}`}
+              className={`flex min-h-[64px] items-center gap-4 rounded-3xl border p-3.5 text-left transition-colors ${active ? "border-primary bg-primary/8 ring-4 ring-primary/12" : "border-border-ui bg-panel hover:bg-panel-hover"}`}
             >
               <span className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-primary/12 text-primary">
                 <Icon size={24} />
@@ -488,6 +557,7 @@ export function BioWizard({ onLock, onCreated }: BioWizardProps) {
     // 4: tema e publicar
     <div key="theme" className="flex flex-col gap-4">
       <h1 className="text-[26px] font-extrabold leading-tight tracking-tight text-text-primary">Escolha o visual</h1>
+      {s.kit && <KitThemes kit={s.kit} value={s.theme} onChange={(theme) => set({ theme })} />}
       <ThemePicker value={s.theme} onChange={(theme) => set({ theme })} />
       <PhoneFrame size="sm" inert statusTone={themeIsDark(s.theme) ? "light" : "dark"} statusBg={themeBg(s.theme)} label="Prévia da bio">
         <LandingRenderer title={s.name || "Sua bio"} theme={s.theme} sections={previewSections(s)} settings={{ showChatWidget: true, fontHeading: "inter", layout: "bio", showBadge: true }} onChat={() => undefined} />
@@ -499,12 +569,16 @@ export function BioWizard({ onLock, onCreated }: BioWizardProps) {
   const last = step === STEP_TITLES.length - 1;
 
   if (express && s.audience) {
-    const audience = s.audience;
     const merged = fromExpress(s, ex);
     const waOk = recognizeLink(ex.whatsapp)?.kind === "whatsapp";
     const igOk = !ex.instagram.trim() || merged.links.some((l) => l.kind !== "whatsapp");
     const ready = s.name.trim().length >= 2 && waOk && igOk && (!s.photoUrl || isImageUrl(s.photoUrl));
-    const picks = EXPRESS_PICKS[audience].map((i) => AUDIENCE_PRESETS[audience].suggestions[i]);
+    const picks = picksOf(s);
+    const switchKit = (kit: BioKit | null) => {
+      const audience = kit ? KITS[kit].audience : me?.workspace.profile.audience ?? s.audience ?? "business";
+      choose(kit, audience);
+      setEx({ ...ex, answers: ["", ""] });
+    };
     const goSteps = () => {
       setS({ ...merged, faqs: merged.faqs.map((f) => ({ ...f, hint: picks.find((p) => p.question === f.question)?.hint })), faqsTouched: true });
       setExpress(false);
@@ -519,6 +593,30 @@ export function BioWizard({ onLock, onCreated }: BioWizardProps) {
             </span>
             <h1 className="text-[26px] font-extrabold leading-tight tracking-tight text-text-primary">Falta pouco para a sua bio ir ao ar</h1>
             <p className="-mt-2 text-[15px] text-text-secondary">Já usamos o que você contou. Confira e publique: dá para mudar tudo depois.</p>
+
+            <div className="flex flex-col gap-1.5">
+              <span className="text-[13px] font-semibold text-text-secondary">Seu kit</span>
+              <div role="radiogroup" aria-label="Kit do seu nicho" className="-mx-1 flex gap-1.5 overflow-x-auto px-1 pb-1 [scrollbar-width:none]">
+                {[...BIO_KITS, null].map((id) => {
+                  const k = id ? KITS[id] : null;
+                  const active = s.kit === id;
+                  const Icon = k?.icon ?? Briefcase;
+                  return (
+                    <button
+                      key={id ?? "outro"}
+                      type="button"
+                      role="radio"
+                      aria-checked={active}
+                      onClick={() => switchKit(id)}
+                      className={`flex h-10 shrink-0 items-center gap-1.5 rounded-full px-3.5 text-[13.5px] font-semibold transition-colors ${active ? "bg-primary text-white" : "bg-panel-2 text-text-secondary hover:bg-panel-hover hover:text-text-primary"}`}
+                    >
+                      <Icon size={16} /> {k?.title ?? "Outro"}
+                    </button>
+                  );
+                })}
+              </div>
+              {s.kit && <span className="text-[12.5px] text-text-secondary">O botão do WhatsApp vira &ldquo;{KITS[s.kit].whatsappLabel}&rdquo;, com a mensagem pronta para o seu cliente.</span>}
+            </div>
 
             <div className="flex flex-col gap-1.5">
               <Label htmlFor="ex-name">Nome na bio</Label>
@@ -547,7 +645,7 @@ export function BioWizard({ onLock, onCreated }: BioWizardProps) {
             <div className="flex flex-col gap-3 rounded-3xl border border-border-ui bg-panel p-3.5">
               <p className="flex gap-2 text-[14px] text-text-secondary">
                 <Bot size={18} className="mt-0.5 shrink-0 text-primary" />
-                O bot da bio já responde &ldquo;{CONTACT_FAQ[audience].question}&rdquo;. Quer que ele responda mais? (opcional)
+                O bot da bio já responde &ldquo;{contactOf(s).question}&rdquo;. Quer que ele responda mais? (opcional)
               </p>
               {picks.map((p, i) => (
                 <div key={p.question} className="flex flex-col gap-1.5">
@@ -615,7 +713,7 @@ export function BioWizard({ onLock, onCreated }: BioWizardProps) {
         </div>
       </div>
 
-      <div className="min-h-0 flex-1 overflow-y-auto">
+      <div ref={scroller} className="min-h-0 flex-1 overflow-y-auto">
         <AnimatePresence mode="wait" initial={false}>
           <motion.div key={step} initial={reduce ? false : { opacity: 0, x: 16 }} animate={{ opacity: 1, x: 0 }} exit={reduce ? undefined : { opacity: 0, x: -16 }} transition={{ duration: 0.16 }} className="mx-auto w-full max-w-xl px-4 py-6">
             {body[step]}

@@ -10,7 +10,7 @@ import { toast } from "../../shared/components/ui/toast-store";
 import { useFlowStore } from "../flow/store/flow.store";
 import type { LandingPageRecord } from "../landing/contract";
 import { ProBadge } from "../plan/ProBadge";
-import { AUDIENCE_PRESETS } from "./presets";
+import { presetFor } from "./kits";
 
 interface Row {
   key: string;
@@ -28,7 +28,7 @@ export function BioBotTab({ page, ensureSaved }: { page: LandingPageRecord; ensu
   const setSelectedChatId = useFlowStore((s) => s.setSelectedChatId);
   const { mutateAsync: regenerate, isPending } = useRegenerateBioBot();
   const saved = page.settings.bio?.faqs ?? [];
-  const preset = AUDIENCE_PRESETS[page.settings.bio?.audience ?? "business"];
+  const preset = presetFor(page.settings.bio?.kit, page.settings.bio?.audience);
   const [rows, setRows] = useState<Row[]>(() => saved.map((f) => ({ key: f.id, ...f })));
   const [needsConfirm, setNeedsConfirm] = useState(false);
 

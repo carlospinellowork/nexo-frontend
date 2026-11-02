@@ -1,4 +1,4 @@
-import { CheckCircle2, ChevronDown, Globe, type IconComponent, Instagram, Link2, MessageCircle, Music2, Phone, QrCode, Search, ShoppingBag, Sparkles, Star, WhatsApp, X, Youtube } from "../../../shared/icons";
+import { CheckCircle2, ChevronDown, Globe, type IconComponent, Instagram, Link2, MessageCircle, Music2, Phone, QrCode, Search, ShoppingBag, Sparkles, Spotify, Star, WhatsApp, X, Youtube } from "../../../shared/icons";
 import { AnimatePresence, motion, useReducedMotion } from "motion/react";
 import { useEffect, useId, useRef, useState } from "react";
 import { SealPill } from "../../../shared/components/ui/NexoSeal";
@@ -303,6 +303,14 @@ function PageRenderer({ title, theme, sections, settings, onChat }: LandingRende
   );
 }
 
+const hostOf = (url?: string) => {
+  try {
+    return new URL(url ?? "").hostname;
+  } catch {
+    return "";
+  }
+};
+
 const LINK_ICONS: Record<LinkKind, IconComponent> = {
   chat: MessageCircle,
   whatsapp: WhatsApp,
@@ -330,7 +338,7 @@ interface LinkButtonProps {
 }
 
 function LinkButton({ item, look, onChat, onPix, onClick, primary }: LinkButtonProps) {
-  const Icon = LINK_ICONS[item.kind] ?? Link2;
+  const Icon = (item.kind === "link" && /(^|\.)spotify\.(com|link)$/.test(hostOf(item.url))) ? Spotify : (LINK_ICONS[item.kind] ?? Link2);
   const className = `flex min-h-[52px] w-full items-center gap-3 px-5 py-3.5 text-left text-[16px] font-semibold transition-[transform,box-shadow] hover:scale-[1.02] active:scale-[0.98] ${buttonClass(look.style, look.shape, primary)}`;
   const content = (
     <>
