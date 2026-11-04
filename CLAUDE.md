@@ -37,7 +37,7 @@ src/features/profile/      "conhecer você": UserAvatar (foto ou iniciais na cor
                            a tela é pages/boas-vindas.tsx (primeiro login; editar pelo avatar do menu, ?editar=1). GET/PUT /api/me
 src/features/feedback/      "Dar opinião" (menu); pages/_app/admin.tsx = Acompanhamento da fase de testes (só admin, via /api/me isAdmin)
 src/shared/hooks/useWorkspaceRole.ts  papel do usuário no workspace ativo (esconder ações de Admin para Membro)
-src/features/auth/         LoginHero e GoogleButton (aparece só se GET /auth-providers devolver google: true)
+src/features/auth/         AuthShell (moldura das telas de acesso), IconInput, LoginHero e GoogleButton; o botão do Google e o "Esqueci minha senha" (pages/redefinir-senha.tsx) só aparecem se GET /auth-providers devolver google / passwordReset: true
 ```
 
 ## Regras

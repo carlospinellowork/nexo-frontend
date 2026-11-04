@@ -7,7 +7,7 @@ export const LEGAL = {
   responsible: "Carlos Pinello, pessoa física",
   city: "Poá, SP",
   email: "suportenexo@gmail.com",
-  updatedAt: "31 de outubro de 2026",
+  updatedAt: "3 de novembro de 2026",
 };
 
 export interface LegalSection {
@@ -60,12 +60,13 @@ export const PRIVACY: LegalSection[] = [
   },
   {
     title: "Com quem compartilhamos",
-    paragraphs: ["Não vendemos dados. Usamos estes fornecedores para o Nexo funcionar, que podem tratar dados fora do Brasil (Estados Unidos), com contratos e medidas de segurança próprios:"],
+    paragraphs: ["Não vendemos dados. Usamos estes fornecedores para o Nexo funcionar, que podem tratar dados fora do Brasil (Estados Unidos e União Europeia), com contratos e medidas de segurança próprios:"],
     items: [
       "Vercel: hospedagem do painel e do site.",
       "Render: servidor da aplicação.",
       "Neon: banco de dados.",
       "Groq: quando um bot usa um bloco de inteligência artificial, a conversa daquele trecho é enviada para gerar a resposta.",
+      "Brevo: envio do e-mail de redefinição de senha, com o seu endereço de e-mail.",
       "Google: só para quem escolhe entrar com o Google.",
       "Meta (WhatsApp e Instagram) e Telegram: só quando o negócio conecta esses canais; as mensagens passam por essas plataformas.",
     ],

@@ -1,9 +1,10 @@
 import { useQuery } from "@tanstack/react-query";
 import { api } from "../instance";
 
-/** Formas de entrar ligadas no servidor (o botão do Google só aparece com as chaves configuradas). */
+/** Formas de entrar ligadas no servidor (o botão do Google e o "Esqueci minha senha" só aparecem com as chaves configuradas). */
 export interface AuthProviders {
   google: boolean;
+  passwordReset: boolean;
 }
 
 export const useGetAuthProviders = () =>

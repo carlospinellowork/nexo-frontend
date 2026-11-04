@@ -14,6 +14,7 @@ import { Route as AppLayoutRouteImport } from './pages/_app/layout'
 import { Route as BoasVindasRouteImport } from './pages/boas-vindas'
 import { Route as LoginRouteImport } from './pages/login'
 import { Route as PrivacidadeRouteImport } from './pages/privacidade'
+import { Route as RedefinirSenhaRouteImport } from './pages/redefinir-senha'
 import { Route as TermosRouteImport } from './pages/termos'
 import { Route as AppIndexRouteImport } from './pages/_app/index'
 import { Route as AppAdminRouteImport } from './pages/_app/admin'
@@ -51,6 +52,11 @@ const LoginRoute = LoginRouteImport.update({
 const PrivacidadeRoute = PrivacidadeRouteImport.update({
   id: '/privacidade',
   path: '/privacidade',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const RedefinirSenhaRoute = RedefinirSenhaRouteImport.update({
+  id: '/redefinir-senha',
+  path: '/redefinir-senha',
   getParentRoute: () => rootRouteImport,
 } as any)
 const TermosRoute = TermosRouteImport.update({
@@ -130,6 +136,7 @@ export interface FileRoutesByFullPath {
   '/boas-vindas': typeof BoasVindasRoute
   '/login': typeof LoginRoute
   '/privacidade': typeof PrivacidadeRoute
+  '/redefinir-senha': typeof RedefinirSenhaRoute
   '/termos': typeof TermosRoute
   '/admin': typeof AppAdminRoute
   '/chat-builder': typeof AppChatBuilderRoute
@@ -149,6 +156,7 @@ export interface FileRoutesByTo {
   '/boas-vindas': typeof BoasVindasRoute
   '/login': typeof LoginRoute
   '/privacidade': typeof PrivacidadeRoute
+  '/redefinir-senha': typeof RedefinirSenhaRoute
   '/termos': typeof TermosRoute
   '/admin': typeof AppAdminRoute
   '/chat-builder': typeof AppChatBuilderRoute
@@ -171,6 +179,7 @@ export interface FileRoutesById {
   '/boas-vindas': typeof BoasVindasRoute
   '/login': typeof LoginRoute
   '/privacidade': typeof PrivacidadeRoute
+  '/redefinir-senha': typeof RedefinirSenhaRoute
   '/termos': typeof TermosRoute
   '/_app/admin': typeof AppAdminRoute
   '/_app/chat-builder': typeof AppChatBuilderRoute
@@ -194,6 +203,7 @@ export interface FileRouteTypes {
     | '/boas-vindas'
     | '/login'
     | '/privacidade'
+    | '/redefinir-senha'
     | '/termos'
     | '/admin'
     | '/chat-builder'
@@ -213,6 +223,7 @@ export interface FileRouteTypes {
     | '/boas-vindas'
     | '/login'
     | '/privacidade'
+    | '/redefinir-senha'
     | '/termos'
     | '/admin'
     | '/chat-builder'
@@ -234,6 +245,7 @@ export interface FileRouteTypes {
     | '/boas-vindas'
     | '/login'
     | '/privacidade'
+    | '/redefinir-senha'
     | '/termos'
     | '/_app/admin'
     | '/_app/chat-builder'
@@ -256,6 +268,7 @@ export interface RootRouteChildren {
   BoasVindasRoute: typeof BoasVindasRoute
   LoginRoute: typeof LoginRoute
   PrivacidadeRoute: typeof PrivacidadeRoute
+  RedefinirSenhaRoute: typeof RedefinirSenhaRoute
   TermosRoute: typeof TermosRoute
   PSlugRoute: typeof PSlugRoute
 }
@@ -295,6 +308,13 @@ declare module '@tanstack/react-router' {
       path: '/privacidade'
       fullPath: '/privacidade'
       preLoaderRoute: typeof PrivacidadeRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/redefinir-senha': {
+      id: '/redefinir-senha'
+      path: '/redefinir-senha'
+      fullPath: '/redefinir-senha'
+      preLoaderRoute: typeof RedefinirSenhaRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/termos': {
@@ -438,6 +458,7 @@ const rootRouteChildren: RootRouteChildren = {
   BoasVindasRoute: BoasVindasRoute,
   LoginRoute: LoginRoute,
   PrivacidadeRoute: PrivacidadeRoute,
+  RedefinirSenhaRoute: RedefinirSenhaRoute,
   TermosRoute: TermosRoute,
   PSlugRoute: PSlugRoute,
 }
