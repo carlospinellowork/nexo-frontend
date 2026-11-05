@@ -57,6 +57,8 @@ export function whatsappOfCustomer(phone: string) {
   return `https://wa.me/${digits.length <= 11 ? `55${digits}` : digits}`;
 }
 
+export const weekdayOf = (date: string) => new Date(`${date}T12:00:00Z`).getUTCDay();
+
 export const durationLabel = (minutes: number) => {
   const h = Math.floor(minutes / 60);
   const m = minutes % 60;

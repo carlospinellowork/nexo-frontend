@@ -115,8 +115,8 @@ export function HoursView({ agenda, canEdit }: { agenda: AgendaData; canEdit: bo
   const today = dayIn(config.timeZone);
 
   return (
-    <div className="flex flex-col gap-4">
-      <section className="flex flex-col gap-2 rounded-2xl border border-border-ui/70 bg-panel p-3 shadow-card">
+    <div className="flex flex-col gap-4 lg:grid lg:grid-cols-[minmax(0,1.25fr)_minmax(0,1fr)] lg:items-start">
+      <section className="flex flex-col gap-2 rounded-2xl border border-border-ui/70 bg-panel p-3 shadow-card lg:p-4">
         <h2 className="text-[16px] font-bold tracking-tight text-text-primary">Horário de atendimento</h2>
         {ORDER.map((day) => {
           const intervals = hours.filter((h) => h.day === day);
@@ -164,7 +164,8 @@ export function HoursView({ agenda, canEdit }: { agenda: AgendaData; canEdit: bo
         )}
       </section>
 
-      <section className="flex flex-col gap-3 rounded-2xl border border-border-ui/70 bg-panel p-3 shadow-card">
+      <div className="flex flex-col gap-4 lg:sticky lg:top-0">
+      <section className="flex flex-col gap-3 rounded-2xl border border-border-ui/70 bg-panel p-3 shadow-card lg:p-4">
         <h2 className="text-[16px] font-bold tracking-tight text-text-primary">Regras da reserva</h2>
         <div className="flex items-start gap-3">
           <span className="flex flex-1 flex-col">
@@ -223,6 +224,7 @@ export function HoursView({ agenda, canEdit }: { agenda: AgendaData; canEdit: bo
           </Button>
         )}
       </section>
+      </div>
       {blocking && <BlockSheet today={today} onClose={() => setBlocking(false)} />}
     </div>
   );

@@ -467,8 +467,8 @@ function BioRenderer({ title, theme, sections, settings, slug, canAsk, onChat, o
   return (
     <div className={`nx-landing @container relative isolate min-h-full w-full ${t.page}`} style={look.vars}>
       <Backdrop bg={look.bg} />
-      <div className="mx-auto flex min-h-full max-w-[460px] flex-col items-center px-4 pb-8 pt-12 text-center">
-        <div className={`flex w-full flex-col items-center ${ring("profile")}`} {...pick({ type: "profile" })}>
+      <div className={`mx-auto flex min-h-full max-w-[460px] flex-col items-center px-4 pb-8 pt-12 text-center ${hasJourney ? "@4xl:grid @4xl:max-w-5xl @4xl:grid-cols-[minmax(0,340px)_minmax(0,1fr)] @4xl:grid-rows-[auto_1fr] @4xl:items-start @4xl:gap-x-14 @4xl:px-8 @4xl:pt-20" : ""}`}>
+        <div className={`flex w-full flex-col items-center ${hasJourney ? "@4xl:sticky @4xl:top-20" : ""} ${ring("profile")}`} {...pick({ type: "profile" })}>
         <motion.span
           initial={reduceMotion ? false : { scale: 0.8, opacity: 0 }}
           animate={{ scale: 1, opacity: 1 }}
@@ -483,6 +483,7 @@ function BioRenderer({ title, theme, sections, settings, slug, canAsk, onChat, o
         {hero?.subheadline && <p className={`mt-2 text-[15px] leading-relaxed ${t.muted}`}>{hero.subheadline}</p>}
         </div>
 
+        <div className={`flex w-full flex-col items-center ${hasJourney ? "@4xl:col-start-2 @4xl:row-span-2 @4xl:row-start-1" : ""}`}>
         {inConversation && journey && <JourneyView journey={journey} t={t} optionClass={buttonClass(buttons.style, buttons.shape)} onViewLinks={links.length > 0 || products.length > 0 ? () => setLinksOpen(true) : undefined} />}
 
         {!inConversation && hasJourney && (
@@ -554,8 +555,9 @@ function BioRenderer({ title, theme, sections, settings, slug, canAsk, onChat, o
             </div>
           )}
         </div>}
+        </div>
 
-        <div className="mt-auto flex flex-col items-center gap-2 pt-12">
+        <div className={`mt-auto flex flex-col items-center gap-2 pt-12 ${hasJourney ? "@4xl:col-start-1 @4xl:row-start-2 @4xl:mt-0 @4xl:pt-8" : ""}`}>
           {footer?.companyName && <span className={`text-[12px] font-semibold ${t.muted}`}>{footer.companyName}</span>}
           {showBadge && <SealPill href={`${SITE_URL}?ref=${encodeURIComponent(slug ?? "")}`} className="my-2" />}
           {/* Os visitantes podem deixar dados no chat: link para a política do Nexo (operador). */}

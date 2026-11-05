@@ -1,12 +1,14 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useState } from "react";
 import { useGetAgenda } from "../../api/queries/useGetAgenda";
-import { DayView } from "../../features/agenda/DayView";
+import { DesktopAgenda } from "../../features/agenda/DesktopAgenda";
 import { HoursView } from "../../features/agenda/HoursView";
+import { MobileAgenda } from "../../features/agenda/MobileAgenda";
 import { ServicesView } from "../../features/agenda/ServicesView";
 import { dayIn } from "../../features/agenda/types";
 import { Header } from "../../shared/components/layout/Header";
 import { Segmented } from "../../shared/components/ui/Segmented";
+import { useIsDesktop } from "../../shared/hooks/useIsDesktop";
 import { useWorkspaceRole } from "../../shared/hooks/useWorkspaceRole";
 import { Loader2 } from "../../shared/icons";
 
@@ -17,7 +19,7 @@ export const Route = createFileRoute("/_app/agenda")({
 });
 
 const TABS = [
-  { value: "dia", label: "Dia" },
+  { value: "dia", label: "Agenda" },
   { value: "servicos", label: "Serviços" },
   { value: "horarios", label: "Horários" },
 ] as const;
@@ -29,19 +31,26 @@ function AgendaPage() {
   const [tab, setTab] = useState<"dia" | "servicos" | "horarios">("dia");
   const [picked, setPicked] = useState<string | null>(null);
   const canEdit = role.canManage;
+  const desktop = useIsDesktop();
+  const date = picked ?? dia ?? (agenda ? dayIn(agenda.config.timeZone) : "");
 
   return (
     <div className="flex h-full flex-col">
-      <Header title="Agenda" subtitle="Quem vem, quando e o que você atende" />
-      <div className="flex-1 overflow-y-auto">
+      <Header title="Agenda" subtitle="Quem vem, quando e o que você atende" actions={desktop ? <Segmented label="Parte da agenda" size="sm" value={tab} onChange={setTab} options={[...TABS]} /> : undefined} />
+      <div className={`min-h-0 flex-1 ${desktop && tab === "dia" ? "overflow-hidden" : "overflow-y-auto"}`}>
         {isLoading || !agenda ? (
           <div className="flex h-64 items-center justify-center">
             <Loader2 size={32} className="animate-spin text-primary" />
           </div>
         ) : (
-          <div className="mx-auto flex w-full max-w-xl flex-col gap-3 px-3 py-4 md:px-6 md:py-6">
-            <Segmented label="Parte da agenda" fullWidth value={tab} onChange={setTab} options={[...TABS]} />
-            {tab === "dia" && <DayView agenda={agenda} date={picked ?? dia ?? dayIn(agenda.config.timeZone)} onDate={setPicked} onSetup={() => setTab("servicos")} />}
+          <div className={`mx-auto flex w-full flex-col gap-3 ${desktop ? (tab === "dia" ? "h-full max-w-none px-5 py-4" : "max-w-5xl px-6 py-5") : "max-w-xl px-3 py-4"}`}>
+            {!desktop && <Segmented label="Parte da agenda" fullWidth value={tab} onChange={setTab} options={[...TABS]} />}
+            {tab === "dia" &&
+              (desktop ? (
+                <DesktopAgenda agenda={agenda} date={date} onDate={setPicked} onSetup={() => setTab("servicos")} />
+              ) : (
+                <MobileAgenda agenda={agenda} date={date} onDate={setPicked} onSetup={() => setTab("servicos")} />
+              ))}
             {tab === "servicos" && <ServicesView services={agenda.services} canEdit={canEdit} />}
             {tab === "horarios" && <HoursView key={agenda.config.workspaceId} agenda={agenda} canEdit={canEdit} />}
           </div>

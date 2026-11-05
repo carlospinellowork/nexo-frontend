@@ -78,7 +78,7 @@ export function ServicesView({ services, canEdit }: { services: AgendaServiceIte
 
   return (
     <div className="flex flex-col gap-3">
-      <ul className="flex flex-col gap-2">
+      <ul className="grid grid-cols-1 gap-2 lg:grid-cols-2 xl:grid-cols-3 lg:gap-3">
         {services.map((s) => (
           <li key={s.id} className="flex items-center gap-2 rounded-2xl border border-border-ui/70 bg-panel p-3 shadow-card">
             <span className={`flex min-w-0 flex-1 flex-col ${s.active ? "" : "opacity-50"}`}>
@@ -101,7 +101,7 @@ export function ServicesView({ services, canEdit }: { services: AgendaServiceIte
       </ul>
       {!services.length && <p className="px-1 text-[14px] text-text-secondary">Nenhum serviço ainda.</p>}
       {canEdit && (
-        <Button size="lg" variant="secondary" icon={Plus} onClick={() => setEditing("new")}>
+        <Button size="lg" variant="secondary" icon={Plus} className="lg:self-start" onClick={() => setEditing("new")}>
           Adicionar serviço
         </Button>
       )}

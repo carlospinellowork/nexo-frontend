@@ -83,8 +83,8 @@ function BookingPage() {
   const active = booking && booking.status !== "CANCELLED";
 
   return (
-    <div className="flex min-h-dvh flex-col items-center bg-bg-start px-4 py-8 text-text-primary">
-      <main className="flex w-full max-w-md flex-1 flex-col gap-3">
+    <div className="flex min-h-dvh flex-col items-center bg-bg-start px-4 py-8 text-text-primary lg:justify-center">
+      <main className="flex w-full max-w-md flex-1 flex-col gap-3 lg:max-w-3xl lg:flex-none">
         {isLoading && (
           <div className="flex h-64 items-center justify-center">
             <Loader2 size={32} className="animate-spin text-primary" />
@@ -97,13 +97,13 @@ function BookingPage() {
           </div>
         )}
         {booking && (
-          <>
-            <section className="flex flex-col gap-3 rounded-2xl border border-border-ui/70 bg-panel p-5 shadow-card">
+          <div className="flex flex-col gap-3 lg:grid lg:grid-cols-[minmax(0,1.4fr)_minmax(0,1fr)] lg:items-start lg:gap-4">
+            <section className="flex flex-col gap-3 rounded-2xl border border-border-ui/70 bg-panel p-5 shadow-card lg:p-7">
               <div className="flex flex-wrap items-center justify-between gap-2">
                 <span className="text-[14px] font-semibold text-text-secondary">{booking.business || "Sua reserva"}</span>
                 {STATUS[booking.status]}
               </div>
-              <h1 className={`font-display text-[26px] font-bold leading-tight tracking-tight ${active ? "" : "line-through opacity-60"}`}>{booking.serviceName}</h1>
+              <h1 className={`font-display text-[26px] font-bold leading-tight tracking-tight lg:text-[32px] ${active ? "" : "line-through opacity-60"}`}>{booking.serviceName}</h1>
               <p className="flex items-center gap-2 text-[16px] font-semibold first-letter:uppercase">
                 <Calendar size={18} className="shrink-0 text-primary" />
                 <span className="first-letter:uppercase">{day}</span>
@@ -116,6 +116,7 @@ function BookingPage() {
               <p className="text-[14px] text-text-secondary">Em nome de {booking.customerName}</p>
             </section>
 
+            <div className="flex flex-col gap-3">
             {active && (
               <section className="flex flex-col gap-2">
                 <a href={googleCalendar(booking)} target="_blank" rel="noopener noreferrer" className="flex min-h-12 items-center justify-center gap-2 rounded-xl border border-border-ui bg-panel text-[15px] font-semibold hover:bg-panel-hover">
@@ -137,8 +138,9 @@ function BookingPage() {
                 Cancelar reserva
               </Button>
             )}
-            {!active && <p className="text-center text-[14px] text-text-secondary">Esta reserva foi cancelada. Para marcar de novo, volte ao link do negócio.</p>}
-          </>
+            {!active && <p className="text-center text-[14px] text-text-secondary lg:text-left">Esta reserva foi cancelada. Para marcar de novo, volte ao link do negócio.</p>}
+            </div>
+          </div>
         )}
       </main>
       <div className="mt-8 flex flex-col items-center gap-2">

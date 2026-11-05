@@ -28,7 +28,7 @@ src/features/integrations/ definição dos canais (channels.ts) e ChannelCard
 src/features/landing/      contract.ts (tipos e limites), LandingRenderer, SectionEditor, ThemePicker, icons.ts
 src/features/bio/          Minha Bio; JourneyEditor (modelos e edição da jornada sem o editor de fluxo), JourneyGreetingGuide (saudação do WhatsApp Business)
 src/features/landing/journey/  bio em modo jornada: useJourney (estado), transports (rota pública ou simulador na prévia), JourneyView
-src/features/agenda/       tela Agenda (pages/_app/agenda.tsx): DayView (lista do dia, lembrar, confirmar e cancelar), ServicesView, HoursView (horário, regras e bloqueios)
+src/features/agenda/       tela Agenda (pages/_app/agenda.tsx). Computador: DesktopAgenda (mês com as pessoas em cada dia, ou semana em grade). Celular: MobileAgenda (faixa da semana). Nos dois, DayPanel: as pessoas do dia, horários livres, lembrar, confirmar e cancelar. ServicesView, HoursView
 src/pages/reserva.$token.tsx  página da reserva para o cliente, sem login, pelo link que ele recebe ao reservar: adicionar à agenda e cancelar
 src/features/tour/         tour guiado (driver.js) e HelpButton; títulos com ícone do `shared/icons`
 src/features/workspaces/   seletor e store (só o id ativo)
@@ -48,6 +48,8 @@ src/features/auth/         AuthShell (moldura das telas de acesso), IconInput, L
 
 ## Regras
 
+- **Toda tela nova nasce com layout de celular e de computador** (regra do Carlos, 05/11/2026). Coluna estreita centralizada no
+  computador não conta: use a largura com colunas, grades, calendários e animação. Olhe as duas larguras antes de terminar.
 - **O servidor é a fonte da verdade.** O Zustand guarda só preferências (workspace e chat
   ativos) e rascunhos em edição (`dirty`). Não persista dados de domínio no localStorage.
 - Mutations retornam a promise de `invalidateQueries` no `onSuccess`, para que o `mutateAsync` só resolva com o cache atualizado.
