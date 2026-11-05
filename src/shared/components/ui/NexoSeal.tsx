@@ -65,12 +65,14 @@ export function SealRosette({ size = 36, className = "", label }: { size?: numbe
 export function SealPill({ href, onClick, className = "" }: { href?: string; onClick?: () => void; className?: string }) {
   const content = (
     <>
-      <NMark size={11} ink={3} glow={0} />
-      <span>feito com Nexo</span>
+      <SealRosette size={24} />
+      <span>
+        feito com <b className="font-bold">Nexo</b>
+      </span>
     </>
   );
-  // Discreto de propósito: a marca do cliente é que aparece. O selo só ganha força ao passar o mouse.
-  const cls = `inline-flex min-h-6 items-center gap-1 text-[11px] font-medium no-underline opacity-55 transition-opacity hover:opacity-100 ${className}`;
+  // A logo é o selo: fica inteira e brilhando, e só o texto é discreto, para não competir com a marca do cliente.
+  const cls = `inline-flex min-h-7 items-center gap-1.5 text-[11.5px] font-medium no-underline transition-transform duration-200 hover:-rotate-2 hover:scale-105 ${className}`;
   if (href)
     return (
       <a href={href} target="_blank" rel="noopener" className={cls}>
