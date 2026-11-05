@@ -23,7 +23,7 @@ function Message({ entry, t, onLink }: { entry: JourneyEntry; t: Palette; onLink
     return (
       <>
         {m.text && bubble(m.text)}
-        {m.url.startsWith("https://") && (
+        {(m.url.startsWith("https://") || import.meta.env.DEV) && (
           <a href={m.url} target="_blank" rel="noopener noreferrer" onClick={() => onLink(m.url)} className={`flex min-h-[52px] w-full items-center justify-center gap-2.5 rounded-2xl px-5 py-3 text-[16px] font-bold transition-transform active:scale-[0.98] ${t.primary}`}>
             {m.url.startsWith("https://wa.me/") && <WhatsApp size={20} className="shrink-0" />}
             {m.label}
