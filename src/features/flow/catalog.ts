@@ -1,5 +1,6 @@
 import {
   Bot,
+  Calendar,
   Clock,
   GitBranch,
   Headset,
@@ -42,6 +43,7 @@ export const BLOCKS: Record<NodeType, BlockDefinition> = {
   action: { type: "action", name: "Webhook / API", description: "Consulta ou envia para um sistema", icon: Zap, color: "var(--nx-success)", group: "Ações" },
   handoff: { type: "handoff", name: "Falar com humano", description: "Passa a conversa para a equipe", icon: Headset, color: "var(--nx-success)", group: "Ações" },
   whatsapp: { type: "whatsapp", name: "Continuar no WhatsApp", description: "Envia o pedido pronto ao seu WhatsApp", icon: MessageCircle, color: "var(--nx-success)", group: "Ações" },
+  booking: { type: "booking", name: "Agendar", description: "Reserva sozinho nos horários livres da sua agenda", icon: Calendar, color: "var(--nx-success)", group: "Ações" },
   end: { type: "end", name: "Fim", description: "Encerra a conversa", icon: Square, color: "var(--nx-danger)", group: "Ações" },
 };
 
@@ -92,6 +94,8 @@ export function blockSummary(type: NodeType, raw: Record<string, unknown>): stri
       const w = d as NodeDataMap["whatsapp"];
       return w.phone ? `Botão "${w.buttonText || "Continuar no WhatsApp"}"` : "Informe o WhatsApp da empresa";
     }
+    case "booking":
+      return "Serviço, dia, horário, nome e WhatsApp.";
     case "end":
       return "Encerra a conversa.";
   }

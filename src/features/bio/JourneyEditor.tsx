@@ -1,3 +1,4 @@
+import { Link } from "@tanstack/react-router";
 import { isAxiosError } from "axios";
 import { useState } from "react";
 import { apiErrorMessage } from "../../api/instance";
@@ -35,7 +36,7 @@ function StepCard({ step, index, total, onChange, onMove, onRemove }: { step: Jo
           <Trash2 size={16} />
         </button>
       </div>
-      <Field label="O que o bot pergunta" required value={step.question} max={JOURNEY_MAX.question} onChange={(question) => onChange({ question })} />
+      <Field label={step.kind === "booking" ? "Frase antes de marcar" : "O que o bot pergunta"} required value={step.question} max={JOURNEY_MAX.question} onChange={(question) => onChange({ question })} />
       <div className="grid grid-cols-2 gap-2">
         <div className="flex flex-col gap-1">
           <label htmlFor={`kind-${step.id}`} className="text-[13px] font-semibold text-text-secondary">
@@ -51,6 +52,15 @@ function StepCard({ step, index, total, onChange, onMove, onRemove }: { step: Jo
         </div>
         <Field label="Nome no WhatsApp" required value={step.label} max={JOURNEY_MAX.stepLabel} onChange={(label) => onChange({ label })} />
       </div>
+      {step.kind === "booking" && (
+        <p className="text-[13px] leading-snug text-text-secondary">
+          O bot pergunta serviço, dia, horário livre, nome e WhatsApp e já reserva. Os serviços e horários ficam na{" "}
+          <Link to="/agenda" className="font-semibold text-primary-strong underline">
+            Agenda
+          </Link>
+          .
+        </p>
+      )}
       {step.kind === "choice" && (
         <div className="flex flex-col gap-2">
           <span className="text-[13px] font-semibold text-text-secondary">Botões</span>

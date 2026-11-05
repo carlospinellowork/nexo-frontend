@@ -35,7 +35,7 @@ export function PushCard() {
       </span>
       <span className="flex min-w-0 flex-1 flex-col">
         <span className="text-[14px] font-semibold text-text-primary">Ser avisado na hora</span>
-        <span className="text-[12.5px] text-text-secondary">Quando alguém for para o seu WhatsApp, o Nexo te avisa neste aparelho.</span>
+        <span className="text-[12.5px] text-text-secondary">Quando alguém reservar ou for para o seu WhatsApp, o Nexo te avisa neste aparelho.</span>
       </span>
       <Button size="sm" loading={push.busy} onClick={() => push.enable().catch(failed)}>
         Ligar

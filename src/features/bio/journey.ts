@@ -1,6 +1,6 @@
 /** Espelho do contrato da jornada (nexo-backend/src/domain/bio/journey.ts): tipos e limites. */
 export type JourneyTemplateKey = "agendar" | "pedir" | "orcamento" | "contratar" | "duvida" | "produto";
-export type JourneyStepKind = "choice" | "text" | "name" | "phone";
+export type JourneyStepKind = "choice" | "text" | "name" | "phone" | "booking";
 
 export const JOURNEY_MAX = { steps: 6, options: 10, optionLabel: 24, question: 300, stepLabel: 30, answer: 600, greeting: 500, closing: 500, intro: 200, invite: 200, buttonText: 30 } as const;
 
@@ -36,6 +36,7 @@ export const STEP_KINDS: { value: JourneyStepKind; label: string }[] = [
   { value: "text", label: "Texto livre" },
   { value: "name", label: "Nome" },
   { value: "phone", label: "Telefone" },
+  { value: "booking", label: "Reserva na agenda" },
 ];
 
 /** A primeira pendência, em português, para mostrar antes de salvar. */
@@ -44,6 +45,7 @@ export function journeyProblem(spec: JourneySpec): string | null {
   if (digits.length < 10 || digits.length > 13) return "Informe o WhatsApp com DDD.";
   if (!spec.buttonText.trim()) return "Escreva o texto do botão do WhatsApp.";
   if (!spec.steps.length) return "Deixe ao menos uma pergunta.";
+  if (spec.steps.filter((s) => s.kind === "booking").length > 1) return "Use a reserva na agenda só uma vez.";
   for (const [i, s] of spec.steps.entries()) {
     if (!s.question.trim()) return `Escreva a pergunta ${i + 1}.`;
     if (!s.label.trim()) return `Dê um nome à resposta da pergunta ${i + 1}.`;

@@ -16,6 +16,7 @@ export const NODE_TYPES = [
   "action",
   "handoff",
   "whatsapp",
+  "booking",
   "end",
 ] as const;
 export type NodeType = (typeof NODE_TYPES)[number];
@@ -62,6 +63,8 @@ export interface NodeDataMap {
   handoff: { label?: string; content: string };
   /** Termina com um botão que abre o WhatsApp da empresa com a mensagem pronta (wa.me). */
   whatsapp: { label?: string; content: string; phone: string; message: string; buttonText: string };
+  /** Reserva na agenda do negócio: conduz serviço, dia, horário, nome e WhatsApp. */
+  booking: { label?: string; intro: string; confirmedMessage: string; pendingMessage: string; unavailableMessage: string };
   end: { label?: string };
 }
 
@@ -112,6 +115,13 @@ export function defaultNodeData<T extends NodeType>(type: T): NodeDataMap[T] {
       message: "Olá! Sou {{nome}} e vim pelo site.",
       buttonText: "Continuar no WhatsApp",
     },
+    booking: {
+      label: "Agendar",
+      intro: "Vamos marcar o seu horário.",
+      confirmedMessage: "Pronto, {{nome}}! Sua reserva de {{reserva_servico}} está confirmada para {{reserva_dia}} às {{reserva_hora}}.",
+      pendingMessage: "Recebi, {{nome}}! Seu pedido de {{reserva_servico}} para {{reserva_dia}} às {{reserva_hora}} está guardado e vamos confirmar com você.",
+      unavailableMessage: "No momento não há horários livres por aqui.",
+    },
     end: { label: "Fim" },
   };
   return structuredClone(defaults[type]);
@@ -146,6 +156,11 @@ export function nodeOutputs(type: NodeType, data: Record<string, unknown>, color
       return [
         { id: "source", label: "Resolvido", color },
         { id: "handoff", label: "Humano", color: "var(--nx-warning)" },
+      ];
+    case "booking":
+      return [
+        { id: "source", label: "Reservou", color },
+        { id: "unavailable", label: "Sem horário", color: "var(--nx-warning)" },
       ];
     case "buttons":
       return ((data.options as ChoiceOption[]) ?? []).map((o) => ({ id: o.id, label: o.label, color }));

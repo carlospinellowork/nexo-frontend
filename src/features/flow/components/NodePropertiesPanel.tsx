@@ -1,3 +1,4 @@
+import { Link } from "@tanstack/react-router";
 import { ArrowDown, ArrowUp, Plus, Trash2, TriangleAlert, X } from "../../../shared/icons";
 import { motion } from "motion/react";
 import type { ReactNode } from "react";
@@ -116,6 +117,7 @@ export function NodePropertiesPanel({ inSheet = false }: { inSheet?: boolean } =
           </>
         )}
         {type === "whatsapp" && <WhatsappFields data={node.data as NodeDataMap["whatsapp"]} set={set} />}
+        {type === "booking" && <BookingFields data={node.data as NodeDataMap["booking"]} set={set} />}
       </div>
 
       {type !== "start" && (
@@ -436,6 +438,27 @@ function WhatsappFields({ data, set }: { data: NodeDataMap["whatsapp"]; set: Set
         <input className={inputClass} maxLength={30} value={data.buttonText ?? ""} onChange={(e) => set({ buttonText: e.target.value })} />
       </Field>
       <Note>Funciona no site e na landing page sem nenhuma integração: usa o link oficial do WhatsApp. Se a conversa já estiver no WhatsApp, o cliente recebe só o texto.</Note>
+    </>
+  );
+}
+
+function BookingFields({ data, set }: { data: NodeDataMap["booking"]; set: SetData }) {
+  const fields = [
+    { key: "intro", label: "Frase antes de marcar" },
+    { key: "confirmedMessage", label: "Quando a reserva entra confirmada" },
+    { key: "pendingMessage", label: "Quando você confirma à mão" },
+    { key: "unavailableMessage", label: "Quando não há horário livre" },
+  ] as const;
+  return (
+    <>
+      {fields.map((f) => (
+        <Field key={f.key} label={f.label} hint={f.key === "unavailableMessage" ? undefined : VARIABLE_HINT}>
+          <textarea className={`${textareaClass} h-20`} maxLength={500} value={data[f.key] ?? ""} onChange={(e) => set({ [f.key]: e.target.value })} />
+        </Field>
+      ))}
+      <Note>
+        Serviços e horários vêm da tela <Link to="/agenda" className="font-semibold underline">Agenda</Link>. O bloco pergunta serviço, dia, horário, nome e WhatsApp, e grava {"{{reserva_resumo}}"}, para usar nos blocos seguintes. No simulador, nada é reservado de verdade.
+      </Note>
     </>
   );
 }
