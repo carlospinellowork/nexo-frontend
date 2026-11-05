@@ -1,7 +1,7 @@
 import { useQueryClient } from "@tanstack/react-query";
 import { Building2, Check, ChevronsUpDown, Plus } from "../../../shared/icons";
 import { AnimatePresence, motion } from "motion/react";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { apiErrorMessage } from "../../../api/instance";
 import { usePostWorkspace } from "../../../api/mutations/usePostWorkspace";
 import { useGetWorkspaces } from "../../../api/queries/useGetWorkspaces";
@@ -18,13 +18,6 @@ export function WorkspaceSelector() {
   const { activeWorkspaceId, setActiveWorkspaceId } = useWorkspaceStore();
   const [isOpen, setIsOpen] = useState(false);
   const [creating, setCreating] = useState(false);
-
-  // Garante um workspace ativo válido (ex.: primeiro login ou workspace removido).
-  useEffect(() => {
-    if (workspaces && !workspaces.some((w) => w.id === activeWorkspaceId)) {
-      setActiveWorkspaceId(workspaces[0]?.id ?? null);
-    }
-  }, [workspaces, activeWorkspaceId, setActiveWorkspaceId]);
 
   const select = (id: string) => {
     setActiveWorkspaceId(id);

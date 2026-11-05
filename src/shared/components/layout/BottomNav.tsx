@@ -1,5 +1,5 @@
 import { Link, useRouterState } from "@tanstack/react-router";
-import { ChartLine, House, Link2, type IconComponent, Menu, Users } from "../../icons";
+import { Calendar, House, Link2, type IconComponent, Menu, Users } from "../../icons";
 import { motion } from "motion/react";
 import { isNavActive } from "../../navigation";
 import { gestureFor } from "../ui/gestures";
@@ -7,7 +7,7 @@ import { gestureFor } from "../ui/gestures";
 const ITEMS: { to: string; label: string; icon: IconComponent }[] = [
   { to: "/", label: "Início", icon: House },
   { to: "/minha-bio", label: "Bio", icon: Link2 },
-  { to: "/results", label: "Resultados", icon: ChartLine },
+  { to: "/agenda", label: "Agenda", icon: Calendar },
   { to: "/leads", label: "Leads", icon: Users },
 ];
 

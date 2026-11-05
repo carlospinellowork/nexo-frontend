@@ -9,9 +9,11 @@ interface HeaderProps {
   /** selo ao lado do título (ex.: Rascunho/Salvo) */
   badge?: ReactNode;
   actions?: ReactNode;
+  /** Abas da área (ToolTabs), logo depois do título. */
+  tabs?: ReactNode;
 }
 
-export function Header({ title, subtitle, badge, actions }: HeaderProps) {
+export function Header({ title, subtitle, badge, actions, tabs }: HeaderProps) {
   // Ícone e cor da área da tela atual, vindos do menu.
   const pathname = useRouterState({ select: (s) => s.location.pathname });
   const area = navItemFor(pathname);
@@ -28,7 +30,9 @@ export function Header({ title, subtitle, badge, actions }: HeaderProps) {
           {subtitle && <span className="truncate text-[12.5px] text-text-secondary">{subtitle}</span>}
         </div>
         {badge}
+        {tabs && <div className="ml-2 hidden lg:block">{tabs}</div>}
       </div>
+      {tabs && <div className="nx-phone-scroll -mx-4 overflow-x-auto px-4 lg:hidden">{tabs}</div>}
       {/* Celular: as ações numa linha que rola de lado (nada fica cortado). */}
       {actions && <div className="nx-phone-scroll -mx-4 flex items-center gap-2 overflow-x-auto px-4 md:mx-0 md:flex-wrap md:overflow-visible md:px-0 [&>*]:shrink-0">{actions}</div>}
     </header>

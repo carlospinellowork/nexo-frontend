@@ -65,33 +65,25 @@ export function SealRosette({ size = 36, className = "", label }: { size?: numbe
 export function SealPill({ href, onClick, className = "" }: { href?: string; onClick?: () => void; className?: string }) {
   const content = (
     <>
-      <span className="grid h-5 w-5 place-items-center rounded-full bg-white/70 shadow-[inset_0_0_0_1px_rgb(109_74_255/0.3)]">
-        <NMark size={12} ink={3.2} glow={6} />
-      </span>
-      <span>
-        feito com <b className="font-extrabold text-[#6d4aff]">Nexo</b>
-      </span>
+      <NMark size={11} ink={3} glow={0} />
+      <span>feito com Nexo</span>
     </>
   );
-  const cls = `nx-holo inline-flex h-7 items-center gap-1.5 rounded-full pl-1 pr-3 text-[12px] font-semibold tracking-[0.01em] no-underline shadow-[inset_0_0_0_1px_rgb(109_74_255/0.25),0_4px_14px_rgb(109_74_255/0.18)] transition-transform hover:-translate-y-px ${className}`;
+  // Discreto de propósito: a marca do cliente é que aparece. O selo só ganha força ao passar o mouse.
+  const cls = `inline-flex min-h-6 items-center gap-1 text-[11px] font-medium no-underline opacity-55 transition-opacity hover:opacity-100 ${className}`;
   if (href)
     return (
-      <a href={href} target="_blank" rel="noopener" className={cls} {...holoHandlers}>
+      <a href={href} target="_blank" rel="noopener" className={cls}>
         {content}
       </a>
     );
   if (onClick)
     return (
-      <button type="button" onClick={onClick} className={cls} {...holoHandlers}>
+      <button type="button" onClick={onClick} className={cls}>
         {content}
       </button>
     );
-  // Sem link nem ação (ex.: exemplos ilustrativos), é só o selo.
-  return (
-    <span className={cls} {...holoHandlers}>
-      {content}
-    </span>
-  );
+  return <span className={cls}>{content}</span>;
 }
 
 /** C · Carimbo "Verificado pelo Nexo": relatório de campanha e mídia kit. */

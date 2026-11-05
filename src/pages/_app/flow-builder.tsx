@@ -11,6 +11,7 @@ import { TestPanel } from "../../features/flow/components/TestPanel";
 import { FlowCanvas } from "../../features/flow/FlowCanvas";
 import { useFlowStore } from "../../features/flow/store/flow.store";
 import { Header } from "../../shared/components/layout/Header";
+import { ToolTabs } from "../../shared/components/layout/ToolTabs";
 import { Badge } from "../../shared/components/ui/Badge";
 import { Button, IconButton } from "../../shared/components/ui/Button";
 import { ChatSelect } from "../../shared/components/ui/ChatSelect";
@@ -19,7 +20,6 @@ import { toast } from "../../shared/components/ui/toast-store";
 import { useActiveChat } from "../../shared/hooks/useActiveChat";
 import { useIsMobile } from "../../shared/hooks/useIsMobile";
 import { HelpButton } from "../../features/tour/HelpButton";
-import { ProBadge } from "../../features/plan/ProBadge";
 import { startTour } from "../../features/tour/driver-service";
 
 export const Route = createFileRoute("/_app/flow-builder")({
@@ -126,18 +126,18 @@ function FlowBuilderPage() {
   return (
     <div className="flex h-full flex-col">
       <Header
-        title={chat?.name ?? "Fluxos"}
-        subtitle="Monte a conversa do seu assistente"
-        badge={<span className="flex items-center gap-2">{status}<ProBadge className="hidden sm:inline-flex" /></span>}
+        title="Fluxos"
+        badge={status}
+        tabs={<ToolTabs area="flows" />}
         actions={
           <div id="tour-flow-actions" className="flex items-center gap-2">
             <ChatSelect label="Chat" chats={chats} value={chatId} onChange={changeChat} />
-            <div className="ml-1 flex items-center">
+            <div className="flex items-center">
               <IconButton icon={Undo2} label="Desfazer (Ctrl+Z)" title="Desfazer (Ctrl+Z)" onClick={undo} disabled={!canUndo} className="disabled:opacity-35" />
               <IconButton icon={Redo2} label="Refazer (Ctrl+Shift+Z)" title="Refazer (Ctrl+Shift+Z)" onClick={redo} disabled={!canRedo} className="disabled:opacity-35" />
             </div>
-            <Button variant="outline" icon={Save} onClick={() => void ensureSaved(true)} loading={isSaving && !isPublishing} disabled={!chatId || !dirty}>
-              Salvar
+            <Button variant="outline" icon={Save} aria-label="Salvar" onClick={() => void ensureSaved(true)} loading={isSaving && !isPublishing} disabled={!chatId || !dirty}>
+              <span className="hidden 2xl:inline">Salvar</span>
             </Button>
             <span id="tour-flow-test">
               <Button variant={testOpen ? "secondary" : "outline"} icon={FlaskConical} onClick={() => setTestOpen(!testOpen)} disabled={!chatId}>

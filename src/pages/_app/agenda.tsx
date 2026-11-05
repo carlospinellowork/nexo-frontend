@@ -5,7 +5,7 @@ import { DesktopAgenda } from "../../features/agenda/DesktopAgenda";
 import { HoursView } from "../../features/agenda/HoursView";
 import { MobileAgenda } from "../../features/agenda/MobileAgenda";
 import { ServicesView } from "../../features/agenda/ServicesView";
-import { MoveBookingSheet, NewBookingSheet } from "../../features/agenda/BookingSheets";
+import { type CustomerNotice, MoveBookingSheet, NewBookingSheet, NotifyCustomerSheet } from "../../features/agenda/BookingSheets";
 import { type Booking, dayIn } from "../../features/agenda/types";
 import { Header } from "../../shared/components/layout/Header";
 import { Segmented } from "../../shared/components/ui/Segmented";
@@ -35,6 +35,10 @@ function AgendaPage() {
   const desktop = useIsDesktop();
   const [creating, setCreating] = useState<{ date: string; time?: string } | null>(null);
   const [moving, setMoving] = useState<Booking | null>(null);
+  const [notice, setNotice] = useState<CustomerNotice | null>(null);
+  // Reserva marcada à mão pode não ter telefone: aí não há o que abrir.
+  const notifyMoved = (booking: Booking) => booking.customerPhone && setNotice({ booking, kind: "moved" });
+  const notifyCancelled = (booking: Booking) => booking.customerPhone && setNotice({ booking, kind: "cancelled" });
   const date = picked ?? dia ?? (agenda ? dayIn(agenda.config.timeZone) : "");
 
   return (
@@ -50,9 +54,9 @@ function AgendaPage() {
             {!desktop && <Segmented label="Parte da agenda" fullWidth value={tab} onChange={setTab} options={[...TABS]} />}
             {tab === "dia" &&
               (desktop ? (
-                <DesktopAgenda agenda={agenda} date={date} onDate={setPicked} onSetup={() => setTab("servicos")} onNew={(d, time) => setCreating({ date: d, time })} onMove={setMoving} />
+                <DesktopAgenda agenda={agenda} date={date} onDate={setPicked} onSetup={() => setTab("servicos")} onNew={(d, time) => setCreating({ date: d, time })} onMove={setMoving} onMoved={notifyMoved} onCancelled={notifyCancelled} />
               ) : (
-                <MobileAgenda agenda={agenda} date={date} onDate={setPicked} onSetup={() => setTab("servicos")} onNew={(d, time) => setCreating({ date: d, time })} onMove={setMoving} />
+                <MobileAgenda agenda={agenda} date={date} onDate={setPicked} onSetup={() => setTab("servicos")} onNew={(d, time) => setCreating({ date: d, time })} onMove={setMoving} onCancelled={notifyCancelled} />
               ))}
             {tab === "servicos" && <ServicesView services={agenda.services} canEdit={canEdit} />}
             {tab === "horarios" && <HoursView key={agenda.config.workspaceId} agenda={agenda} canEdit={canEdit} />}
@@ -60,7 +64,8 @@ function AgendaPage() {
         )}
       </div>
       {creating && agenda && <NewBookingSheet agenda={agenda} date={creating.date} time={creating.time} onClose={() => setCreating(null)} />}
-      {moving && agenda && <MoveBookingSheet booking={moving} timeZone={agenda.config.timeZone} onClose={() => setMoving(null)} />}
+      {moving && agenda && <MoveBookingSheet booking={moving} timeZone={agenda.config.timeZone} onClose={() => setMoving(null)} onMoved={notifyMoved} />}
+      {notice && agenda && <NotifyCustomerSheet notice={notice} timeZone={agenda.config.timeZone} onClose={() => setNotice(null)} />}
     </div>
   );
 }

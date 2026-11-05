@@ -9,7 +9,7 @@ const LETTERS = ["D", "S", "T", "Q", "Q", "S", "S"];
 const weekStart = (date: string) => shiftDay(date, -((weekdayOf(date) + 6) % 7));
 
 /** A agenda no celular: uma faixa com a semana ao alcance do polegar e, embaixo, as pessoas do dia. */
-export function MobileAgenda({ agenda, date, onDate, onSetup, onNew, onMove }: { agenda: AgendaData; date: string; onDate: (date: string) => void; onSetup: () => void; onNew: (date: string, time?: string) => void; onMove: (b: Booking) => void }) {
+export function MobileAgenda({ agenda, date, onDate, onSetup, onNew, onMove, onCancelled }: { agenda: AgendaData; date: string; onDate: (date: string) => void; onSetup: () => void; onNew: (date: string, time?: string) => void; onMove: (b: Booking) => void; onCancelled: (b: Booking) => void }) {
   const { timeZone } = agenda.config;
   const reduce = useReducedMotion();
   const [activeId, setActiveId] = useState<string | null>(null);
@@ -59,7 +59,7 @@ export function MobileAgenda({ agenda, date, onDate, onSetup, onNew, onMove }: {
           <ChevronRight size={18} />
         </button>
       </section>
-      <DayPanel agenda={agenda} date={date} direction={direction} activeId={activeId} onActive={setActiveId} onSetup={onSetup} onNew={onNew} onMove={onMove} className="overflow-hidden rounded-2xl border border-border-ui/70 bg-panel shadow-card" />
+      <DayPanel agenda={agenda} date={date} direction={direction} activeId={activeId} onActive={setActiveId} onSetup={onSetup} onNew={onNew} onMove={onMove} onCancelled={onCancelled} className="overflow-hidden rounded-2xl border border-border-ui/70 bg-panel shadow-card" />
     </div>
   );
 }

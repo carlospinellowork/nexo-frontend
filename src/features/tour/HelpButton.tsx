@@ -96,7 +96,7 @@ export function HelpButton({ tourKey, screenTitle }: HelpButtonProps) {
           title="Ajuda e Tutoriais"
         >
           <HelpCircle size={15} className="text-primary" />
-          <span className="hidden sm:inline">Ajuda</span>
+          <span className="hidden 2xl:inline">Ajuda</span>
         </button>
 
         {/* Dropdown Menu */}

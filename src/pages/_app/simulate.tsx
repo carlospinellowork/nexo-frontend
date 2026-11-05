@@ -1,5 +1,5 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
-import { ArrowLeft, Play, Plus, Variable } from "../../shared/icons";
+import { Play, Plus, Variable } from "../../shared/icons";
 import { motion } from "motion/react";
 import { useCallback, useEffect, useRef } from "react";
 import type { SimulatorResult } from "../../api/mutations/useSimulator";
@@ -10,6 +10,7 @@ import { SimulationChat } from "../../features/flow/components/SimulationChat";
 import { useSimulatorSession } from "../../features/flow/hooks/useSimulatorSession";
 import { useFlowStore } from "../../features/flow/store/flow.store";
 import { Header } from "../../shared/components/layout/Header";
+import { ToolTabs } from "../../shared/components/layout/ToolTabs";
 import { Button } from "../../shared/components/ui/Button";
 import { ChatSelect } from "../../shared/components/ui/ChatSelect";
 import { EmptyState } from "../../shared/components/ui/EmptyState";
@@ -52,14 +53,11 @@ function SimulatorPage() {
   return (
     <div className="flex h-full flex-col">
       <Header
-        title="Simulador"
-        subtitle="Teste o rascunho salvo, exatamente como o cliente vai ver"
+        title="Testar conversa"
+        tabs={<ToolTabs area="pages" />}
         actions={
           <>
             <ChatSelect label="Chat" chats={chats} value={chatId} onChange={setChatId} />
-            <Button variant="outline" icon={ArrowLeft} onClick={() => navigate({ to: "/flow-builder" })}>
-              Voltar ao editor
-            </Button>
           </>
         }
       />

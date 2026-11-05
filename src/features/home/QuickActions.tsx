@@ -1,5 +1,5 @@
 import { Link } from "@tanstack/react-router";
-import { Link2, type IconComponent, Play, QrCode, Users } from "../../shared/icons";
+import { Link2, type IconComponent, Calendar, QrCode, Users } from "../../shared/icons";
 import { gestureFor } from "../../shared/components/ui/gestures";
 import { type Tone, TONES } from "../../shared/components/ui/tones";
 
@@ -13,7 +13,7 @@ interface Action {
 const ACTIONS: Action[] = [
   { to: "/minha-bio", label: "Editar a bio", icon: Link2, tone: "rose" },
   { to: "/qr-codes", label: "Novo QR Code", icon: QrCode, tone: "lagoon" },
-  { to: "/simulate", label: "Testar o bot", icon: Play, tone: "mint" },
+  { to: "/agenda", label: "Ver a agenda", icon: Calendar, tone: "mint" },
   { to: "/leads", label: "Ver contatos", icon: Users, tone: "green" },
 ];
 

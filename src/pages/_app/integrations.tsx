@@ -7,6 +7,7 @@ import { useGetIntegrations } from "../../api/queries/useGetIntegrations";
 import { CHANNELS } from "../../features/integrations/channels";
 import { ChannelCard } from "../../features/integrations/components/ChannelCard";
 import { Header } from "../../shared/components/layout/Header";
+import { ToolTabs } from "../../shared/components/layout/ToolTabs";
 import { Button } from "../../shared/components/ui/Button";
 import { ChatSelect } from "../../shared/components/ui/ChatSelect";
 import { gestureFor } from "../../shared/components/ui/gestures";
@@ -56,7 +57,7 @@ function IntegrationsPage() {
     <div className="flex h-full flex-col overflow-y-auto">
       <Header
         title="Canais"
-        subtitle="Onde as pessoas encontram você e o seu assistente"
+        tabs={<ToolTabs area="flows" />}
         actions={!noChats && open ? <ChatSelect label="Chat" chats={chats} value={chatId} onChange={setChatId} /> : undefined}
       />
 

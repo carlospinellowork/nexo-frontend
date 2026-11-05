@@ -3,6 +3,7 @@ import { X } from "../../shared/icons";
 import { motion } from "motion/react";
 import { useEffect, useState } from "react";
 import { useGetMe } from "../../api/queries/useGetMe";
+import { useEnsureActiveWorkspace } from "../../features/workspaces/useEnsureActiveWorkspace";
 import { authClient } from "../../lib/auth-client";
 import { BottomNav } from "../../shared/components/layout/BottomNav";
 import { Sidebar } from "../../shared/components/layout/Sidebar";
@@ -13,6 +14,12 @@ export const Route = createFileRoute("/_app")({
   component: AppLayout,
 });
 
+
+/** Fica dentro da parte logada: sem sessão, não há espaços para buscar. */
+function EnsureWorkspace() {
+  useEnsureActiveWorkspace();
+  return null;
+}
 
 function AppLayout() {
   const { data: session, isPending } = authClient.useSession();
@@ -44,11 +51,12 @@ function AppLayout() {
   return (
     <div className="nx-app-bg flex h-dvh w-full flex-col overflow-hidden text-text-primary md:h-screen md:flex-row">
       <div className="hidden md:flex">
+        <EnsureWorkspace />
         <Sidebar groups={NAV_GROUPS} />
       </div>
 
       {/* Celular: barra de navegação embaixo; "Mais" abre o menu completo em gaveta. */}
-      <BottomNav onMore={() => setMenuOpen(true)} moreActive={!["/", "/minha-bio", "/results", "/leads"].some((p) => (p === "/" ? pathname === "/" : pathname.startsWith(p)))} />
+      <BottomNav onMore={() => setMenuOpen(true)} moreActive={!["/", "/minha-bio", "/agenda", "/leads"].some((p) => (p === "/" ? pathname === "/" : pathname.startsWith(p)))} />
       {menuOpen && (
         <div className="fixed inset-0 z-50 flex md:hidden" role="dialog" aria-modal="true" aria-label="Menu">
           <Sidebar groups={NAV_GROUPS} className="h-full w-[280px] max-w-[85vw] overflow-y-auto bg-panel" onNavigate={() => setMenuOpen(false)} />

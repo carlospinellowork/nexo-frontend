@@ -26,7 +26,7 @@ function reminderLink(booking: Booking, timeZone: string) {
   return `${whatsappOfCustomer(booking.customerPhone)}?text=${encodeURIComponent(text)}`;
 }
 
-function PersonRow({ booking, timeZone, open, onToggle, onMove }: { booking: Booking; timeZone: string; open: boolean; onToggle: () => void; onMove: (b: Booking) => void }) {
+function PersonRow({ booking, timeZone, open, onToggle, onMove, onCancelled }: { booking: Booking; timeZone: string; open: boolean; onToggle: () => void; onMove: (b: Booking) => void; onCancelled: (b: Booking) => void }) {
   const { mutateAsync, isPending, variables } = useBookingAction();
   const reduce = useReducedMotion();
   const cancelled = booking.status === "CANCELLED";
@@ -36,8 +36,9 @@ function PersonRow({ booking, timeZone, open, onToggle, onMove }: { booking: Boo
   const run = async (action: "confirm" | "cancel") => {
     if (action === "cancel" && !confirm(`Cancelar a reserva de ${booking.customerName}? O horário volta a ficar livre.`)) return;
     try {
-      await mutateAsync({ id: booking.id, action });
-      toast.success(action === "confirm" ? "Reserva confirmada." : "Reserva cancelada. Avise o cliente pelo WhatsApp.");
+      const updated = await mutateAsync({ id: booking.id, action });
+      toast.success(action === "confirm" ? "Reserva confirmada." : "Reserva cancelada.");
+      if (action === "cancel") onCancelled(updated);
     } catch (err) {
       toast.error(apiErrorMessage(err, "Não foi possível atualizar a reserva."));
     }
@@ -133,7 +134,7 @@ function buildDay(date: string, bookings: Booking[], agenda: AgendaData, today: 
 }
 
 /** O dia escolhido: as pessoas entram em sequência, cada uma no seu horário. Serve ao computador e ao celular. */
-export function DayPanel({ agenda, date, direction, activeId, onActive, onSetup, onNew, onMove, className = "" }: { agenda: AgendaData; date: string; direction: number; activeId: string | null; onActive: (id: string | null) => void; onSetup: () => void; onNew: (date: string, time?: string) => void; onMove: (b: Booking) => void; className?: string }) {
+export function DayPanel({ agenda, date, direction, activeId, onActive, onSetup, onNew, onMove, onCancelled, className = "" }: { agenda: AgendaData; date: string; direction: number; activeId: string | null; onActive: (id: string | null) => void; onSetup: () => void; onNew: (date: string, time?: string) => void; onMove: (b: Booking) => void; onCancelled: (b: Booking) => void; className?: string }) {
   const { timeZone } = agenda.config;
   const { blocks, services } = agenda;
   const reduce = useReducedMotion();
@@ -226,7 +227,7 @@ export function DayPanel({ agenda, date, direction, activeId, onActive, onSetup,
                       <>
                         <span className={`pt-[18px] text-right text-[13px] font-bold tabular-nums ${item.booking.status === "CANCELLED" ? "text-text-secondary/60 line-through" : "text-text-primary"}`}>{clock(item.at)}</span>
                         <div className="py-1">
-                          <PersonRow booking={item.booking} timeZone={timeZone} open={activeId === item.booking.id} onToggle={() => onActive(activeId === item.booking.id ? null : item.booking.id)} onMove={onMove} />
+                          <PersonRow booking={item.booking} timeZone={timeZone} open={activeId === item.booking.id} onToggle={() => onActive(activeId === item.booking.id ? null : item.booking.id)} onMove={onMove} onCancelled={onCancelled} />
                         </div>
                       </>
                     )}

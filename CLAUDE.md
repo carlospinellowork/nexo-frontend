@@ -34,7 +34,7 @@ src/pages/reserva.$token.tsx  página da reserva para o cliente, sem login, pelo
 src/features/tour/         tour guiado (driver.js) e HelpButton; títulos com ícone do `shared/icons`
 src/features/workspaces/   seletor e store (só o id ativo)
 src/shared/                layout, ui (PromptDialog, Toaster/toast, ChatSelect, EmptyState), hooks/useActiveChat
-src/shared/navigation.ts   menu do painel (NAV_GROUPS: Presença, Assistente, Acompanhar); tela nova entra aqui
+src/shared/navigation.ts   menu do painel (NAV_GROUPS: Presença, Atendimento, Acompanhar, Criar); tela nova entra aqui. Detalhe de uma área vira aba (layout/ToolTabs), não item de menu. Conta, avisos, opinião, empresa e tema ficam em layout/AccountMenu
 src/shared/components/ui/tones.ts  cor dos ícones e destaques das áreas: desde 31/10/2026 é UMA cor só (o roxo da marca) para todas; não crie cor por área
 src/features/qr/           QR Codes: QrFormSheet (criar/editar por tipo), QrDetailSheet (baixar PNG/SVG, gráfico), PrintCard (@media print)
 src/shared/components/ui/Sheet.tsx  o modal do Nexo (único): centralizado no computador com a altura do conteúdo (até 86% da tela), sobe de baixo no celular; aceita onSubmit (vira <form>) e busy

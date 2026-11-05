@@ -336,7 +336,7 @@ function WeekPulse({ agenda, today, onPick }: { agenda: AgendaData; today: strin
 }
 
 /** A agenda no computador: o calendário de um lado e, do outro, as pessoas do dia escolhido. */
-export function DesktopAgenda({ agenda, date, onDate, onSetup, onNew, onMove }: { agenda: AgendaData; date: string; onDate: (date: string) => void; onSetup: () => void; onNew: (date: string, time?: string) => void; onMove: (b: Booking) => void }) {
+export function DesktopAgenda({ agenda, date, onDate, onSetup, onNew, onMove, onMoved, onCancelled }: { agenda: AgendaData; date: string; onDate: (date: string) => void; onSetup: () => void; onNew: (date: string, time?: string) => void; onMove: (b: Booking) => void; onMoved: (b: Booking) => void; onCancelled: (b: Booking) => void }) {
   const { timeZone } = agenda.config;
   const [view, setView] = useState<"month" | "week">("month");
   const [activeId, setActiveId] = useState<string | null>(null);
@@ -421,13 +421,16 @@ export function DesktopAgenda({ agenda, date, onDate, onSetup, onNew, onMove }: 
             onEmpty={onNew}
             onDrop={(b, nextDate, time) => {
               reschedule({ id: b.id, date: nextDate, time })
-                .then(() => toast.success(`${b.customerName} remarcado para ${time}. Avise pelo WhatsApp.`))
+                .then((moved) => {
+                  toast.success(`${b.customerName} remarcado para ${time}.`);
+                  onMoved(moved);
+                })
                 .catch((err: unknown) => toast.error(isAxiosError(err) && err.response?.status === 409 ? "Esse horário já está ocupado." : apiErrorMessage(err, "Não foi possível remarcar.")));
             }}
           />
         )}
       </div>
-      <DayPanel agenda={agenda} date={date} direction={direction} activeId={activeId} onActive={setActiveId} onSetup={onSetup} onNew={onNew} onMove={onMove} className="min-h-0 overflow-y-auto rounded-2xl border border-border-ui/70 bg-panel shadow-card" />
+      <DayPanel agenda={agenda} date={date} direction={direction} activeId={activeId} onActive={setActiveId} onSetup={onSetup} onNew={onNew} onMove={onMove} onCancelled={onCancelled} className="min-h-0 overflow-y-auto rounded-2xl border border-border-ui/70 bg-panel shadow-card" />
     </div>
   );
 }

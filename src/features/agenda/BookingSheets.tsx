@@ -6,9 +6,10 @@ import { Button } from "../../shared/components/ui/Button";
 import { Sheet } from "../../shared/components/ui/Sheet";
 import { DatePicker, TimePicker } from "../../shared/components/ui/DatePicker";
 import { Select } from "../../shared/components/ui/Select";
-import { inputClass } from "../../shared/components/ui/styles";
+import { inputClass, textareaClass } from "../../shared/components/ui/styles";
+import { WhatsApp } from "../../shared/icons";
 import { toast } from "../../shared/components/ui/toast-store";
-import { type AgendaData, type Booking, dayIn, durationLabel, money, timeIn } from "./types";
+import { type AgendaData, type Booking, dayIn, durationLabel, money, timeIn, whatsappOfCustomer } from "./types";
 
 const field = "flex flex-col gap-1 text-[13px] font-semibold text-text-secondary";
 const text = `${inputClass} text-[16px] font-normal text-text-primary md:text-[14px]`;
@@ -83,7 +84,7 @@ export function NewBookingSheet({ agenda, date, time, onClose }: { agenda: Agend
 }
 
 /** Remarcar sem arrastar: é o caminho no celular e no teclado. */
-export function MoveBookingSheet({ booking, timeZone, onClose }: { booking: Booking; timeZone: string; onClose: () => void }) {
+export function MoveBookingSheet({ booking, timeZone, onClose, onMoved }: { booking: Booking; timeZone: string; onClose: () => void; onMoved: (b: Booking) => void }) {
   const [day, setDay] = useState(dayIn(timeZone, new Date(booking.startsAt)));
   const [hour, setHour] = useState(timeIn(booking.startsAt, timeZone));
   const { mutateAsync, isPending } = useRescheduleBooking();
@@ -91,9 +92,10 @@ export function MoveBookingSheet({ booking, timeZone, onClose }: { booking: Book
   const submit = async (e: FormEvent) => {
     e.preventDefault();
     try {
-      await mutateAsync({ id: booking.id, date: day, time: hour });
-      toast.success(`${booking.customerName} remarcado. Avise pelo WhatsApp.`);
+      const moved = await mutateAsync({ id: booking.id, date: day, time: hour });
+      toast.success(`${booking.customerName} remarcado.`);
       onClose();
+      onMoved(moved);
     } catch (err) {
       toast.error(failure(err, "Não foi possível remarcar."));
     }
@@ -122,6 +124,42 @@ export function MoveBookingSheet({ booking, timeZone, onClose }: { booking: Book
           <TimePicker value={hour} onChange={setHour} />
         </label>
       </div>
+    </Sheet>
+  );
+}
+
+export interface CustomerNotice {
+  booking: Booking;
+  kind: "moved" | "cancelled";
+}
+
+function noticeText({ booking, kind }: CustomerNotice, timeZone: string) {
+  const day = new Date(booking.startsAt).toLocaleDateString("pt-BR", { timeZone, weekday: "long", day: "2-digit", month: "2-digit" });
+  const time = timeIn(booking.startsAt, timeZone);
+  return kind === "moved" ? `Oi, ${booking.customerName}! Seu horário de ${booking.serviceName} foi remarcado para ${day}, às ${time}. Se não puder, é só me avisar.` : `Oi, ${booking.customerName}! Precisei cancelar o seu horário de ${booking.serviceName} de ${day}, às ${time}. Quer marcar outro?`;
+}
+
+/** O cliente não recebe nada sozinho: depois de remarcar ou cancelar, o dono manda com um toque, já escrito. */
+export function NotifyCustomerSheet({ notice, timeZone, onClose }: { notice: CustomerNotice; timeZone: string; onClose: () => void }) {
+  const [message, setMessage] = useState(() => noticeText(notice, timeZone));
+  return (
+    <Sheet
+      open
+      title={notice.kind === "moved" ? "Remarcado. Avisar o cliente?" : "Cancelado. Avisar o cliente?"}
+      onClose={onClose}
+      footer={
+        <>
+          <Button variant="ghost" className="h-11 md:h-9" onClick={onClose}>
+            Agora não
+          </Button>
+          <a href={`${whatsappOfCustomer(notice.booking.customerPhone)}?text=${encodeURIComponent(message.trim())}`} target="_blank" rel="noopener noreferrer" onClick={onClose} className="nx-btn-primary inline-flex h-11 items-center gap-2 rounded-xl px-4 text-[14px] font-semibold text-white md:h-9">
+            <WhatsApp size={16} /> Abrir o WhatsApp
+          </a>
+        </>
+      }
+    >
+      <textarea aria-label="Mensagem" className={`${textareaClass} min-h-28 text-[16px] md:text-[14px]`} maxLength={500} value={message} onChange={(e) => setMessage(e.target.value)} />
+      <p className="text-[13px] leading-snug text-text-secondary">Abre a conversa com {notice.booking.customerName} com este texto pronto. É você quem envia.</p>
     </Sheet>
   );
 }

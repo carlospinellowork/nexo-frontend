@@ -7,6 +7,9 @@ import { useGetChats } from "../../api/queries/useGetChats";
 import { useGetHandoffs } from "../../api/queries/useGetHandoffs";
 import { useGetIntegrations } from "../../api/queries/useGetIntegrations";
 import { useGetLandingClicks } from "../../api/queries/useGetLandingClicks";
+import { useGetAgenda } from "../../api/queries/useGetAgenda";
+import { useGetBookingsRange } from "../../api/queries/useGetBookingsRange";
+import { shiftDay } from "../../features/agenda/types";
 import { useGetMe } from "../../api/queries/useGetMe";
 import { useGetQrCodes } from "../../api/queries/useGetQrCodes";
 import { useGetResults } from "../../api/queries/useGetResults";
@@ -64,9 +67,15 @@ function HomePage() {
   const clicksWeek = bio === null ? 0 : bioClicks ? sum(Object.values(bioClicks.items).map((i) => i.last7)) : undefined;
 
   const chatCount = chats?.length ?? 0;
+  const agenda = useGetAgenda().data;
+  const todayIso = new Date().toLocaleDateString("sv-SE");
+  const { data: bookings } = useGetBookingsRange(shiftDay(todayIso, -30), shiftDay(todayIso, 30));
   const channelCount = integrations?.length ?? 0;
   const allSteps = [
     { key: "bio", done: Boolean(bio), title: "Crie a sua bio", description: "Links, Pix e o assistente numa página só.", to: "/minha-bio" },
+    { key: "journey", done: bio?.settings.bio?.botMode === "journey", title: "Escolha o que a pessoa vem fazer", description: "Agendar, pedir, orçamento: a bio conduz a conversa.", to: "/minha-bio" },
+    { key: "services", done: (agenda?.services.length ?? 0) > 0, title: "Cadastre o que você atende", description: "Com serviços e horários, a bio reserva sozinha.", to: "/agenda" },
+    { key: "booking", done: (bookings?.length ?? 0) > 0, title: "Faça uma reserva de teste", description: "Abra o seu link e marque um horário, como um cliente.", to: "/minha-bio", search: { instagram: true } },
     { key: "bot", done: chatCount > 0, title: "Monte a conversa do bot", description: "Mensagens, perguntas e decisões.", to: "/flow-builder" },
     { key: "qr", done: (qrCodes?.length ?? 0) > 0, title: "Crie um QR Code", description: "Para o balcão, a vitrine ou a embalagem.", to: "/qr-codes" },
     { key: "channel", done: channelCount > 0, title: "Conecte um canal", description: "WhatsApp, Instagram, Telegram ou site.", to: "/integrations" },
@@ -79,15 +88,15 @@ function HomePage() {
       search: { instagram: true },
     },
   ];
-  // O objetivo contado no "conhecer você" decide quais passos aparecem e em que ordem. Fluxos e canais
-  // só entram para quem quer resposta automática: para o resto, o caminho é bio → QR → divulgar.
+  // O objetivo contado no "conhecer você" decide quais passos aparecem e em que ordem. O caminho padrão vai
+  // até a primeira reserva; quem só quer uma lista de links não vê a agenda.
   const ORDER: Record<string, string[]> = {
-    whatsapp: ["bio", "qr", "share"],
+    whatsapp: ["bio", "journey", "share", "qr"],
     links: ["bio", "share", "qr"],
-    autoreply: ["bot", "channel", "bio", "qr"],
+    autoreply: ["bio", "journey", "services", "booking", "share"],
     sources: ["qr", "bio", "share"],
   };
-  const order = ORDER[me?.workspace.profile.goal ?? ""] ?? ["bio", "qr", "share"];
+  const order = ORDER[me?.workspace.profile.goal ?? ""] ?? ["bio", "journey", "services", "booking", "share"];
   const steps = allSteps.filter((s) => order.includes(s.key)).sort((a, b) => order.indexOf(a.key) - order.indexOf(b.key));
   const pending = steps.filter((s) => !s.done).length;
   const next = steps.find((s) => !s.done);

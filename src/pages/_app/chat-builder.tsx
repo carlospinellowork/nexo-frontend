@@ -9,6 +9,7 @@ import { SettingsPanel } from "../../features/chatBuilder/components/SettingsPan
 import { WidgetPreview } from "../../features/chatBuilder/components/WidgetPreview";
 import { useChatBuilderStore } from "../../features/chatBuilder/store/chat-builder-store";
 import { Header } from "../../shared/components/layout/Header";
+import { ToolTabs } from "../../shared/components/layout/ToolTabs";
 import { Badge } from "../../shared/components/ui/Badge";
 import { Button } from "../../shared/components/ui/Button";
 import { ChatSelect } from "../../shared/components/ui/ChatSelect";
@@ -86,7 +87,7 @@ function ChatBuilderPage() {
     <div className="flex flex-col h-full">
       <Header
         title="Aparência"
-        subtitle="Como o assistente aparece no seu site"
+        tabs={<ToolTabs area="pages" />}
         badge={dirty ? <Badge tone="warning">Não salvo</Badge> : <Badge tone="success" icon={CheckCircle2}>Salvo</Badge>}
         actions={
           <div className="flex items-center gap-3">

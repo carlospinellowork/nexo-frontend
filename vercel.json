@@ -8,6 +8,8 @@
     { "source": "/q/:code", "destination": "https://nexo-api-zz4y.onrender.com/q/:code" },
     { "source": "/webhooks/:path*", "destination": "https://nexo-api-zz4y.onrender.com/webhooks/:path*" },
     { "source": "/nexo-chat.js", "destination": "https://nexo-api-zz4y.onrender.com/nexo-chat.js" },
+    { "source": "/p/:slug", "has": [{ "type": "header", "key": "user-agent", "value": "(?i).*(facebookexternalhit|facebot|whatsapp/|twitterbot|telegrambot|slackbot|linkedinbot|discordbot|skypeuripreview|pinterestbot|redditbot|embedly).*" }], "destination": "https://nexo-api-zz4y.onrender.com/preview/:slug" },
+    { "source": "/:slug", "has": [{ "type": "header", "key": "user-agent", "value": "(?i).*(facebookexternalhit|facebot|whatsapp/|twitterbot|telegrambot|slackbot|linkedinbot|discordbot|skypeuripreview|pinterestbot|redditbot|embedly).*" }], "destination": "https://nexo-api-zz4y.onrender.com/preview/:slug" },
     { "source": "/(.*)", "destination": "/index.html" }
   ]
 }
