@@ -309,7 +309,7 @@ export function DesktopAgenda({ agenda, date, onDate, onSetup }: { agenda: Agend
     <div className="grid min-h-0 flex-1 grid-cols-[minmax(0,1fr)_380px] gap-4 2xl:grid-cols-[minmax(0,1fr)_440px]">
       <div className="flex min-h-0 min-w-0 flex-col gap-3">
         <div className="flex items-center gap-2">
-          <h2 className="font-display text-[22px] font-bold tracking-tight text-text-primary first-letter:uppercase">{view === "month" ? monthLabel(month) : rangeLabel(from, days[6])}</h2>
+          <h2 className="min-w-0 truncate whitespace-nowrap font-display text-[19px] font-bold tracking-tight text-text-primary first-letter:uppercase 2xl:text-[22px]">{view === "month" ? monthLabel(month) : rangeLabel(from, days[6])}</h2>
           <div className="flex items-center rounded-xl border border-border-ui/70 bg-panel p-0.5">
             <button type="button" aria-label={view === "month" ? "Mês anterior" : "Semana anterior"} onClick={() => shift(-1)} className="flex h-8 w-8 items-center justify-center rounded-lg text-text-secondary hover:bg-panel-hover">
               <ChevronLeft size={18} />
