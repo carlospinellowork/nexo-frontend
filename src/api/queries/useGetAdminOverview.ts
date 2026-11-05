@@ -27,12 +27,23 @@ export interface AdminFeedback {
   user: { name: string | null; email: string };
 }
 
+export interface AdminError {
+  id: string;
+  source: "web" | "api";
+  message: string;
+  path: string;
+  stack: string | null;
+  count: number;
+  firstSeenAt: string;
+  lastSeenAt: string;
+}
+
 /** Painel de acompanhamento da fase de testes (só admin; os outros recebem 404). */
 export const useGetAdminOverview = (enabled: boolean) =>
   useQuery({
     queryKey: ["admin-overview"],
     queryFn: async () => {
-      const { data } = await api.get<{ accounts: AdminAccount[]; feedback: AdminFeedback[] }>("/admin/overview");
+      const { data } = await api.get<{ accounts: AdminAccount[]; feedback: AdminFeedback[]; errors: AdminError[] }>("/admin/overview");
       return data;
     },
     enabled,

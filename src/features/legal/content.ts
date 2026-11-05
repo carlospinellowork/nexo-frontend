@@ -74,7 +74,7 @@ export const PRIVACY: LegalSection[] = [
   {
     title: "Por quanto tempo guardamos",
     items: [
-      "Dados da conta e o conteúdo criado: enquanto a conta existir. Ao pedir a exclusão, apagamos em até 30 dias, salvo o que a lei obrigar a manter.",
+      "Dados da conta e o conteúdo criado: enquanto a conta existir. Ao excluir a conta, em Minha conta, ou pedir a exclusão, apagamos em até 30 dias, salvo o que a lei obrigar a manter.",
       "Leads e conversas: enquanto o negócio mantiver a conta, ou até ele apagá-los (o painel tem a exclusão de lead a pedido do titular).",
       "Código anônimo de cliques e leituras de QR: até um dia.",
     ],

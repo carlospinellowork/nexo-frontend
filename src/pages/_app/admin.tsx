@@ -1,9 +1,16 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { Check, Loader2, Minus, ShieldOff } from "../../shared/icons";
+import { useState } from "react";
+import { Check, Copy, KeyRound, Loader2, Minus, ShieldOff } from "../../shared/icons";
+import { apiErrorMessage } from "../../api/instance";
+import { useCreateResetLink } from "../../api/mutations/useCreateResetLink";
 import { useGetMe } from "../../api/queries/useGetMe";
 import { type AdminAccount, useGetAdminOverview } from "../../api/queries/useGetAdminOverview";
 import { Header } from "../../shared/components/layout/Header";
+import { Button } from "../../shared/components/ui/Button";
 import { EmptyState } from "../../shared/components/ui/EmptyState";
+import { Sheet } from "../../shared/components/ui/Sheet";
+import { inputClass } from "../../shared/components/ui/styles";
+import { toast } from "../../shared/components/ui/toast-store";
 
 export const Route = createFileRoute("/_app/admin")({
   component: AdminPage,
@@ -41,6 +48,53 @@ function Num({ label, value }: { label: string; value: number }) {
       <span className="font-display text-[17px] font-bold tabular-nums text-text-primary">{value}</span>
       <span className="text-[11.5px] text-text-secondary">{label}</span>
     </span>
+  );
+}
+
+/** Gera o link de redefinição para a conta e mostra para copiar: o Carlos manda pelo WhatsApp. */
+function ResetLinkButton({ email }: { email: string }) {
+  const create = useCreateResetLink();
+  const [link, setLink] = useState("");
+
+  const generate = () =>
+    create.mutate(email, {
+      onSuccess: setLink,
+      onError: (err) => toast.error(apiErrorMessage(err)),
+    });
+  const copy = async () => {
+    try {
+      await navigator.clipboard.writeText(link);
+      toast.success("Link copiado.");
+    } catch {
+      toast.error("Não foi possível copiar. Selecione o link e copie à mão.");
+    }
+  };
+
+  return (
+    <>
+      <Button variant="ghost" size="sm" icon={KeyRound} loading={create.isPending} onClick={generate} className="self-start md:self-center">
+        Link de senha
+      </Button>
+      <Sheet
+        open={Boolean(link)}
+        title="Link de redefinição de senha"
+        onClose={() => setLink("")}
+        footer={
+          <div className="flex justify-end">
+            <Button icon={Copy} onClick={copy}>
+              Copiar o link
+            </Button>
+          </div>
+        }
+      >
+        <div className="flex flex-col gap-3">
+          <p className="text-[14px] text-text-secondary">
+            Envie só para <strong className="font-semibold text-text-primary">{email}</strong>: quem abrir o link pode trocar a senha dessa conta. Ele vale por 1 hora e uma vez só.
+          </p>
+          <input className={inputClass} readOnly value={link} aria-label="Link de redefinição" onFocus={(e) => e.target.select()} />
+        </div>
+      </Sheet>
+    </>
   );
 }
 
@@ -112,7 +166,23 @@ function AdminPage() {
                     <Num label="leads" value={a.leads} />
                     <Num label="bots" value={a.bots} />
                   </div>
+                  <ResetLinkButton email={a.email} />
                 </article>
+              ))}
+            </section>
+
+            <section className="flex flex-col gap-2">
+              <h2 className="px-1 text-[16px] font-bold text-text-primary">Erros ({data?.errors.length ?? 0})</h2>
+              <p className="px-1 text-[12.5px] text-text-secondary">O mesmo erro é agrupado. Ficam aqui por 30 dias, sem dados de quem estava usando.</p>
+              {!data?.errors.length && <p className="px-1 text-[13.5px] text-text-secondary">Nenhum erro registrado.</p>}
+              {data?.errors.map((e) => (
+                <details key={e.id} className="rounded-2xl border border-border-ui/70 bg-panel p-3.5 shadow-card">
+                  <summary className="cursor-pointer text-[14px] font-semibold text-text-primary">{e.message}</summary>
+                  <p className="mt-1 text-[12.5px] text-text-secondary">
+                    {e.source === "api" ? "API" : "Painel"} em {e.path || "—"} · {e.count}x · último {ago(e.lastSeenAt)}
+                  </p>
+                  {e.stack && <pre className="mt-2 overflow-x-auto rounded-xl bg-panel-2 p-2.5 text-[12px] text-text-secondary">{e.stack}</pre>}
+                </details>
               ))}
             </section>
 

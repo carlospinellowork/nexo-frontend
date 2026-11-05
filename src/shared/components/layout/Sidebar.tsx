@@ -1,5 +1,5 @@
 import { Link, useNavigate, useRouterState } from "@tanstack/react-router";
-import { ChevronDown, Gauge, LogOut, SlidersHorizontal } from "../../icons";
+import { ChevronDown, Gauge, LogOut, SlidersHorizontal, UserRound } from "../../icons";
 import { AnimatePresence, motion } from "motion/react";
 import { useState } from "react";
 import { useGetMe } from "../../../api/queries/useGetMe";
@@ -219,6 +219,13 @@ export function Sidebar({
       )}
 
       <div className="mt-auto flex flex-col gap-2">
+        <Link
+          to="/conta"
+          onClick={onNavigate}
+          className="nx-anim flex h-11 w-full items-center gap-2.5 rounded-xl px-2.5 text-[14px] font-semibold text-text-primary hover:bg-panel-hover md:h-9"
+        >
+          <UserRound size={17} className="text-primary" /> Minha conta
+        </Link>
         <FeedbackButton />
         <PushMenuItem />
         <InstallMenuItem onDone={onNavigate} />

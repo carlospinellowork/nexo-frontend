@@ -19,6 +19,7 @@ import { Route as TermosRouteImport } from './pages/termos'
 import { Route as AppIndexRouteImport } from './pages/_app/index'
 import { Route as AppAdminRouteImport } from './pages/_app/admin'
 import { Route as AppChatBuilderRouteImport } from './pages/_app/chat-builder'
+import { Route as AppContaRouteImport } from './pages/_app/conta'
 import { Route as AppFlowBuilderRouteImport } from './pages/_app/flow-builder'
 import { Route as AppIntegrationsRouteImport } from './pages/_app/integrations'
 import { Route as AppLandingBuilderRouteImport } from './pages/_app/landing-builder'
@@ -77,6 +78,11 @@ const AppAdminRoute = AppAdminRouteImport.update({
 const AppChatBuilderRoute = AppChatBuilderRouteImport.update({
   id: '/chat-builder',
   path: '/chat-builder',
+  getParentRoute: () => AppLayoutRoute,
+} as any)
+const AppContaRoute = AppContaRouteImport.update({
+  id: '/conta',
+  path: '/conta',
   getParentRoute: () => AppLayoutRoute,
 } as any)
 const AppFlowBuilderRoute = AppFlowBuilderRouteImport.update({
@@ -140,6 +146,7 @@ export interface FileRoutesByFullPath {
   '/termos': typeof TermosRoute
   '/admin': typeof AppAdminRoute
   '/chat-builder': typeof AppChatBuilderRoute
+  '/conta': typeof AppContaRoute
   '/flow-builder': typeof AppFlowBuilderRoute
   '/integrations': typeof AppIntegrationsRoute
   '/landing-builder': typeof AppLandingBuilderRoute
@@ -160,6 +167,7 @@ export interface FileRoutesByTo {
   '/termos': typeof TermosRoute
   '/admin': typeof AppAdminRoute
   '/chat-builder': typeof AppChatBuilderRoute
+  '/conta': typeof AppContaRoute
   '/flow-builder': typeof AppFlowBuilderRoute
   '/integrations': typeof AppIntegrationsRoute
   '/landing-builder': typeof AppLandingBuilderRoute
@@ -183,6 +191,7 @@ export interface FileRoutesById {
   '/termos': typeof TermosRoute
   '/_app/admin': typeof AppAdminRoute
   '/_app/chat-builder': typeof AppChatBuilderRoute
+  '/_app/conta': typeof AppContaRoute
   '/_app/flow-builder': typeof AppFlowBuilderRoute
   '/_app/integrations': typeof AppIntegrationsRoute
   '/_app/landing-builder': typeof AppLandingBuilderRoute
@@ -207,6 +216,7 @@ export interface FileRouteTypes {
     | '/termos'
     | '/admin'
     | '/chat-builder'
+    | '/conta'
     | '/flow-builder'
     | '/integrations'
     | '/landing-builder'
@@ -227,6 +237,7 @@ export interface FileRouteTypes {
     | '/termos'
     | '/admin'
     | '/chat-builder'
+    | '/conta'
     | '/flow-builder'
     | '/integrations'
     | '/landing-builder'
@@ -249,6 +260,7 @@ export interface FileRouteTypes {
     | '/termos'
     | '/_app/admin'
     | '/_app/chat-builder'
+    | '/_app/conta'
     | '/_app/flow-builder'
     | '/_app/integrations'
     | '/_app/landing-builder'
@@ -345,6 +357,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppChatBuilderRouteImport
       parentRoute: typeof AppLayoutRoute
     }
+    '/_app/conta': {
+      id: '/_app/conta'
+      path: '/conta'
+      fullPath: '/conta'
+      preLoaderRoute: typeof AppContaRouteImport
+      parentRoute: typeof AppLayoutRoute
+    }
     '/_app/flow-builder': {
       id: '/_app/flow-builder'
       path: '/flow-builder'
@@ -421,6 +440,7 @@ declare module '@tanstack/react-router' {
 interface AppLayoutRouteChildren {
   AppAdminRoute: typeof AppAdminRoute
   AppChatBuilderRoute: typeof AppChatBuilderRoute
+  AppContaRoute: typeof AppContaRoute
   AppFlowBuilderRoute: typeof AppFlowBuilderRoute
   AppIntegrationsRoute: typeof AppIntegrationsRoute
   AppLandingBuilderRoute: typeof AppLandingBuilderRoute
@@ -436,6 +456,7 @@ interface AppLayoutRouteChildren {
 const AppLayoutRouteChildren: AppLayoutRouteChildren = {
   AppAdminRoute: AppAdminRoute,
   AppChatBuilderRoute: AppChatBuilderRoute,
+  AppContaRoute: AppContaRoute,
   AppFlowBuilderRoute: AppFlowBuilderRoute,
   AppIntegrationsRoute: AppIntegrationsRoute,
   AppLandingBuilderRoute: AppLandingBuilderRoute,
