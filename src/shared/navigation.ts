@@ -1,4 +1,4 @@
-import { ChartLine, GitGraph, Globe, House, Link2, type IconComponent, Paintbrush, Play, QrCode, Send, Users } from "./icons";
+import { Calendar, ChartLine, GitGraph, Globe, House, Link2, type IconComponent, Paintbrush, Play, QrCode, Send, Users } from "./icons";
 import type { Tone } from "./components/ui/tones";
 
 export interface NavItem {
@@ -29,6 +29,7 @@ export const NAV_GROUPS: NavGroup[] = [
   {
     label: "Acompanhar",
     items: [
+      { to: "/agenda", title: "Agenda", icon: Calendar, tone: "violet" },
       { to: "/leads", title: "Leads", icon: Users, tone: "green" },
       { to: "/results", title: "Resultados", icon: ChartLine, tone: "amber" },
     ],

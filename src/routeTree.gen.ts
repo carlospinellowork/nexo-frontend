@@ -18,6 +18,7 @@ import { Route as RedefinirSenhaRouteImport } from './pages/redefinir-senha'
 import { Route as TermosRouteImport } from './pages/termos'
 import { Route as AppIndexRouteImport } from './pages/_app/index'
 import { Route as AppAdminRouteImport } from './pages/_app/admin'
+import { Route as AppAgendaRouteImport } from './pages/_app/agenda'
 import { Route as AppChatBuilderRouteImport } from './pages/_app/chat-builder'
 import { Route as AppContaRouteImport } from './pages/_app/conta'
 import { Route as AppFlowBuilderRouteImport } from './pages/_app/flow-builder'
@@ -73,6 +74,11 @@ const AppIndexRoute = AppIndexRouteImport.update({
 const AppAdminRoute = AppAdminRouteImport.update({
   id: '/admin',
   path: '/admin',
+  getParentRoute: () => AppLayoutRoute,
+} as any)
+const AppAgendaRoute = AppAgendaRouteImport.update({
+  id: '/agenda',
+  path: '/agenda',
   getParentRoute: () => AppLayoutRoute,
 } as any)
 const AppChatBuilderRoute = AppChatBuilderRouteImport.update({
@@ -145,6 +151,7 @@ export interface FileRoutesByFullPath {
   '/redefinir-senha': typeof RedefinirSenhaRoute
   '/termos': typeof TermosRoute
   '/admin': typeof AppAdminRoute
+  '/agenda': typeof AppAgendaRoute
   '/chat-builder': typeof AppChatBuilderRoute
   '/conta': typeof AppContaRoute
   '/flow-builder': typeof AppFlowBuilderRoute
@@ -166,6 +173,7 @@ export interface FileRoutesByTo {
   '/redefinir-senha': typeof RedefinirSenhaRoute
   '/termos': typeof TermosRoute
   '/admin': typeof AppAdminRoute
+  '/agenda': typeof AppAgendaRoute
   '/chat-builder': typeof AppChatBuilderRoute
   '/conta': typeof AppContaRoute
   '/flow-builder': typeof AppFlowBuilderRoute
@@ -190,6 +198,7 @@ export interface FileRoutesById {
   '/redefinir-senha': typeof RedefinirSenhaRoute
   '/termos': typeof TermosRoute
   '/_app/admin': typeof AppAdminRoute
+  '/_app/agenda': typeof AppAgendaRoute
   '/_app/chat-builder': typeof AppChatBuilderRoute
   '/_app/conta': typeof AppContaRoute
   '/_app/flow-builder': typeof AppFlowBuilderRoute
@@ -215,6 +224,7 @@ export interface FileRouteTypes {
     | '/redefinir-senha'
     | '/termos'
     | '/admin'
+    | '/agenda'
     | '/chat-builder'
     | '/conta'
     | '/flow-builder'
@@ -236,6 +246,7 @@ export interface FileRouteTypes {
     | '/redefinir-senha'
     | '/termos'
     | '/admin'
+    | '/agenda'
     | '/chat-builder'
     | '/conta'
     | '/flow-builder'
@@ -259,6 +270,7 @@ export interface FileRouteTypes {
     | '/redefinir-senha'
     | '/termos'
     | '/_app/admin'
+    | '/_app/agenda'
     | '/_app/chat-builder'
     | '/_app/conta'
     | '/_app/flow-builder'
@@ -350,6 +362,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppAdminRouteImport
       parentRoute: typeof AppLayoutRoute
     }
+    '/_app/agenda': {
+      id: '/_app/agenda'
+      path: '/agenda'
+      fullPath: '/agenda'
+      preLoaderRoute: typeof AppAgendaRouteImport
+      parentRoute: typeof AppLayoutRoute
+    }
     '/_app/chat-builder': {
       id: '/_app/chat-builder'
       path: '/chat-builder'
@@ -439,6 +458,7 @@ declare module '@tanstack/react-router' {
 
 interface AppLayoutRouteChildren {
   AppAdminRoute: typeof AppAdminRoute
+  AppAgendaRoute: typeof AppAgendaRoute
   AppChatBuilderRoute: typeof AppChatBuilderRoute
   AppContaRoute: typeof AppContaRoute
   AppFlowBuilderRoute: typeof AppFlowBuilderRoute
@@ -455,6 +475,7 @@ interface AppLayoutRouteChildren {
 
 const AppLayoutRouteChildren: AppLayoutRouteChildren = {
   AppAdminRoute: AppAdminRoute,
+  AppAgendaRoute: AppAgendaRoute,
   AppChatBuilderRoute: AppChatBuilderRoute,
   AppContaRoute: AppContaRoute,
   AppFlowBuilderRoute: AppFlowBuilderRoute,

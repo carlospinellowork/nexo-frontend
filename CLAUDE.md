@@ -28,6 +28,7 @@ src/features/integrations/ definição dos canais (channels.ts) e ChannelCard
 src/features/landing/      contract.ts (tipos e limites), LandingRenderer, SectionEditor, ThemePicker, icons.ts
 src/features/bio/          Minha Bio; JourneyEditor (modelos e edição da jornada sem o editor de fluxo), JourneyGreetingGuide (saudação do WhatsApp Business)
 src/features/landing/journey/  bio em modo jornada: useJourney (estado), transports (rota pública ou simulador na prévia), JourneyView
+src/features/agenda/       tela Agenda (pages/_app/agenda.tsx): DayView (lista do dia, confirmar e cancelar), ServicesView, HoursView (horário, regras e bloqueios)
 src/features/tour/         tour guiado (driver.js) e HelpButton; títulos com ícone do `shared/icons`
 src/features/workspaces/   seletor e store (só o id ativo)
 src/shared/                layout, ui (PromptDialog, Toaster/toast, ChatSelect, EmptyState), hooks/useActiveChat
