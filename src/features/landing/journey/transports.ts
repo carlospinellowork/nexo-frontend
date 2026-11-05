@@ -20,11 +20,10 @@ function remembered(key: string, value?: string | null) {
   return null;
 }
 
-export function publicJourneyTransport(slug: string): JourneyTransport {
-  const key = `nexo-journey:${slug}`;
+function publicTransport(key: string, start: () => Promise<JourneyTurn>): JourneyTransport {
   return {
     start: async () => {
-      const turn = await publicCall<JourneyTurn>(`/public/landing-pages/${encodeURIComponent(slug)}/journey`, { method: "POST" });
+      const turn = await start();
       remembered(key, turn.sessionId);
       return turn;
     },
@@ -51,6 +50,12 @@ export function publicJourneyTransport(slug: string): JourneyTransport {
     },
   };
 }
+
+/** Bio que abre direto na jornada. */
+export const publicJourneyTransport = (slug: string) => publicTransport(`nexo-journey:${slug}`, () => publicCall<JourneyTurn>(`/public/landing-pages/${encodeURIComponent(slug)}/journey`, { method: "POST" }));
+
+/** Bio que abre nos links: a conversa começa quando a pessoa toca em falar com o assistente, na própria página. */
+export const publicChatTransport = (slug: string, chatId: string) => publicTransport(`nexo-chat:${slug}`, () => publicCall<JourneyTurn>("/sessions", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ chatId }) }));
 
 /** Prévia do editor: o motor real com o rascunho do fluxo, sem contar nos Resultados. */
 export function previewJourneyTransport(chatId: string): JourneyTransport {

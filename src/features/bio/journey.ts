@@ -11,6 +11,7 @@ export interface JourneyOption {
   description?: string;
   imageUrl?: string;
   icon?: string;
+  iconMotion?: string;
 }
 
 export interface JourneyStep {

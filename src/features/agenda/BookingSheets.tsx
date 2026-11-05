@@ -4,7 +4,9 @@ import { apiErrorMessage } from "../../api/instance";
 import { useCreateBooking, useRescheduleBooking } from "../../api/mutations/useAgendaMutations";
 import { Button } from "../../shared/components/ui/Button";
 import { Sheet } from "../../shared/components/ui/Sheet";
-import { inputClass, selectClass } from "../../shared/components/ui/styles";
+import { DatePicker, TimePicker } from "../../shared/components/ui/DatePicker";
+import { Select } from "../../shared/components/ui/Select";
+import { inputClass } from "../../shared/components/ui/styles";
 import { toast } from "../../shared/components/ui/toast-store";
 import { type AgendaData, type Booking, dayIn, durationLabel, money, timeIn } from "./types";
 
@@ -51,23 +53,16 @@ export function NewBookingSheet({ agenda, date, time, onClose }: { agenda: Agend
       <div className="flex flex-col gap-3">
         <label className={field}>
           Serviço
-          <select className={selectClass} value={serviceId} onChange={(e) => setServiceId(e.target.value)}>
-            {services.map((s) => (
-              <option key={s.id} value={s.id}>
-                {s.name} · {durationLabel(s.durationMinutes)}
-                {s.priceCents != null ? ` · ${money(s.priceCents)}` : ""}
-              </option>
-            ))}
-          </select>
+          <Select value={serviceId} onChange={setServiceId} options={services.map((sv) => ({ value: sv.id, label: sv.name, hint: [durationLabel(sv.durationMinutes), sv.priceCents != null ? money(sv.priceCents) : ""].filter(Boolean).join(" · ") }))} />
         </label>
         <div className="grid grid-cols-2 gap-2">
           <label className={field}>
             Dia
-            <input type="date" className={inputClass} value={day} onChange={(e) => e.target.value && setDay(e.target.value)} />
+            <DatePicker value={day} onChange={setDay} />
           </label>
           <label className={field}>
             Horário
-            <input type="time" className={inputClass} value={hour} onChange={(e) => e.target.value && setHour(e.target.value)} />
+            <TimePicker value={hour} onChange={setHour} />
           </label>
         </div>
         <label className={field}>
@@ -120,11 +115,11 @@ export function MoveBookingSheet({ booking, timeZone, onClose }: { booking: Book
       <div className="grid grid-cols-2 gap-2">
         <label className={field}>
           Dia
-          <input type="date" className={inputClass} value={day} onChange={(e) => e.target.value && setDay(e.target.value)} />
+          <DatePicker value={day} onChange={setDay} />
         </label>
         <label className={field}>
           Horário
-          <input type="time" className={inputClass} value={hour} onChange={(e) => e.target.value && setHour(e.target.value)} />
+          <TimePicker value={hour} onChange={setHour} />
         </label>
       </div>
     </Sheet>

@@ -1,6 +1,8 @@
 import { ArrowDown, ArrowUp, MousePointerClick, Plus, Star, Trash2, TriangleAlert } from "../../../shared/icons";
 import { type ReactNode, useId, useState } from "react";
-import { inputClass, selectClass, textareaClass } from "../../../shared/components/ui/styles";
+import { DateTimePicker } from "../../../shared/components/ui/DatePicker";
+import { Select } from "../../../shared/components/ui/Select";
+import { inputClass, textareaClass } from "../../../shared/components/ui/styles";
 import {
   type CtaData,
   type FaqItem,
@@ -18,7 +20,7 @@ import {
   type ServiceItem,
   type TestimonialItem,
 } from "../contract";
-import { landingIcon } from "../icons";
+import { ICON_LABELS, landingIcon } from "../icons";
 import { normalizePixKey } from "../pix";
 import { fromLocalInput, scheduleState, toLocalInput } from "../schedule";
 import { ImageField } from "../../uploads/ImageField";
@@ -130,44 +132,14 @@ function IconSelect({ value, onChange }: { value: LandingIcon; onChange: (icon: 
         <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-primary/10 text-primary">
           <Icon size={18} />
         </span>
-        <select id={id} className={`${selectClass} h-10 text-[14px]`} value={value} onChange={(e) => onChange(e.target.value as LandingIcon)}>
-          {LANDING_ICONS.map((name) => (
-            <option key={name} value={name}>
-              {ICON_LABELS[name]}
-            </option>
-          ))}
-        </select>
+        <div className="min-w-0 flex-1">
+          <Select id={id} className="h-10 w-full text-[14px]" value={value} onChange={onChange} options={LANDING_ICONS.map((name) => ({ value: name, label: ICON_LABELS[name] }))} />
+        </div>
       </div>
     </div>
   );
 }
 
-const ICON_LABELS: Record<LandingIcon, string> = {
-  Sparkles: "Brilho",
-  Zap: "Raio",
-  ShieldCheck: "Escudo",
-  Award: "Medalha",
-  Star: "Estrela",
-  CheckCircle2: "Confirmado",
-  Users: "Pessoas",
-  Phone: "Telefone",
-  Globe: "Mundo",
-  Heart: "Coração",
-  Clock: "Relógio",
-  Calendar: "Agenda",
-  MapPin: "Local",
-  Truck: "Entrega",
-  Wrench: "Ferramenta",
-  Stethoscope: "Saúde",
-  GraduationCap: "Educação",
-  Home: "Casa",
-  Briefcase: "Negócios",
-  Scissors: "Beleza",
-  Camera: "Foto",
-  Utensils: "Comida",
-  Car: "Carro",
-  Dumbbell: "Academia",
-};
 
 function SectionHeading<D extends { badge?: string; title: string; subtitle?: string }>({ data, set }: { data: D; set: (patch: Partial<D>) => void }) {
   return (
@@ -381,6 +353,16 @@ const LINK_KIND_LABELS: Record<LinkKind, string> = {
   link: "Outro link",
   pix: "Pix (QR Code)",
   youtube: "YouTube",
+  linkedin: "LinkedIn",
+  spotify: "Spotify",
+  facebook: "Facebook",
+  x: "X",
+  threads: "Threads",
+  pinterest: "Pinterest",
+  telegram: "Telegram",
+  github: "GitHub",
+  discord: "Discord",
+  behance: "Behance",
 };
 
 const LINK_HINTS: Partial<Record<LinkKind, string>> = {
@@ -428,11 +410,11 @@ function ScheduleFields({ item, update }: { item: { startsAt?: string; endsAt?: 
       <div className="grid grid-cols-1 gap-2 min-[420px]:grid-cols-2">
         <label htmlFor={startId} className="flex flex-col gap-1 text-[12px] text-text-secondary">
           A partir de
-          <input id={startId} type="datetime-local" className={`${inputClass} text-[14px]`} value={toLocalInput(item.startsAt)} onChange={(e) => update({ startsAt: fromLocalInput(e.target.value) })} />
+          <DateTimePicker id={startId} label="A partir de" value={toLocalInput(item.startsAt)} onChange={(v) => update({ startsAt: fromLocalInput(v) })} />
         </label>
         <label htmlFor={endId} className="flex flex-col gap-1 text-[12px] text-text-secondary">
           Até
-          <input id={endId} type="datetime-local" className={`${inputClass} text-[14px]`} value={toLocalInput(item.endsAt)} onChange={(e) => update({ endsAt: fromLocalInput(e.target.value) })} />
+          <DateTimePicker id={endId} label="Até" value={toLocalInput(item.endsAt)} onChange={(v) => update({ endsAt: fromLocalInput(v) })} />
         </label>
       </div>
       {item.startsAt && item.endsAt && Date.parse(item.endsAt) <= Date.parse(item.startsAt) && <span className="text-[12px] text-danger-strong">O fim precisa ser depois do início.</span>}
@@ -471,21 +453,13 @@ export function LinkFields({ item, update }: { item: LinkItem; update: (patch: P
         <label htmlFor={id} className="text-[13px] font-semibold text-text-secondary">
           Tipo
         </label>
-        <select
+        <Select
           id={id}
-          className={`${selectClass} text-[14px]`}
+          className="text-[14px]"
           value={item.kind}
-          onChange={(e) => {
-            const kind = e.target.value as LinkKind;
-            update({ kind, label: LINK_KIND_LABELS[kind], url: kind === "chat" || kind === "pix" ? undefined : kind === "whatsapp" ? "" : "https://" });
-          }}
-        >
-          {LINK_KINDS.map((k) => (
-            <option key={k} value={k}>
-              {LINK_KIND_LABELS[k]}
-            </option>
-          ))}
-        </select>
+          onChange={(kind) => update({ kind, label: LINK_KIND_LABELS[kind], url: kind === "chat" || kind === "pix" ? undefined : kind === "whatsapp" ? "" : "https://" })}
+          options={LINK_KINDS.map((k) => ({ value: k, label: LINK_KIND_LABELS[k] }))}
+        />
       </div>
       <Field label="Texto do botão" required value={item.label} max={MAX.linkLabel} onChange={(label) => update({ label })} />
       {item.kind === "whatsapp" && (

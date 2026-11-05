@@ -43,7 +43,8 @@ import { Button, IconButton } from "../../shared/components/ui/Button";
 import { EmptyState } from "../../shared/components/ui/EmptyState";
 import { PhoneFrame } from "../../shared/components/ui/PhoneFrame";
 import { Segmented } from "../../shared/components/ui/Segmented";
-import { inputClass, selectClass, textareaClass } from "../../shared/components/ui/styles";
+import { Select } from "../../shared/components/ui/Select";
+import { inputClass, textareaClass } from "../../shared/components/ui/styles";
 import { Switch } from "../../shared/components/ui/Switch";
 import { toast } from "../../shared/components/ui/toast-store";
 
@@ -443,14 +444,7 @@ function LandingBuilderPage() {
                 </div>
                 <label className="flex flex-col gap-1.5">
                   <span className="text-[13px] font-semibold text-text-secondary">Bot que atende na página</span>
-                  <select className={selectClass} value={draft.chatId ?? ""} onChange={(e) => change({ chatId: e.target.value || null })}>
-                    <option value="">Nenhum</option>
-                    {chats?.map((c) => (
-                      <option key={c.id} value={c.id}>
-                        {c.name}
-                      </option>
-                    ))}
-                  </select>
+                  <Select value={draft.chatId ?? ""} onChange={(v) => change({ chatId: v || null })} options={[{ value: "", label: "Nenhum" }, ...(chats ?? []).map((c) => ({ value: c.id, label: c.name }))]} />
                   <span className="text-[12px] text-text-secondary">Os botões de conversa abrem este bot. Ele usa o fluxo publicado.</span>
                 </label>
                 <div className="flex items-center justify-between gap-3 rounded-2xl bg-panel-2 p-3">

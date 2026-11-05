@@ -3,7 +3,9 @@ import { apiErrorMessage } from "../../api/instance";
 import { useCreateAgendaBlock, useDeleteAgendaBlock, useUpdateAgenda } from "../../api/mutations/useAgendaMutations";
 import { Button } from "../../shared/components/ui/Button";
 import { Sheet } from "../../shared/components/ui/Sheet";
-import { inputClass, selectClass } from "../../shared/components/ui/styles";
+import { DatePicker, TimePicker } from "../../shared/components/ui/DatePicker";
+import { Select } from "../../shared/components/ui/Select";
+import { inputClass } from "../../shared/components/ui/styles";
 import { Switch } from "../../shared/components/ui/Switch";
 import { toast } from "../../shared/components/ui/toast-store";
 import { Plus, Save, Trash2, X } from "../../shared/icons";
@@ -73,11 +75,11 @@ function BlockSheet({ today, onClose }: { today: string; onClose: () => void }) 
         <div className="grid grid-cols-2 gap-2">
           <label className="flex flex-col gap-1 text-[13px] font-semibold text-text-secondary">
             De
-            <input type="date" className={inputClass} min={today} value={from} onChange={(e) => setFrom(e.target.value)} />
+            <DatePicker min={today} value={from} onChange={setFrom} />
           </label>
           <label className="flex flex-col gap-1 text-[13px] font-semibold text-text-secondary">
             Até
-            <input type="date" className={inputClass} min={from} value={to < from ? from : to} onChange={(e) => setTo(e.target.value)} />
+            <DatePicker min={from} value={to < from ? from : to} onChange={setTo} />
           </label>
         </div>
         <label className="flex flex-col gap-1 text-[13px] font-semibold text-text-secondary">
@@ -131,9 +133,9 @@ export function HoursView({ agenda, canEdit }: { agenda: AgendaData; canEdit: bo
                 const change = (patch: Partial<WorkingInterval>) => edit(hours.map((h) => (h === interval ? { ...h, ...patch } : h)));
                 return (
                   <div key={`${day}-${i}`} className="flex items-center gap-1.5">
-                    <input type="time" aria-label={`${DAYS[day]}: início`} disabled={!canEdit} className={`${inputClass} min-w-0 flex-1`} value={interval.start} onChange={(e) => e.target.value && change({ start: e.target.value })} />
+                    <TimePicker label={`${DAYS[day]}: início`} disabled={!canEdit} className="flex-1" value={interval.start} onChange={(start) => change({ start })} />
                     <span className="text-[13px] text-text-secondary">até</span>
-                    <input type="time" aria-label={`${DAYS[day]}: fim`} disabled={!canEdit} className={`${inputClass} min-w-0 flex-1`} value={interval.end === "24:00" ? "23:59" : interval.end} onChange={(e) => e.target.value && change({ end: e.target.value })} />
+                    <TimePicker label={`${DAYS[day]}: fim`} disabled={!canEdit} className="flex-1" value={interval.end === "24:00" ? "23:59" : interval.end} onChange={(end) => change({ end })} />
                     {canEdit && intervals.length > 1 && (
                       <button type="button" aria-label="Remover este horário" onClick={() => edit(hours.filter((h) => h !== interval))} className="flex h-11 w-9 shrink-0 items-center justify-center rounded-lg text-text-secondary hover:bg-danger/12 hover:text-danger">
                         <X size={16} />
@@ -176,23 +178,11 @@ export function HoursView({ agenda, canEdit }: { agenda: AgendaData; canEdit: bo
         </div>
         <label className="flex flex-col gap-1 text-[13px] font-semibold text-text-secondary">
           Oferecer horários
-          <select className={selectClass} disabled={!canEdit} value={config.stepMinutes} onChange={(e) => void setRule({ stepMinutes: Number(e.target.value) })}>
-            {[...STEPS, ...(STEPS.some((s) => s.value === config.stepMinutes) ? [] : [{ value: config.stepMinutes, label: `A cada ${config.stepMinutes} minutos` }])].map((s) => (
-              <option key={s.value} value={s.value}>
-                {s.label}
-              </option>
-            ))}
-          </select>
+          <Select disabled={!canEdit} value={config.stepMinutes} onChange={(stepMinutes) => void setRule({ stepMinutes })} options={[...STEPS, ...(STEPS.some((s) => s.value === config.stepMinutes) ? [] : [{ value: config.stepMinutes, label: `A cada ${config.stepMinutes} minutos` }])]} />
         </label>
         <label className="flex flex-col gap-1 text-[13px] font-semibold text-text-secondary">
           Reservar com antecedência de
-          <select className={selectClass} disabled={!canEdit} value={config.minNoticeMinutes} onChange={(e) => void setRule({ minNoticeMinutes: Number(e.target.value) })}>
-            {[...NOTICES, ...(NOTICES.some((n) => n.value === config.minNoticeMinutes) ? [] : [{ value: config.minNoticeMinutes, label: `${config.minNoticeMinutes} minutos antes` }])].map((n) => (
-              <option key={n.value} value={n.value}>
-                {n.label}
-              </option>
-            ))}
-          </select>
+          <Select disabled={!canEdit} value={config.minNoticeMinutes} onChange={(minNoticeMinutes) => void setRule({ minNoticeMinutes })} options={[...NOTICES, ...(NOTICES.some((n) => n.value === config.minNoticeMinutes) ? [] : [{ value: config.minNoticeMinutes, label: `${config.minNoticeMinutes} minutos antes` }])]} />
         </label>
       </section>
 

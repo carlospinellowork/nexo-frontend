@@ -3,6 +3,7 @@ import { type FormEvent, Fragment, useEffect, useRef, useState } from "react";
 import type { OutboundMessage } from "../../../api/mutations/useSimulator";
 import { ArrowRight, Check, RefreshCw, Send, WhatsApp } from "../../../shared/icons";
 import { imageSrc, isImageUrl } from "../../uploads/image";
+import { AnimatedIcon } from "../AnimatedIcon";
 import { landingIcon } from "../icons";
 import type { Palette } from "../look/resolve";
 import type { Journey, JourneyEntry } from "./useJourney";
@@ -32,12 +33,12 @@ function Headline({ text, reduce }: { text: string; reduce: boolean | null }) {
 }
 
 /** Ícone numa peça com a cor da marca do cliente. Sem foto, ainda é um cartão bonito. */
-function IconTile({ name, t, large }: { name?: string; t: Palette; large?: boolean }) {
+function IconTile({ name, iconMotion, t, large }: { name?: string; iconMotion?: string; t: Palette; large?: boolean }) {
   const Icon = landingIcon(name ?? "Sparkles");
   return (
     <span className={`relative flex shrink-0 items-center justify-center overflow-hidden rounded-2xl ${large ? "h-14 w-14" : "h-12 w-12"} ${t.primary}`}>
       <motion.span whileHover={{ rotate: [0, -10, 10, 0], scale: 1.12 }} transition={{ duration: 0.45 }} className="flex">
-        <Icon size={large ? 26 : 22} />
+        <AnimatedIcon icon={Icon} motion={iconMotion} size={large ? 26 : 22} />
       </motion.span>
     </span>
   );
@@ -63,7 +64,7 @@ function ServiceCard({ option, t, chosen, dimmed, disabled, onPick, index, reduc
         </span>
       )}
       <span className="flex items-center gap-3 p-3">
-        {!photo && <IconTile name={option.icon} t={t} />}
+        {!photo && <IconTile name={option.icon} iconMotion={option.iconMotion} t={t} />}
         <span className="flex min-w-0 flex-1 flex-col gap-0.5">
           <span className="text-[16px] font-bold leading-snug">{option.label}</span>
           {option.description && <span className={`text-[13.5px] leading-snug ${t.muted}`}>{option.description}</span>}

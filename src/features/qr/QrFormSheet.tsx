@@ -10,7 +10,8 @@ import { useGetLandingPages } from "../../api/queries/useGetLandingPages";
 import { Button } from "../../shared/components/ui/Button";
 import { Segmented } from "../../shared/components/ui/Segmented";
 import { Sheet } from "../../shared/components/ui/Sheet";
-import { inputClass, selectClass, textareaClass } from "../../shared/components/ui/styles";
+import { Select } from "../../shared/components/ui/Select";
+import { inputClass, textareaClass } from "../../shared/components/ui/styles";
 import { Switch } from "../../shared/components/ui/Switch";
 import { toast } from "../../shared/components/ui/toast-store";
 import { TONES } from "../../shared/components/ui/tones";
@@ -537,13 +538,7 @@ function PageField({ kind, value, onChange, error }: { kind: "bio" | "page"; val
       {options.length > 1 || kind === "page" ? (
         <Field label={kind === "bio" ? "Qual bio" : "Qual página"} error={error}>
           {(id) => (
-            <select id={id} value={value} onChange={(e) => onChange(e.target.value)} className={selectClass}>
-              {options.map((p) => (
-                <option key={p.id} value={p.id}>
-                  {p.title}
-                </option>
-              ))}
-            </select>
+            <Select id={id} value={value} onChange={onChange} options={options.map((p) => ({ value: p.id, label: p.title }))} />
           )}
         </Field>
       ) : (

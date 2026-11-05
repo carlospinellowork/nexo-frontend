@@ -49,8 +49,17 @@ export function recognizeLink(raw: string): LinkItem | null {
   }
   if (isHost(host, "instagram.com")) return make("instagram", "Instagram");
   if (isHost(host, "tiktok.com")) return make("tiktok", "TikTok");
+  if (isHost(host, "linkedin.com")) return make("linkedin", "LinkedIn");
+  if (isHost(host, "facebook.com") || isHost(host, "fb.com")) return make("facebook", "Facebook");
+  if (isHost(host, "x.com") || isHost(host, "twitter.com")) return make("x", "X");
+  if (isHost(host, "threads.net")) return make("threads", "Threads");
+  if (isHost(host, "pinterest.com")) return make("pinterest", "Pinterest");
+  if (isHost(host, "t.me")) return make("telegram", "Telegram");
+  if (isHost(host, "github.com")) return make("github", "GitHub");
+  if (isHost(host, "discord.gg") || isHost(host, "discord.com")) return make("discord", "Discord");
+  if (isHost(host, "behance.net")) return make("behance", "Behance");
   // Plataformas de música (kit Artista): o botão já diz onde ouvir.
-  if (isHost(host, "spotify.com") || isHost(host, "spotify.link")) return make("link", "Ouça no Spotify");
+  if (isHost(host, "spotify.com") || isHost(host, "spotify.link")) return make("spotify", "Spotify");
   if (isHost(host, "music.youtube.com")) return make("youtube", "Ouça no YouTube Music");
   if (isHost(host, "deezer.com") || isHost(host, "deezer.page.link")) return make("link", "Ouça no Deezer");
   if (isHost(host, "music.apple.com")) return make("link", "Ouça no Apple Music");

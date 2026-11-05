@@ -27,6 +27,7 @@ src/features/chatBuilder/  aparência do widget e código de instalação
 src/features/integrations/ definição dos canais (channels.ts) e ChannelCard
 src/features/landing/      contract.ts (tipos e limites), LandingRenderer, SectionEditor, ThemePicker, icons.ts
 src/features/bio/          Minha Bio; JourneyEditor (modelos e edição da jornada sem o editor de fluxo), JourneyGreetingGuide (saudação do WhatsApp Business)
+src/features/landing/AnimatedIcon.tsx + iconMotion.ts  ícone fixo ou animado, escolhido pelo dono (components/IconPicker). BioSplash = entrada com a logo. Redes sociais (SOCIAL_KINDS no contract) viram ícones no perfil
 src/features/landing/journey/  bio em modo jornada: useJourney (estado), transports (rota pública ou simulador na prévia), JourneyView (experiência em etapas, não chat: cartões, dias, horários e tela de sucesso; `display` da mensagem do motor escolhe o desenho)
 src/features/agenda/       tela Agenda (pages/_app/agenda.tsx). Computador: DesktopAgenda (mês com as pessoas em cada dia, ou semana em grade). Celular: MobileAgenda (faixa da semana). Nos dois, DayPanel: as pessoas do dia, horários livres, lembrar, confirmar e cancelar. ServicesView, HoursView
 src/pages/reserva.$token.tsx  página da reserva para o cliente, sem login, pelo link que ele recebe ao reservar: adicionar à agenda e cancelar
@@ -48,6 +49,7 @@ src/features/auth/         AuthShell (moldura das telas de acesso), IconInput, L
 
 ## Regras
 
+- **Nada de `<select>` nem de campo de data ou hora do navegador** (pedido do Carlos, 06/11/2026): use `Select`, `DatePicker`, `TimePicker` e `DateTimePicker` (`shared/components/ui`), no tema do Nexo, por cima dos modais e com teclado.
 - **Toda tela nova nasce com layout de celular e de computador** (regra do Carlos, 05/11/2026). Coluna estreita centralizada no
   computador não conta: use a largura com colunas, grades, calendários e animação. Olhe as duas larguras antes de terminar.
 - **O servidor é a fonte da verdade.** O Zustand guarda só preferências (workspace e chat

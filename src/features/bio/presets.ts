@@ -85,9 +85,6 @@ export const AUDIENCE_PRESETS: Record<BioAudience, AudiencePreset> = {
 /** Opções do botão "+ Adicionar" do editor da bio. */
 export const NEW_ITEM_OPTIONS = [
   { key: "whatsapp", label: "WhatsApp", hint: "Com mensagem pronta" },
-  { key: "instagram", label: "Instagram", hint: "Seu perfil" },
-  { key: "tiktok", label: "TikTok", hint: "Seu perfil" },
-  { key: "youtube", label: "YouTube", hint: "Seu canal" },
   { key: "site", label: "Site ou outro link", hint: "Qualquer endereço https" },
   { key: "pix", label: "Pix", hint: "QR Code e copia e cola" },
   { key: "product", label: "Produto", hint: "Com botões de compra" },

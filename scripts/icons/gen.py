@@ -11,6 +11,7 @@ MingCute no MAP abaixo (veja os nomes em https://www.mingcute.com) e rode de nov
 import json, re, glob, sys
 D = json.load(open(sys.argv[1]))['icons']
 MAP = {
+ 'Linkedin':'linkedin','Threads':'threads','Pinterest':'pinterest','Github':'github','Discord':'discord','Behance':'behance',
  'AlignLeft':'align-left','AlignRight':'align-right','ArrowDown':'arrow-down','ArrowDownRight':'arrow-right-down','ArrowLeft':'arrow-left',
  'ArrowRight':'arrow-right','ArrowUp':'arrow-up','ArrowUpRight':'arrow-right-up','AtSign':'at','Award':'award','BatteryFull':'battery',
  'Bell':'notification','BellOff':'notification-off','BellRing':'bell-ringing','BookOpen':'book-2','Bot':'robot','Briefcase':'briefcase',
@@ -28,7 +29,7 @@ MAP = {
  'PanelsTopLeft':'layout-left','PartyPopper':'celebrate','Pencil':'edit-2','Phone':'phone','Play':'play','Plug':'plugin','Plus':'add',
  'Printer':'print','QrCode':'qrcode','Redo2':'forward-2','RefreshCw':'refresh-2','Repeat2':'repeat','Rocket':'rocket','RotateCcw':'anticlockwise',
  'Route':'route','Save':'save-2','ScanLine':'scan','Scissors':'scissors','Search':'search','Send':'send-plane','Settings2':'settings-3',
- 'Share':'share-forward','Share2':'share-2','ShieldAlert':'safe-alert','ShieldCheck':'safe-shield','ShieldOff':'forbid-circle','ShoppingBag':'shopping-bag-1',
+ 'Share':'share-forward','Share2':'share-2','ShieldAlert':'safe-alert','ShieldCheck':'safe-shield-2','ShieldOff':'forbid-circle','ShoppingBag':'shopping-bag-1',
  'ShoppingCart':'shopping-cart-1','Shuffle':'shuffle','Signal':'signal','SlidersHorizontal':'settings-6','Smartphone':'cellphone','Sparkles':'sparkles',
  'Square':'square','SquareDot':'dot-grid','Star':'star','Stethoscope':'stethoscope','Store':'store','Sun':'sun','Trash2':'delete-2',
  'TriangleAlert':'warning','Truck':'truck','Undo2':'back-2','Unplug':'unlink','Upload':'upload-2','User':'user-3','UserPlus':'user-add',

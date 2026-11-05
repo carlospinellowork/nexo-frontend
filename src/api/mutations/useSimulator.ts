@@ -6,7 +6,7 @@ export type OutboundMessage =
   | { type: "text"; text: string }
   | { type: "image"; url: string; caption?: string }
   /** `display` e os extras da opção desenham a bio; o simulador e os canais usam só o rótulo. */
-  | { type: "buttons"; text: string; options: { id: string; label: string; description?: string; imageUrl?: string; icon?: string; note?: string }[]; display?: "cards" | "dates" | "times" }
+  | { type: "buttons"; text: string; options: { id: string; label: string; description?: string; imageUrl?: string; icon?: string; iconMotion?: string; note?: string }[]; display?: "cards" | "dates" | "times" }
   | { type: "link"; text: string; label: string; url: string };
 
 export type SessionStatus = "WAITING" | "COMPLETED" | "ERROR" | "HANDOFF";

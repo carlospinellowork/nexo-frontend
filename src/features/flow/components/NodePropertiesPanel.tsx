@@ -3,7 +3,9 @@ import { ArrowDown, ArrowUp, Plus, Trash2, TriangleAlert, X } from "../../../sha
 import { motion } from "motion/react";
 import type { ReactNode } from "react";
 import { useGetAiStatus } from "../../../api/queries/useGetAiStatus";
-import { inputClass, selectClass, textareaClass } from "../../../shared/components/ui/styles";
+import { TimePicker } from "../../../shared/components/ui/DatePicker";
+import { Select } from "../../../shared/components/ui/Select";
+import { inputClass, textareaClass } from "../../../shared/components/ui/styles";
 import { BLOCKS } from "../catalog";
 import {
   type ChoiceOption,
@@ -229,13 +231,7 @@ function QuestionFields({ data, set }: { data: NodeDataMap["question"]; set: Set
         <input className={`${inputClass} font-mono`} value={data.variable ?? ""} onChange={(e) => set({ variable: e.target.value.trim() })} placeholder="nome" />
       </Field>
       <Field label="Tipo de resposta esperada">
-        <select className={selectClass} value={data.validation ?? "none"} onChange={(e) => set({ validation: e.target.value as QuestionValidation })}>
-          {Object.entries(QUESTION_VALIDATIONS).map(([value, label]) => (
-            <option key={value} value={value}>
-              {label}
-            </option>
-          ))}
-        </select>
+        <Select value={data.validation ?? "none"} onChange={(validation) => set({ validation })} options={(Object.entries(QUESTION_VALIDATIONS) as [QuestionValidation, string][]).map(([value, label]) => ({ value, label }))} />
       </Field>
       {data.validation && data.validation !== "none" && (
         <Field label="Mensagem se a resposta for inválida" hint="Opcional. Há uma mensagem padrão.">
@@ -297,22 +293,10 @@ function ConditionFields({ data, set, variables }: { data: NodeDataMap["conditio
   return (
     <>
       <Field label="Verificar">
-        <select className={`${selectClass} font-mono`} value={data.variable || "last_input"} onChange={(e) => set({ variable: e.target.value })}>
-          {options.map((v) => (
-            <option key={v} value={v}>
-              {v === "last_input" ? "Última mensagem do cliente" : v === "last_choice" ? "Último botão escolhido" : `{{${v}}}`}
-            </option>
-          ))}
-        </select>
+        <Select className="font-mono" value={data.variable || "last_input"} onChange={(variable) => set({ variable })} options={options.map((v) => ({ value: v, label: v === "last_input" ? "Última mensagem do cliente" : v === "last_choice" ? "Último botão escolhido" : `{{${v}}}` }))} />
       </Field>
       <Field label="Regra">
-        <select className={selectClass} value={data.operator ?? "equals"} onChange={(e) => set({ operator: e.target.value as ConditionOperator })}>
-          {Object.entries(CONDITION_OPERATORS).map(([value, label]) => (
-            <option key={value} value={value}>
-              {label}
-            </option>
-          ))}
-        </select>
+        <Select value={data.operator ?? "equals"} onChange={(operator) => set({ operator })} options={(Object.entries(CONDITION_OPERATORS) as [ConditionOperator, string][]).map(([value, label]) => ({ value, label }))} />
       </Field>
       {!OPERATORS_WITHOUT_VALUE.includes(data.operator) && (
         <Field label="Valor" hint="Separe alternativas por vírgula: sim, s, quero. Maiúsculas e acentos são ignorados.">
@@ -345,20 +329,24 @@ function HoursFields({ data, set }: { data: NodeDataMap["hours"]; set: SetData }
       </div>
       <div className="grid grid-cols-2 gap-3">
         <Field label="Abre às">
-          <input type="time" className={inputClass} value={data.start} onChange={(e) => set({ start: e.target.value })} />
+          <TimePicker value={data.start} onChange={(start) => set({ start })} />
         </Field>
         <Field label="Fecha às">
-          <input type="time" className={inputClass} value={data.end} onChange={(e) => set({ end: e.target.value })} />
+          <TimePicker value={data.end} onChange={(end) => set({ end })} />
         </Field>
       </div>
       <Field label="Fuso horário">
-        <select className={selectClass} value={data.timezone} onChange={(e) => set({ timezone: e.target.value })}>
-          <option value="America/Sao_Paulo">Brasília (São Paulo, Rio, Sul, Nordeste)</option>
-          <option value="America/Manaus">Amazonas (Manaus)</option>
-          <option value="America/Cuiaba">Mato Grosso (Cuiabá)</option>
-          <option value="America/Rio_Branco">Acre (Rio Branco)</option>
-          <option value="America/Noronha">Fernando de Noronha</option>
-        </select>
+        <Select
+          value={data.timezone}
+          onChange={(timezone) => set({ timezone })}
+          options={[
+            { value: "America/Sao_Paulo", label: "Brasília (São Paulo, Rio, Sul, Nordeste)" },
+            { value: "America/Manaus", label: "Amazonas (Manaus)" },
+            { value: "America/Cuiaba", label: "Mato Grosso (Cuiabá)" },
+            { value: "America/Rio_Branco", label: "Acre (Rio Branco)" },
+            { value: "America/Noronha", label: "Fernando de Noronha" },
+          ]}
+        />
       </Field>
       <Note>Saída “Aberto” no horário de atendimento e “Fechado” fora dele.</Note>
     </>
@@ -395,13 +383,7 @@ function IntentFields({ nodeId, data, set, variables }: { nodeId: string; data: 
     <>
       {ai && !ai.configured && <Note tone="warning">A IA ainda não está ligada neste servidor. Sem ela, este bloco sempre segue pela saída “Outro”.</Note>}
       <Field label="Analisar">
-        <select className={`${selectClass} font-mono`} value={data.variable || "last_input"} onChange={(e) => set({ variable: e.target.value })}>
-          {options.map((v) => (
-            <option key={v} value={v}>
-              {v === "last_input" ? "Última mensagem do cliente" : `{{${v}}}`}
-            </option>
-          ))}
-        </select>
+        <Select className="font-mono" value={data.variable || "last_input"} onChange={(variable) => set({ variable })} options={options.map((v) => ({ value: v, label: v === "last_input" ? "Última mensagem do cliente" : `{{${v}}}` }))} />
       </Field>
       <div className="flex flex-col gap-1.5">
         <span className="text-[13px] font-semibold text-text-secondary">Intenções</span>
@@ -470,11 +452,7 @@ function ActionFields({ data, set }: { data: NodeDataMap["action"]; set: SetData
         <input className={`${inputClass} font-mono text-[13px]`} value={data.url ?? ""} onChange={(e) => set({ url: e.target.value })} placeholder="https://" />
       </Field>
       <Field label="Método">
-        <select className={selectClass} value={data.method ?? "GET"} onChange={(e) => set({ method: e.target.value })}>
-          <option value="GET">GET</option>
-          <option value="POST">POST</option>
-          <option value="PUT">PUT</option>
-        </select>
+        <Select value={data.method ?? "GET"} onChange={(method) => set({ method })} options={[{ value: "GET", label: "GET" }, { value: "POST", label: "POST" }, { value: "PUT", label: "PUT" }]} />
       </Field>
       {data.method !== "GET" && (
         <Field label="Corpo (JSON)" hint="Ex.: {&quot;nome&quot;: &quot;{{nome}}&quot;}">

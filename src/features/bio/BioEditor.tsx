@@ -1,4 +1,4 @@
-import { ArrowDown, ArrowUp, Bot, CheckCircle2, ExternalLink, Globe, GripVertical, type IconComponent, Instagram, Link2, MessageCircle, Music2, Pencil, Plus, QrCode, Rocket, Save, ChevronDown, Paintbrush, ShoppingBag, Smartphone, Star, Trash2, UserRound, WhatsApp, X, Youtube } from "../../shared/icons";
+import { ArrowDown, ArrowUp, Behance, Bot, CheckCircle2, Discord, ExternalLink, Facebook, Github, Globe, Linkedin, Pinterest, Spotify, Telegram, Threads, XSocial, GripVertical, type IconComponent, Instagram, Link2, MessageCircle, Music2, Pencil, Plus, QrCode, Rocket, Save, ChevronDown, Paintbrush, ShoppingBag, Smartphone, Star, Trash2, UserRound, WhatsApp, X, Youtube } from "../../shared/icons";
 import { Reorder, useDragControls } from "motion/react";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { apiErrorMessage } from "../../api/instance";
@@ -17,7 +17,7 @@ import { ThemePicker } from "../landing/components/ThemePicker";
 import { previewJourneyTransport } from "../landing/journey/transports";
 import { useJourney } from "../landing/journey/useJourney";
 import { PhotoTheme } from "../landing/look/PhotoTheme";
-import { type LandingPageRecord, type LandingPageSettings, type LandingSection, type LandingTheme, type LinkItem, type LinkKind, MAX, type ProductItem, themeBg, themeIsDark } from "../landing/contract";
+import { isSocialKind, type LandingPageRecord, type LandingPageSettings, type LandingSection, type LandingTheme, type LinkItem, type LinkKind, MAX, type ProductItem, SOCIAL_KINDS, themeBg, themeIsDark } from "../landing/contract";
 import { BioBotTab } from "./BioBotTab";
 import { BioSheet } from "./BioSheet";
 import { BioShare } from "./BioShare";
@@ -36,7 +36,7 @@ interface Draft {
 const toDraft = (p: LandingPageRecord): Draft => ({ title: p.title, theme: p.theme, sections: p.sections, settings: p.settings });
 const newId = (prefix: string) => `${prefix}-${crypto.randomUUID().slice(0, 6)}`;
 
-const KIND_ICONS: Record<LinkKind, IconComponent> = { chat: MessageCircle, whatsapp: WhatsApp, instagram: Instagram, tiktok: Music2, google: Star, site: Globe, link: Link2, pix: QrCode, youtube: Youtube };
+const KIND_ICONS: Record<LinkKind, IconComponent> = { chat: MessageCircle, whatsapp: WhatsApp, instagram: Instagram, tiktok: Music2, google: Star, site: Globe, link: Link2, pix: QrCode, youtube: Youtube, linkedin: Linkedin, spotify: Spotify, facebook: Facebook, x: XSocial, threads: Threads, pinterest: Pinterest, telegram: Telegram, github: Github, discord: Discord, behance: Behance };
 
 type ClickMap = Record<string, { last7: number; last30: number }>;
 
@@ -146,6 +146,7 @@ export function BioEditor({ page, openInstagram = false }: { page: LandingPageRe
   const [pane, setPane] = useState<"edit" | "preview">("edit");
   const [selection, setSelection] = useState<Selection>(null);
   const [adding, setAdding] = useState(false);
+  const [addingSocial, setAddingSocial] = useState(false);
   const previewChatId = draft.settings.journeyFirst ? page.chatId : null;
   const previewTransport = useMemo(() => (previewChatId ? previewJourneyTransport(previewChatId) : null), [previewChatId]);
   const previewJourney = useJourney(previewTransport);
@@ -178,6 +179,8 @@ export function BioEditor({ page, openInstagram = false }: { page: LandingPageRe
   const productsSection = draft.sections.find((s): s is Extract<LandingSection, { type: "products" }> => s.type === "products");
   const links = linksSection?.data.items ?? [];
   const products = productsSection?.data.items ?? [];
+  const socials = links.filter((l) => isSocialKind(l.kind));
+  const plainLinks = links.filter((l) => !isSocialKind(l.kind));
 
   const setLinks = (items: LinkItem[]) => setSections((all) => all.map((s) => (s.type === "links" ? { ...s, data: { ...s.data, items } } : s)));
   const setProducts = (items: ProductItem[]) => setSections((all) => all.map((s) => (s.type === "products" ? { ...s, data: { ...s.data, items } } : s)));
@@ -213,6 +216,13 @@ export function BioEditor({ page, openInstagram = false }: { page: LandingPageRe
     }
   };
 
+  const addSocial = (kind: LinkKind, label: string, url: string) => {
+    setAddingSocial(false);
+    const item: LinkItem = { id: newId("lnk"), kind, label, url };
+    setLinks([...links, item]);
+    setSelection({ type: "link", id: item.id });
+  };
+
   const addItem = (key: NewItemKey) => {
     setAdding(false);
     if (key === "product") {
@@ -231,9 +241,6 @@ export function BioEditor({ page, openInstagram = false }: { page: LandingPageRe
     }
     const base: Record<Exclude<NewItemKey, "product">, Omit<LinkItem, "id">> = {
       whatsapp: { kind: "whatsapp", label: "Falar no WhatsApp", url: "", message: "Oi! Vim pela sua bio e queria conversar." },
-      instagram: { kind: "instagram", label: "Instagram", url: "https://instagram.com/" },
-      tiktok: { kind: "tiktok", label: "TikTok", url: "https://tiktok.com/@" },
-      youtube: { kind: "youtube", label: "YouTube", url: "https://youtube.com/@" },
       site: { kind: "site", label: "Meu site", url: "https://" },
       pix: { kind: "pix", label: "Pagar com Pix", pixKey: "", pixName: "", pixCity: "" },
     };
@@ -321,9 +328,32 @@ export function BioEditor({ page, openInstagram = false }: { page: LandingPageRe
                 </button>
 
                 <div className="flex flex-col gap-2">
+                  <span className="text-[13px] font-semibold text-text-secondary">Redes sociais</span>
+                  <p className="text-[12.5px] leading-snug text-text-secondary">Aparecem animadas abaixo da descrição, no perfil.</p>
+                  <div className="flex flex-wrap gap-1.5">
+                    {socials.map((l) => {
+                      const Icon = KIND_ICONS[l.kind] ?? Link2;
+                      return (
+                        <span key={l.id} className={`inline-flex items-center rounded-full border bg-panel ${selection?.type === "link" && selection.id === l.id ? "border-primary ring-2 ring-primary/20" : "border-border-ui"}`}>
+                          <button type="button" aria-label={`Editar ${l.label}`} onClick={() => setSelection({ type: "link", id: l.id })} className="flex min-h-11 items-center gap-1.5 rounded-l-full pl-3 pr-1 text-[13.5px] font-semibold text-text-primary">
+                            <Icon size={16} className="text-primary" /> {l.label}
+                          </button>
+                          <button type="button" aria-label={`Remover ${l.label}`} onClick={() => setLinks(links.filter((x) => x.id !== l.id))} className="flex h-11 w-9 items-center justify-center rounded-r-full text-text-secondary hover:text-danger">
+                            <X size={14} />
+                          </button>
+                        </span>
+                      );
+                    })}
+                    <button type="button" onClick={() => setAddingSocial(true)} disabled={links.length >= MAX.links} className="inline-flex min-h-11 items-center gap-1.5 rounded-full border border-dashed border-border-ui px-3 text-[13.5px] font-semibold text-primary-strong disabled:opacity-40">
+                      <Plus size={14} /> Adicionar rede
+                    </button>
+                  </div>
+                </div>
+
+                <div className="flex flex-col gap-2">
                   <span className="text-[13px] font-semibold text-text-secondary">Links</span>
-                  <Reorder.Group axis="y" values={links} onReorder={setLinks} className="flex flex-col gap-2">
-                    {links.map((l, i) => (
+                  <Reorder.Group axis="y" values={plainLinks} onReorder={(items) => setLinks([...items, ...socials])} className="flex flex-col gap-2">
+                    {plainLinks.map((l, i) => (
                       <ItemRow
                         key={l.id}
                         id={l.id}
@@ -335,9 +365,9 @@ export function BioEditor({ page, openInstagram = false }: { page: LandingPageRe
                         stats={clicks[l.id]}
                         selected={selection?.type === "link" && selection.id === l.id}
                         first={i === 0}
-                        last={i === links.length - 1}
+                        last={i === plainLinks.length - 1}
                         onOpen={() => setSelection({ type: "link", id: l.id })}
-                        onMove={(dir) => setLinks(moveItem(links, i, dir))}
+                        onMove={(dir) => setLinks([...moveItem(plainLinks, i, dir), ...socials])}
                       />
                     ))}
                   </Reorder.Group>
@@ -440,6 +470,21 @@ export function BioEditor({ page, openInstagram = false }: { page: LandingPageRe
                 <span className="text-[13px] text-text-secondary">{o.hint}</span>
               </button>
             ))}
+          </div>
+        </BioSheet>
+      )}
+
+      {addingSocial && (
+        <BioSheet title="Qual rede?" onClose={() => setAddingSocial(false)}>
+          <div className="grid grid-cols-2 gap-2">
+            {SOCIAL_KINDS.filter((n) => !socials.some((l) => l.kind === n.kind)).map((n) => {
+              const Icon = KIND_ICONS[n.kind] ?? Link2;
+              return (
+                <button key={n.kind} type="button" onClick={() => addSocial(n.kind, n.label, n.prefix)} className="flex min-h-12 items-center gap-2 rounded-2xl border border-border-ui bg-panel-2/60 px-3 text-left text-[14px] font-semibold text-text-primary hover:bg-panel-hover">
+                  <Icon size={18} className="shrink-0 text-primary" /> {n.label}
+                </button>
+              );
+            })}
           </div>
         </BioSheet>
       )}

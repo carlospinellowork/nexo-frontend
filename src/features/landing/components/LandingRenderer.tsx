@@ -1,9 +1,12 @@
-import { ArrowLeft, CheckCircle2, ChevronDown, Globe, type IconComponent, Instagram, Link2, MessageCircle, Music2, Phone, QrCode, Search, ShoppingBag, Sparkles, Spotify, Star, WhatsApp, X, Youtube } from "../../../shared/icons";
+import { ArrowLeft, Behance, CheckCircle2, ChevronDown, Discord, Facebook, Github, Globe, type IconComponent, Instagram, Link2, Linkedin, Pinterest, Telegram, Threads, XSocial, MessageCircle, Music2, Phone, QrCode, Search, ShoppingBag, Sparkles, Spotify, Star, WhatsApp, X, Youtube } from "../../../shared/icons";
 import { AnimatePresence, motion, useReducedMotion } from "motion/react";
 import { useEffect, useId, useRef, useState } from "react";
 import { SealPill } from "../../../shared/components/ui/NexoSeal";
 import type { HeroData, LandingPageSettings, LandingSection, LandingTheme, LinkItem, LinkKind, OpenStatus, ProductItem } from "../contract";
+import { isSocialKind } from "../contract";
+import { AnimatedIcon } from "../AnimatedIcon";
 import { landingIcon } from "../icons";
+import { BioSplash } from "./BioSplash";
 import { fold } from "../schedule";
 import { PixDialog } from "./PixDialog";
 import { Backdrop } from "../look/Backdrop";
@@ -327,6 +330,16 @@ const LINK_ICONS: Record<LinkKind, IconComponent> = {
   link: Link2,
   pix: QrCode,
   youtube: Youtube,
+  linkedin: Linkedin,
+  spotify: Spotify,
+  facebook: Facebook,
+  x: XSocial,
+  threads: Threads,
+  pinterest: Pinterest,
+  telegram: Telegram,
+  github: Github,
+  discord: Discord,
+  behance: Behance,
 };
 
 
@@ -425,6 +438,14 @@ function BioRenderer({ title, theme, sections, settings, slug, canAsk, onChat, o
   const [query, setQuery] = useState("");
   const [pix, setPix] = useState<LinkItem | null>(null);
   const [linksOpen, setLinksOpen] = useState(false);
+  const [splashDone, setSplashDone] = useState(false);
+  const opening = Boolean(journey) && !onEditSelect;
+  // Fica o bastante para a marca aparecer, mesmo com a resposta rápida.
+  useEffect(() => {
+    if (!opening) return;
+    const timer = setTimeout(() => setSplashDone(true), reduceMotion ? 0 : 1200);
+    return () => clearTimeout(timer);
+  }, [opening, reduceMotion]);
   const searchId = useId();
   const visible = sections.filter((s) => s.enabled);
   const hero = visible.find((s): s is Extract<LandingSection, { type: "hero" }> => s.type === "hero")?.data;
@@ -436,7 +457,8 @@ function BioRenderer({ title, theme, sections, settings, slug, canAsk, onChat, o
   const initials = name.split(/\s+/).filter((w) => w.length > 2).slice(0, 2).map((w) => w[0]?.toUpperCase()).join("");
   const firstChat = links.findIndex((l) => l.kind === "chat");
   // Redes sociais viram ícones no perfil; só voltam para a lista quando a pessoa busca.
-  const socials = links.filter((l) => (l.kind === "instagram" || l.kind === "tiktok" || l.kind === "youtube") && l.url?.startsWith("https://"));
+  const socials = links.filter((l) => isSocialKind(l.kind) && l.url?.startsWith("https://"));
+  const editing = Boolean(onEditSelect);
   const hasJourney = Boolean(journey && journey.status !== "failed");
   // No editor, escolher um link ou produto mostra a lista, onde ele aparece selecionado.
   const inConversation = hasJourney && !linksOpen && !(editSelectedId && editSelectedId !== "profile");
@@ -501,6 +523,34 @@ function BioRenderer({ title, theme, sections, settings, slug, canAsk, onChat, o
           </motion.span>
         )}
         {hero?.subheadline && <motion.p initial={reduceMotion ? false : { opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.4, delay: 0.14 }} className={`mt-2.5 text-[15px] leading-relaxed ${compact ? "hidden @4xl:block" : ""} ${t.muted}`}>{hero.subheadline}</motion.p>}
+        {socials.length > 0 && (
+          <div className={`mt-3.5 flex-wrap justify-center gap-2 ${whenFull}`}>
+            {socials.map((item, i) => {
+              const Icon = LINK_ICONS[item.kind] ?? Link2;
+              return (
+                <motion.a
+                  key={item.id}
+                  href={item.url}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  aria-label={item.label}
+                  title={item.label}
+                  onClick={() => onItemClick?.(item.id)}
+                  initial={reduceMotion ? false : { opacity: 0, scale: 0.4, y: 10 }}
+                  animate={{ opacity: 1, scale: 1, y: 0 }}
+                  transition={{ type: "spring", stiffness: 460, damping: 20, delay: 0.24 + i * 0.06 }}
+                  whileHover={reduceMotion ? undefined : { y: -4, scale: 1.12, rotate: i % 2 ? 6 : -6 }}
+                  whileTap={reduceMotion ? undefined : { scale: 0.9 }}
+                  className={`flex h-11 w-11 items-center justify-center rounded-full border ${t.card} ${editing ? ring(item.id) : ""}`}
+                  {...pick({ type: "link", id: item.id })}
+                >
+                  {/* Um de cada vez, num balanço leve, para o olho ir até as redes sem cansar. */}
+                  <AnimatedIcon icon={Icon} motion="float" size={19} delay={i * 0.35} />
+                </motion.a>
+              );
+            })}
+          </div>
+        )}
         {hero?.highlights && hero.highlights.length > 0 && (
           <ul aria-label="Destaques" className={`mt-3 flex-wrap justify-center gap-1.5 ${whenFull}`}>
             {hero.highlights.map((h, i) => (
@@ -509,18 +559,6 @@ function BioRenderer({ title, theme, sections, settings, slug, canAsk, onChat, o
               </motion.li>
             ))}
           </ul>
-        )}
-        {socials.length > 0 && (
-          <div className={`mt-3.5 flex-wrap justify-center gap-2 ${whenFull}`}>
-            {socials.map((item, i) => {
-              const Icon = LINK_ICONS[item.kind] ?? Link2;
-              return (
-                <motion.a key={item.id} href={item.url} target="_blank" rel="noopener noreferrer" aria-label={item.label} title={item.label} onClick={() => onItemClick?.(item.id)} initial={reduceMotion ? false : { opacity: 0, scale: 0.6 }} animate={{ opacity: 1, scale: 1 }} transition={{ type: "spring", stiffness: 460, damping: 22, delay: 0.24 + i * 0.05 }} whileHover={reduceMotion ? undefined : { y: -3, scale: 1.08 }} whileTap={reduceMotion ? undefined : { scale: 0.92 }} className={`flex h-11 w-11 items-center justify-center rounded-full border ${t.card}`}>
-                  <Icon size={19} />
-                </motion.a>
-              );
-            })}
-          </div>
         )}
         </div>
 
@@ -607,6 +645,7 @@ function BioRenderer({ title, theme, sections, settings, slug, canAsk, onChat, o
           </a>
         </div>
       </div>
+      <AnimatePresence>{opening && journey?.status !== "failed" && (!splashDone || journey?.status === "loading") && <BioSplash key="splash" name={name} initials={initials} imageUrl={hero?.imageUrl} />}</AnimatePresence>
       {pix && <PixDialog item={pix} cardClass={t.card} mutedClass={t.muted} buttonClass={t.primary} onClose={() => setPix(null)} />}
     </div>
   );

@@ -6,7 +6,8 @@ import { useGetChats } from "../../../api/queries/useGetChats";
 import { Button } from "../../../shared/components/ui/Button";
 import { Segmented } from "../../../shared/components/ui/Segmented";
 import { Sheet } from "../../../shared/components/ui/Sheet";
-import { inputClass, selectClass, textareaClass } from "../../../shared/components/ui/styles";
+import { Select } from "../../../shared/components/ui/Select";
+import { inputClass, textareaClass } from "../../../shared/components/ui/styles";
 import type { LandingTheme } from "../contract";
 import { ThemePicker } from "./ThemePicker";
 
@@ -141,14 +142,7 @@ export function CreatePageDialog({ open, loading, onClose, onCreate }: CreatePag
       {chats && chats.length > 0 && (
         <label className="flex flex-col gap-1.5">
           <span className="text-[13px] font-semibold text-text-secondary">Bot que atende na página</span>
-          <select className={selectClass} value={chatId} onChange={(e) => setChatId(e.target.value)}>
-            <option value="">Nenhum</option>
-            {chats.map((c) => (
-              <option key={c.id} value={c.id}>
-                {c.name}
-              </option>
-            ))}
-          </select>
+          <Select value={chatId} onChange={setChatId} options={[{ value: "", label: "Nenhum" }, ...chats.map((c) => ({ value: c.id, label: c.name }))]} />
         </label>
       )}
     </Sheet>

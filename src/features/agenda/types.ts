@@ -23,6 +23,7 @@ export interface AgendaServiceItem {
   description: string | null;
   imageUrl: string | null;
   icon: string | null;
+  iconMotion: string | null;
 }
 
 export interface AgendaBlock {

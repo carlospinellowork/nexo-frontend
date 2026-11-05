@@ -142,8 +142,26 @@ export interface CtaData {
   note?: string;
 }
 /** Botões do link na bio. chat abre o bot; os demais abrem o endereço (https). */
-export const LINK_KINDS = ["chat", "whatsapp", "instagram", "tiktok", "google", "site", "link", "pix", "youtube"] as const;
+export const LINK_KINDS = ["chat", "whatsapp", "instagram", "tiktok", "google", "site", "link", "pix", "youtube", "linkedin", "spotify", "facebook", "x", "threads", "pinterest", "telegram", "github", "discord", "behance"] as const;
 export type LinkKind = (typeof LINK_KINDS)[number];
+
+/** Redes sociais: viram ícones animados no perfil da bio, abaixo da descrição. */
+export const SOCIAL_KINDS: { kind: LinkKind; label: string; prefix: string }[] = [
+  { kind: "instagram", label: "Instagram", prefix: "https://instagram.com/" },
+  { kind: "tiktok", label: "TikTok", prefix: "https://tiktok.com/@" },
+  { kind: "youtube", label: "YouTube", prefix: "https://youtube.com/@" },
+  { kind: "linkedin", label: "LinkedIn", prefix: "https://linkedin.com/in/" },
+  { kind: "spotify", label: "Spotify", prefix: "https://open.spotify.com/" },
+  { kind: "facebook", label: "Facebook", prefix: "https://facebook.com/" },
+  { kind: "x", label: "X", prefix: "https://x.com/" },
+  { kind: "threads", label: "Threads", prefix: "https://threads.net/@" },
+  { kind: "pinterest", label: "Pinterest", prefix: "https://pinterest.com/" },
+  { kind: "telegram", label: "Telegram", prefix: "https://t.me/" },
+  { kind: "github", label: "GitHub", prefix: "https://github.com/" },
+  { kind: "discord", label: "Discord", prefix: "https://discord.gg/" },
+  { kind: "behance", label: "Behance", prefix: "https://behance.net/" },
+];
+export const isSocialKind = (kind: LinkKind) => SOCIAL_KINDS.some((s) => s.kind === kind);
 export interface LinkItem {
   id: string;
   kind: LinkKind;

@@ -56,3 +56,30 @@ export const LANDING_ICON_COMPONENTS: Record<LandingIcon, IconComponent> = {
 };
 
 export const landingIcon = (name: string): IconComponent => LANDING_ICON_COMPONENTS[name as LandingIcon] ?? Sparkles;
+
+export const ICON_LABELS: Record<LandingIcon, string> = {
+  Sparkles: "Brilho",
+  Zap: "Raio",
+  ShieldCheck: "Escudo",
+  Award: "Medalha",
+  Star: "Estrela",
+  CheckCircle2: "Confirmado",
+  Users: "Pessoas",
+  Phone: "Telefone",
+  Globe: "Mundo",
+  Heart: "Coração",
+  Clock: "Relógio",
+  Calendar: "Agenda",
+  MapPin: "Local",
+  Truck: "Entrega",
+  Wrench: "Ferramenta",
+  Stethoscope: "Saúde",
+  GraduationCap: "Educação",
+  Home: "Casa",
+  Briefcase: "Negócios",
+  Scissors: "Beleza",
+  Camera: "Foto",
+  Utensils: "Comida",
+  Car: "Carro",
+  Dumbbell: "Academia",
+};

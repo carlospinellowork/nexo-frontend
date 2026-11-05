@@ -1,9 +1,9 @@
-import { Globe, Loader2 } from "../../../shared/icons";
-import { useEffect, useMemo } from "react";
+import { Globe } from "../../../shared/icons";
+import { useEffect, useMemo, useState } from "react";
 import { API_ORIGIN } from "../../../api/instance";
 import { useGetPublicLandingPage } from "../../../api/queries/useGetPublicLandingPage";
 import { LandingRenderer } from "../components/LandingRenderer";
-import { publicJourneyTransport } from "../journey/transports";
+import { publicChatTransport, publicJourneyTransport } from "../journey/transports";
 import { useJourney } from "../journey/useJourney";
 import { trackClick } from "../trackClick";
 
@@ -39,12 +39,30 @@ function setMeta(name: string, content: string) {
 /** Página ou bio publicada, para visitantes (em /p/:slug e, no endereço curto das bios, em /:slug). */
 export function PublicLandingPage({ slug }: { slug: string }) {
   const { data: page, isLoading, isError } = useGetPublicLandingPage(slug);
+  const isBio = page?.settings.layout === "bio";
+  const hasChatLink = Boolean(page?.sections.some((s) => s.type === "links" && s.data.items.some((i) => i.kind === "chat")));
   const journeyFirst = Boolean(page?.settings.journeyFirst && page.chat);
-  const transport = useMemo(() => (journeyFirst ? publicJourneyTransport(slug) : null), [journeyFirst, slug]);
+  const [opened, setOpened] = useState(false);
+  const [question, setQuestion] = useState<string | null>(null);
+  const chatId = page?.chat?.id;
+  const transport = useMemo(() => {
+    if (journeyFirst) return publicJourneyTransport(slug);
+    return opened && chatId ? publicChatTransport(slug, chatId) : null;
+  }, [journeyFirst, opened, chatId, slug]);
   const journey = useJourney(transport);
-  const inPage = journeyFirst && journey.status !== "failed";
-  // Na jornada, a conversa fica na própria página: sem o botão flutuante.
-  useChatWidget(page && !inPage ? page.chat?.id : undefined);
+  const failed = journey.status === "failed";
+  const inPage = Boolean(transport) && !failed;
+  // Na bio, a conversa é na própria página. O botão flutuante fica para as páginas completas, para quando a conversa
+  // não abre e para a bio sem nenhum link de assistente, que ficaria sem como chegar ao bot.
+  useChatWidget(page && !inPage && (!isBio || failed || !hasChatLink) ? chatId : undefined);
+
+  // Pergunta feita na busca, antes de a conversa existir: vai assim que ela abrir.
+  const { ask, status: journeyStatus } = journey;
+  useEffect(() => {
+    if (!question || !inPage || journeyStatus !== "waiting") return;
+    setQuestion(null);
+    void ask(question);
+  }, [question, inPage, journeyStatus, ask]);
 
   useEffect(() => {
     if (!page) return;
@@ -54,8 +72,12 @@ export function PublicLandingPage({ slug }: { slug: string }) {
 
   if (isLoading) {
     return (
-      <div className="flex h-screen items-center justify-center bg-white">
-        <Loader2 size={32} className="animate-spin text-slate-400" />
+      <div className="flex h-screen items-center justify-center bg-bg-start">
+        <span className="flex gap-1.5" role="status" aria-label="Carregando">
+          {[0, 1, 2].map((i) => (
+            <span key={i} className="h-2.5 w-2.5 animate-pulse rounded-full bg-primary" style={{ animationDelay: `${i * 160}ms` }} />
+          ))}
+        </span>
       </div>
     );
   }
@@ -79,8 +101,13 @@ export function PublicLandingPage({ slug }: { slug: string }) {
         settings={page.settings}
         slug={page.slug}
         canAsk={!!page.chat}
-        onChat={() => window.NexoChat?.open()}
-        onAsk={(question) => (inPage ? void journey.ask(question) : window.NexoChat?.open(question))}
+        onChat={() => (isBio && chatId && !failed && hasChatLink ? setOpened(true) : window.NexoChat?.open())}
+        onAsk={(q) => {
+          if (isBio && chatId && !failed && hasChatLink) {
+            setOpened(true);
+            setQuestion(q);
+          } else window.NexoChat?.open(q);
+        }}
         journey={inPage ? journey : undefined}
         openStatus={page.openStatus}
         onItemClick={(itemId) => trackClick(page.slug, itemId)}

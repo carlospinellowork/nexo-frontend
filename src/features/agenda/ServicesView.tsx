@@ -3,16 +3,15 @@ import { apiErrorMessage } from "../../api/instance";
 import { useDeleteAgendaService, useSaveAgendaService } from "../../api/mutations/useAgendaMutations";
 import { Button } from "../../shared/components/ui/Button";
 import { Sheet } from "../../shared/components/ui/Sheet";
-import { inputClass, selectClass } from "../../shared/components/ui/styles";
+import { Select } from "../../shared/components/ui/Select";
+import { inputClass } from "../../shared/components/ui/styles";
 import { Switch } from "../../shared/components/ui/Switch";
 import { toast } from "../../shared/components/ui/toast-store";
 import { Pencil, Plus, Trash2 } from "../../shared/icons";
 import type { LandingIcon } from "../landing/contract";
-import { landingIcon } from "../landing/icons";
+import { IconPicker } from "../landing/components/IconPicker";
 import { ImageField } from "../uploads/ImageField";
 import { type AgendaServiceItem, durationLabel, money } from "./types";
-
-const SERVICE_ICONS: LandingIcon[] = ["Scissors", "Sparkles", "Award", "Star", "Heart", "Camera", "Utensils", "Stethoscope", "Dumbbell", "Car", "Wrench", "GraduationCap", "Briefcase", "Home", "Clock"];
 
 const DURATIONS = [15, 20, 30, 40, 45, 60, 75, 90, 120, 150, 180, 240];
 
@@ -23,6 +22,7 @@ function ServiceSheet({ service, onClose }: { service: AgendaServiceItem | "new"
   const [price, setPrice] = useState(editing?.priceCents != null ? (editing.priceCents / 100).toLocaleString("pt-BR") : "");
   const [description, setDescription] = useState(editing?.description ?? "");
   const [icon, setIcon] = useState<LandingIcon | null>((editing?.icon as LandingIcon | null) ?? null);
+  const [iconMotion, setIconMotion] = useState<string | null>(editing?.iconMotion ?? null);
   const [imageUrl, setImageUrl] = useState<string | undefined>(editing?.imageUrl ?? undefined);
   const { mutateAsync, isPending } = useSaveAgendaService();
   const options = DURATIONS.includes(minutes) ? DURATIONS : [...DURATIONS, minutes].sort((a, b) => a - b);
@@ -32,7 +32,7 @@ function ServiceSheet({ service, onClose }: { service: AgendaServiceItem | "new"
     try {
       const cents = price.trim() ? Math.round(Number(price.replace(/\./g, "").replace(",", ".")) * 100) : null;
       if (cents !== null && !Number.isFinite(cents)) return toast.error("Confira o preço. Exemplo: 45 ou 45,90.");
-      await mutateAsync({ id: editing?.id, name: name.trim(), durationMinutes: minutes, priceCents: cents, description: description.trim() || null, icon, imageUrl: imageUrl ?? null });
+      await mutateAsync({ id: editing?.id, name: name.trim(), durationMinutes: minutes, priceCents: cents, description: description.trim() || null, icon, iconMotion: icon ? iconMotion : null, imageUrl: imageUrl ?? null });
       onClose();
     } catch (err) {
       toast.error(apiErrorMessage(err, "Não foi possível salvar o serviço."));
@@ -63,13 +63,7 @@ function ServiceSheet({ service, onClose }: { service: AgendaServiceItem | "new"
           <label htmlFor="service-duration" className="text-[13px] font-semibold text-text-secondary">
             Quanto tempo leva
           </label>
-          <select id="service-duration" className={selectClass} value={minutes} onChange={(e) => setMinutes(Number(e.target.value))}>
-            {options.map((m) => (
-              <option key={m} value={m}>
-                {durationLabel(m)}
-              </option>
-            ))}
-          </select>
+          <Select id="service-duration" value={minutes} onChange={setMinutes} options={options.map((m) => ({ value: m, label: durationLabel(m) }))} />
         </div>
         <div className="flex flex-col gap-1">
           <label htmlFor="service-price" className="text-[13px] font-semibold text-text-secondary">
@@ -85,19 +79,7 @@ function ServiceSheet({ service, onClose }: { service: AgendaServiceItem | "new"
           <input id="service-description" className={`${inputClass} text-[16px] md:text-[14px]`} maxLength={200} value={description} placeholder="Ex.: Com lavagem e finalização" onChange={(e) => setDescription(e.target.value)} />
         </div>
         <ImageField label="Foto (opcional)" value={imageUrl} shape="square" hint="Aparece no cartão do serviço na bio. Sem foto, usa o ícone." onChange={setImageUrl} />
-        <div className="flex flex-col gap-1.5">
-          <span className="text-[13px] font-semibold text-text-secondary">Ícone</span>
-          <div className="flex flex-wrap gap-1.5" role="radiogroup" aria-label="Ícone do serviço">
-            {SERVICE_ICONS.map((name) => {
-              const Icon = landingIcon(name);
-              return (
-                <button key={name} type="button" role="radio" aria-checked={icon === name} aria-label={name} onClick={() => setIcon(icon === name ? null : name)} className={`flex h-11 w-11 items-center justify-center rounded-xl border transition-colors ${icon === name ? "border-primary bg-primary/12 text-primary-strong" : "border-border-ui text-text-secondary hover:bg-panel-hover"}`}>
-                  <Icon size={18} />
-                </button>
-              );
-            })}
-          </div>
-        </div>
+        <IconPicker icon={icon} iconMotion={iconMotion} onIcon={(v) => setIcon(v ?? null)} onMotion={(v) => setIconMotion(v ?? null)} />
       </div>
     </Sheet>
   );
