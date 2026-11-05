@@ -5,12 +5,14 @@ import { useState } from "react";
 import { apiErrorMessage } from "../../api/instance";
 import { useRegenerateBioBot } from "../../api/mutations/useBioMutations";
 import { Button } from "../../shared/components/ui/Button";
+import { Segmented } from "../../shared/components/ui/Segmented";
 import { inputClass, textareaClass } from "../../shared/components/ui/styles";
 import { Switch } from "../../shared/components/ui/Switch";
 import { toast } from "../../shared/components/ui/toast-store";
 import { useFlowStore } from "../flow/store/flow.store";
 import type { LandingPageRecord } from "../landing/contract";
 import { ProBadge } from "../plan/ProBadge";
+import { JourneyEditor } from "./JourneyEditor";
 import { presetFor } from "./kits";
 
 interface Row {
@@ -24,7 +26,7 @@ interface Row {
 const newKey = () => crypto.randomUUID().slice(0, 6);
 
 /** Aba "Perguntas do bot": edita as perguntas e respostas e gera o fluxo de novo. */
-export function BioBotTab({ page, ensureSaved, journeyFirst, onJourneyFirst }: { page: LandingPageRecord; ensureSaved: () => Promise<boolean>; journeyFirst: boolean; onJourneyFirst: (on: boolean) => void }) {
+export function BioBotTab({ page, ensureSaved, journeyFirst, onJourneyFirst, onJourneySaved, onBotChanged }: { page: LandingPageRecord; ensureSaved: () => Promise<boolean>; journeyFirst: boolean; onJourneyFirst: (on: boolean) => void; onJourneySaved: (page: LandingPageRecord) => void; onBotChanged: () => void }) {
   const navigate = useNavigate();
   const setSelectedChatId = useFlowStore((s) => s.setSelectedChatId);
   const { mutateAsync: regenerate, isPending } = useRegenerateBioBot();
@@ -32,6 +34,7 @@ export function BioBotTab({ page, ensureSaved, journeyFirst, onJourneyFirst }: {
   const preset = presetFor(page.settings.bio?.kit, page.settings.bio?.audience);
   const [rows, setRows] = useState<Row[]>(() => saved.map((f) => ({ key: f.id, ...f })));
   const [needsConfirm, setNeedsConfirm] = useState(false);
+  const [mode, setMode] = useState<"journey" | "faq">(page.settings.bio?.botMode === "journey" ? "journey" : "faq");
 
   const filled = rows.filter((r) => r.question.trim() && r.answer.trim());
   const update = (key: string, patch: Partial<Row>) => setRows((all) => all.map((r) => (r.key === key ? { ...r, ...patch } : r)));
@@ -42,6 +45,7 @@ export function BioBotTab({ page, ensureSaved, journeyFirst, onJourneyFirst }: {
       const { aiUsed } = await regenerate({ pageId: page.id, force, faqs: filled.map((r) => ({ id: r.id, question: r.question.trim(), answer: r.answer.trim() })) });
       setNeedsConfirm(false);
       toast.success(aiUsed ? "Bot atualizado, já com a IA respondendo com base nas suas respostas." : "Bot atualizado e no ar.");
+      onBotChanged();
     } catch (err) {
       if (isAxiosError(err) && err.response?.status === 409 && (err.response.data as { details?: { code?: string } })?.details?.code === "FLOW_EDITED") {
         setNeedsConfirm(true);
@@ -67,6 +71,11 @@ export function BioBotTab({ page, ensureSaved, journeyFirst, onJourneyFirst }: {
           <p className="text-[13px] leading-snug text-text-secondary">Quem abre o seu link fala direto com o bot, com um toque para ver todos os links. Para valer, publique a bio.</p>
         </div>
       )}
+      <Segmented label="O que o bot faz" fullWidth value={mode} onChange={setMode} options={[{ value: "journey", label: "Jornada" }, { value: "faq", label: "Perguntas" }]} />
+      {mode === "journey" ? (
+        <JourneyEditor page={page} ensureSaved={ensureSaved} onSaved={onJourneySaved} />
+      ) : (
+      <>
       <p className="flex gap-2 text-[13px] leading-snug text-text-secondary">
         <Bot size={16} className="mt-px shrink-0 text-primary" />O bot da sua bio responde com estas perguntas. Ao atualizar, o Nexo cria o fluxo de novo e publica na hora.
       </p>
@@ -128,6 +137,8 @@ export function BioBotTab({ page, ensureSaved, journeyFirst, onJourneyFirst }: {
         <button type="button" onClick={openAdvanced} className="flex min-h-11 items-center justify-center gap-1.5 rounded-xl text-[14px] font-semibold text-primary-strong hover:bg-primary/8">
           <ExternalLink size={15} /> Abrir no editor avançado
         </button>
+      )}
+      </>
       )}
     </div>
   );

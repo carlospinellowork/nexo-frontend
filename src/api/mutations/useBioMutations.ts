@@ -1,4 +1,5 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
+import type { JourneySpec } from "../../features/bio/journey";
 import type { BioKit } from "../../features/bio/kits";
 import type { BioAudience, BioFaq } from "../../features/bio/presets";
 import type { LandingPageRecord, LandingTheme, LinkItem, ProductItem } from "../../features/landing/contract";
@@ -37,6 +38,18 @@ export const useRegenerateBioBot = () => {
   return useMutation({
     mutationFn: async ({ pageId, faqs, force }: { pageId: string; faqs: Pick<BioFaq, "question" | "answer" | "id">[]; force?: boolean }) => {
       const { data } = await api.post<{ page: LandingPageRecord; aiUsed: boolean }>(`/bio/${pageId}/bot`, { faqs, force });
+      return data;
+    },
+    onSuccess: () => Promise.all([queryClient.invalidateQueries({ queryKey: ["bio"] }), queryClient.invalidateQueries({ queryKey: ["landing-pages"] }), queryClient.invalidateQueries({ queryKey: ["flow"] })]),
+  });
+};
+
+/** Grava a jornada como o bot da bio, já no ar. Sem `force`, o servidor recusa (409) se o fluxo foi editado à mão. */
+export const useSaveBioJourney = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: async ({ pageId, journey, force }: { pageId: string; journey: JourneySpec; force?: boolean }) => {
+      const { data } = await api.post<{ page: LandingPageRecord }>(`/bio/${pageId}/journey`, { journey, force });
       return data;
     },
     onSuccess: () => Promise.all([queryClient.invalidateQueries({ queryKey: ["bio"] }), queryClient.invalidateQueries({ queryKey: ["landing-pages"] }), queryClient.invalidateQueries({ queryKey: ["flow"] })]),

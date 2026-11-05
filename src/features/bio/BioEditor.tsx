@@ -340,7 +340,7 @@ export function BioEditor({ page, openInstagram = false }: { page: LandingPageRe
               </div>
             )}
 
-            {tab === "bot" && <BioBotTab page={page} ensureSaved={ensureSaved} journeyFirst={Boolean(draft.settings.journeyFirst)} onJourneyFirst={(journeyFirst) => change({ settings: { ...draft.settings, journeyFirst } })} />}
+            {tab === "bot" && <BioBotTab page={page} ensureSaved={ensureSaved} journeyFirst={Boolean(draft.settings.journeyFirst)} onJourneyFirst={(journeyFirst) => change({ settings: { ...draft.settings, journeyFirst } })} onJourneySaved={(saved) => { setDraft((d) => ({ ...d, settings: { ...d.settings, journeyFirst: saved.settings.journeyFirst } })); void previewJourney.restart(); }} onBotChanged={() => void previewJourney.restart()} />}
 
             {tab === "page" && (
               <div className="flex flex-col gap-5">

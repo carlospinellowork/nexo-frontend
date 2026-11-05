@@ -1,3 +1,4 @@
+import type { JourneySpec } from "../bio/journey";
 /**
  * Contrato das landing pages — espelho de nexo-backend/src/domain/landing/contract.ts.
  * O backend valida (Zod); aqui ficam os tipos e os limites usados nos campos do editor.
@@ -213,7 +214,7 @@ export interface LandingPageSettings {
   /** A bio abre direto na conversa com o bot (jornada), com um toque para ver todos os links. */
   journeyFirst?: boolean;
   /** Assistente da bio (gerido pelo servidor). */
-  bio?: { audience: "creator" | "seller" | "business"; kit?: "beleza" | "comida" | "artista" | "influencer" | "saude"; faqs: { id: string; question: string; answer: string }[]; flowSignature?: string };
+  bio?: { audience: "creator" | "seller" | "business"; kit?: "beleza" | "comida" | "artista" | "influencer" | "saude"; faqs: { id: string; question: string; answer: string }[]; flowSignature?: string; botMode?: "faq" | "journey"; journey?: JourneySpec };
 }
 
 export const SECTION_LABELS: Record<SectionType, string> = {
