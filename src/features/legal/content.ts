@@ -46,6 +46,7 @@ export const PRIVACY: LegalSection[] = [
     items: [
       "Conversas com o bot: as mensagens trocadas e as respostas que o bot guarda (por exemplo, o nome).",
       "Contato informado pelo próprio visitante na conversa (nome, telefone ou e-mail), que vira um lead para o negócio.",
+      "Reservas feitas na agenda do negócio: serviço, dia e horário, nome, WhatsApp e observação.",
       "Cliques nos links da bio e leituras de QR Code: só contamos. Para não contar a mesma pessoa duas vezes no mesmo dia, usamos um código anônimo feito a partir do endereço de internet com um segredo que troca todo dia e nunca é guardado. O endereço de internet não é salvo, e esse código é apagado em até um dia.",
     ],
   },
@@ -76,6 +77,7 @@ export const PRIVACY: LegalSection[] = [
     items: [
       "Dados da conta e o conteúdo criado: enquanto a conta existir. Ao excluir a conta, em Minha conta, ou pedir a exclusão, apagamos em até 30 dias, salvo o que a lei obrigar a manter.",
       "Leads e conversas: enquanto o negócio mantiver a conta, ou até ele apagá-los (o painel tem a exclusão de lead a pedido do titular).",
+      "Reservas da agenda: apagadas 90 dias depois do horário marcado.",
       "Código anônimo de cliques e leituras de QR: até um dia.",
     ],
   },
