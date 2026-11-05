@@ -8,6 +8,9 @@ export interface JourneyOption {
   id: string;
   label: string;
   answer?: string;
+  description?: string;
+  imageUrl?: string;
+  icon?: string;
 }
 
 export interface JourneyStep {

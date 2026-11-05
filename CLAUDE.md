@@ -27,7 +27,7 @@ src/features/chatBuilder/  aparência do widget e código de instalação
 src/features/integrations/ definição dos canais (channels.ts) e ChannelCard
 src/features/landing/      contract.ts (tipos e limites), LandingRenderer, SectionEditor, ThemePicker, icons.ts
 src/features/bio/          Minha Bio; JourneyEditor (modelos e edição da jornada sem o editor de fluxo), JourneyGreetingGuide (saudação do WhatsApp Business)
-src/features/landing/journey/  bio em modo jornada: useJourney (estado), transports (rota pública ou simulador na prévia), JourneyView
+src/features/landing/journey/  bio em modo jornada: useJourney (estado), transports (rota pública ou simulador na prévia), JourneyView (experiência em etapas, não chat: cartões, dias, horários e tela de sucesso; `display` da mensagem do motor escolhe o desenho)
 src/features/agenda/       tela Agenda (pages/_app/agenda.tsx). Computador: DesktopAgenda (mês com as pessoas em cada dia, ou semana em grade). Celular: MobileAgenda (faixa da semana). Nos dois, DayPanel: as pessoas do dia, horários livres, lembrar, confirmar e cancelar. ServicesView, HoursView
 src/pages/reserva.$token.tsx  página da reserva para o cliente, sem login, pelo link que ele recebe ao reservar: adicionar à agenda e cancelar
 src/features/tour/         tour guiado (driver.js) e HelpButton; títulos com ícone do `shared/icons`

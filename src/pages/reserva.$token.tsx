@@ -123,7 +123,7 @@ function BookingPage() {
                   <Calendar size={18} /> Adicionar ao Google Agenda
                 </a>
                 <a href={`${url(token)}/calendar.ics`} className="flex min-h-12 items-center justify-center gap-2 rounded-xl border border-border-ui bg-panel text-[15px] font-semibold hover:bg-panel-hover">
-                  <Download size={18} /> Adicionar ao iPhone ou outro calendário
+                  <Download size={18} /> Adicionar ao iPhone e outros
                 </a>
               </section>
             )}

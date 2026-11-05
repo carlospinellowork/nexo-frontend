@@ -82,6 +82,7 @@ export function PublicLandingPage({ slug }: { slug: string }) {
         onChat={() => window.NexoChat?.open()}
         onAsk={(question) => (inPage ? void journey.ask(question) : window.NexoChat?.open(question))}
         journey={inPage ? journey : undefined}
+        openStatus={page.openStatus}
         onItemClick={(itemId) => trackClick(page.slug, itemId)}
       />
     </div>

@@ -94,6 +94,10 @@ export interface HeroData {
   secondaryCtaText?: string;
   secondaryCtaLink?: string;
   imageUrl?: string;
+  /** Capa no topo do perfil da bio. */
+  coverUrl?: string;
+  /** Destaques curtos do perfil ("Desde 2015", "Centro"). */
+  highlights?: string[];
 }
 export interface ServiceItem {
   id: string;
@@ -271,4 +275,12 @@ export interface PublicLandingPage {
   sections: LandingSection[];
   settings: LandingPageSettings;
   chat: { id: string; name: string } | null;
+  /** Aberto ou fechado agora; null para quem não usa a agenda. */
+  openStatus?: OpenStatus | null;
+}
+
+export interface OpenStatus {
+  open: boolean;
+  until?: string;
+  next?: string;
 }

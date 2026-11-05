@@ -1,4 +1,4 @@
-import { ArrowDown, ArrowUp, Bot, CheckCircle2, ExternalLink, Globe, GripVertical, type IconComponent, Instagram, Link2, MessageCircle, Music2, Pencil, Plus, QrCode, Rocket, Save, ChevronDown, Paintbrush, ShoppingBag, Smartphone, Star, Trash2, UserRound, WhatsApp, Youtube } from "../../shared/icons";
+import { ArrowDown, ArrowUp, Bot, CheckCircle2, ExternalLink, Globe, GripVertical, type IconComponent, Instagram, Link2, MessageCircle, Music2, Pencil, Plus, QrCode, Rocket, Save, ChevronDown, Paintbrush, ShoppingBag, Smartphone, Star, Trash2, UserRound, WhatsApp, X, Youtube } from "../../shared/icons";
 import { Reorder, useDragControls } from "motion/react";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { apiErrorMessage } from "../../api/instance";
@@ -8,6 +8,7 @@ import { useGetLandingClicks } from "../../api/queries/useGetLandingClicks";
 import { Badge } from "../../shared/components/ui/Badge";
 import { Button } from "../../shared/components/ui/Button";
 import { PhoneFrame } from "../../shared/components/ui/PhoneFrame";
+import { inputClass } from "../../shared/components/ui/styles";
 import { toast } from "../../shared/components/ui/toast-store";
 import { type BioTarget, LandingRenderer } from "../landing/components/LandingRenderer";
 import { ClickCount, Field, LinkFields, ProductFields, ScheduleBadge } from "../landing/components/SectionEditor";
@@ -96,6 +97,39 @@ function moveItem<T>(list: T[], index: number, dir: -1 | 1): T[] {
 }
 
 type Selection = BioTarget | null;
+
+/** Até 4 destaques curtos no perfil. Só o que for verdade: quem escreve é o dono. */
+function HighlightsField({ value, onChange }: { value: string[]; onChange: (v: string[]) => void }) {
+  const [text, setText] = useState("");
+  const add = () => {
+    const item = text.trim();
+    if (item && !value.includes(item) && value.length < 4) onChange([...value, item]);
+    setText("");
+  };
+  return (
+    <div className="flex flex-col gap-1.5">
+      <label htmlFor="bio-highlight" className="text-[13px] font-semibold text-text-secondary">
+        Destaques
+      </label>
+      {value.length > 0 && (
+        <div className="flex flex-wrap gap-1.5">
+          {value.map((h) => (
+            <button key={h} type="button" aria-label={`Remover ${h}`} onClick={() => onChange(value.filter((x) => x !== h))} className="flex min-h-9 items-center gap-1 rounded-full bg-primary/12 pl-3 pr-2 text-[13px] font-semibold text-primary-strong">
+              {h} <X size={13} />
+            </button>
+          ))}
+        </div>
+      )}
+      {value.length < 4 && (
+        <div className="flex gap-2">
+          <input id="bio-highlight" className={`${inputClass} min-w-0 flex-1 text-[16px] min-[420px]:text-[14px]`} maxLength={28} value={text} placeholder="Ex.: Desde 2015, Centro, Entrega grátis" onChange={(e) => setText(e.target.value)} onKeyDown={(e) => { if (e.key === "Enter") { e.preventDefault(); add(); } }} />
+          <Button variant="secondary" icon={Plus} className="h-11 shrink-0" onClick={add} disabled={!text.trim()} aria-label="Adicionar destaque" />
+        </div>
+      )}
+      <span className="text-[12.5px] text-text-secondary">Aparecem no perfil. Até 4, curtos.</span>
+    </div>
+  );
+}
 
 /** Editor próprio da bio: o celular no centro, toque para editar, arraste para reordenar. */
 export function BioEditor({ page, openInstagram = false }: { page: LandingPageRecord; openInstagram?: boolean }) {
@@ -416,6 +450,8 @@ export function BioEditor({ page, openInstagram = false }: { page: LandingPageRe
           <Field label="Seu @" value={hero.data.badge} max={MAX.badge} placeholder="@seuperfil" onChange={(badge) => patchHero({ badge: badge || undefined })} />
           <Field label="Frase curta" multiline value={hero.data.subheadline} max={MAX.subheadline} onChange={(subheadline) => patchHero({ subheadline: subheadline || undefined })} />
           <ImageField label="Foto do perfil" value={hero.data.imageUrl} shape="square" hint="Aparece redonda no topo da bio." onChange={(imageUrl) => patchHero({ imageUrl })} />
+          <ImageField label="Capa" value={hero.data.coverUrl} shape="wide" hint="Foto larga atrás do perfil: o seu espaço, o seu trabalho." onChange={(coverUrl) => patchHero({ coverUrl })} />
+          <HighlightsField value={hero.data.highlights ?? []} onChange={(highlights) => patchHero({ highlights: highlights.length ? highlights : undefined })} />
         </BioSheet>
       )}
 

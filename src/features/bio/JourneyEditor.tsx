@@ -7,12 +7,16 @@ import { useGetJourneyTemplates } from "../../api/queries/useGetJourneyTemplates
 import { Button } from "../../shared/components/ui/Button";
 import { selectClass } from "../../shared/components/ui/styles";
 import { toast } from "../../shared/components/ui/toast-store";
-import { ArrowDown, ArrowUp, Briefcase, Calendar, FileText, HelpCircle, type IconComponent, Loader2, MessageCircle, Package, Plus, RefreshCw, Rocket, ShoppingBag, Trash2, TriangleAlert, WhatsApp, X } from "../../shared/icons";
-import type { LandingPageRecord } from "../landing/contract";
+import { ArrowDown, ArrowUp, Briefcase, Calendar, ChevronDown, FileText, HelpCircle, type IconComponent, Loader2, MessageCircle, Package, Plus, RefreshCw, Rocket, ShoppingBag, Trash2, TriangleAlert, WhatsApp, X } from "../../shared/icons";
+import type { LandingIcon, LandingPageRecord } from "../landing/contract";
+import { landingIcon } from "../landing/icons";
+import { ImageField } from "../uploads/ImageField";
 import { Field } from "../landing/components/SectionEditor";
 import { bioUrl } from "./bioUrl";
 import { JOURNEY_MAX, journeyProblem, type JourneySpec, type JourneyStep, type JourneyStepKind, type JourneyTemplateKey, STEP_KINDS } from "./journey";
 import { JourneyGreetingGuide } from "./JourneyGreetingGuide";
+
+const OPTION_ICONS: LandingIcon[] = ["Sparkles", "Star", "Heart", "Scissors", "Camera", "Utensils", "Truck", "Clock", "Calendar", "MapPin", "Award", "Briefcase"];
 
 const ICONS: Record<JourneyTemplateKey, IconComponent> = { agendar: Calendar, pedir: ShoppingBag, orcamento: FileText, contratar: Briefcase, duvida: HelpCircle, produto: Package };
 
@@ -21,7 +25,7 @@ const newId = () => `s${crypto.randomUUID().slice(0, 7)}`;
 function StepCard({ step, index, total, onChange, onMove, onRemove }: { step: JourneyStep; index: number; total: number; onChange: (patch: Partial<JourneyStep>) => void; onMove: (dir: -1 | 1) => void; onRemove: () => void }) {
   const options = step.options ?? [];
   const setKind = (kind: JourneyStepKind) => onChange({ kind, options: kind === "choice" ? (options.length ? options : [{ id: newId(), label: "" }, { id: newId(), label: "" }]) : undefined });
-  const setOption = (id: string, patch: { label?: string; answer?: string }) => onChange({ options: options.map((o) => (o.id === id ? { ...o, ...patch } : o)) });
+  const setOption = (id: string, patch: { label?: string; answer?: string; description?: string; imageUrl?: string; icon?: string }) => onChange({ options: options.map((o) => (o.id === id ? { ...o, ...patch } : o)) });
   return (
     <div className="flex flex-col gap-2.5 rounded-2xl border border-border-ui bg-panel-2/60 p-3">
       <div className="flex items-center">
@@ -75,6 +79,26 @@ function StepCard({ step, index, total, onChange, onMove, onRemove }: { step: Jo
                 </button>
               </div>
               <Field label="Resposta ao tocar (opcional)" value={o.answer} max={JOURNEY_MAX.answer} placeholder="Ex.: preço ou explicação" onChange={(answer) => setOption(o.id, { answer: answer || undefined })} />
+              <details className="group rounded-xl">
+                <summary className="flex min-h-9 cursor-pointer list-none items-center gap-1 text-[13px] font-semibold text-primary-strong">
+                  <ChevronDown size={14} className="transition-transform group-open:rotate-180" /> Deixar com cara de cartão
+                </summary>
+                <div className="flex flex-col gap-2 pt-1.5">
+                  <Field label="Descrição curta" value={o.description} max={200} placeholder="Ex.: Com lavagem e finalização" onChange={(description) => setOption(o.id, { description: description || undefined })} />
+                  <ImageField label="Foto" value={o.imageUrl} shape="wide" onChange={(imageUrl) => setOption(o.id, { imageUrl })} />
+                  <span className="text-[13px] font-semibold text-text-secondary">Ou um ícone</span>
+                  <div className="flex flex-wrap gap-1.5" role="radiogroup" aria-label={`Ícone do botão ${i + 1}`}>
+                    {OPTION_ICONS.map((name) => {
+                      const Icon = landingIcon(name);
+                      return (
+                        <button key={name} type="button" role="radio" aria-checked={o.icon === name} aria-label={name} onClick={() => setOption(o.id, { icon: o.icon === name ? undefined : name })} className={`flex h-10 w-10 items-center justify-center rounded-lg border ${o.icon === name ? "border-primary bg-primary/12 text-primary-strong" : "border-border-ui text-text-secondary"}`}>
+                          <Icon size={17} />
+                        </button>
+                      );
+                    })}
+                  </div>
+                </div>
+              </details>
             </div>
           ))}
           {options.length < JOURNEY_MAX.options && (

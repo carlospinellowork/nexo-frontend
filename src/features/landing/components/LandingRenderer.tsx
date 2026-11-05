@@ -2,7 +2,7 @@ import { ArrowLeft, CheckCircle2, ChevronDown, Globe, type IconComponent, Instag
 import { AnimatePresence, motion, useReducedMotion } from "motion/react";
 import { useEffect, useId, useRef, useState } from "react";
 import { SealPill } from "../../../shared/components/ui/NexoSeal";
-import type { HeroData, LandingPageSettings, LandingSection, LandingTheme, LinkItem, LinkKind, ProductItem } from "../contract";
+import type { HeroData, LandingPageSettings, LandingSection, LandingTheme, LinkItem, LinkKind, OpenStatus, ProductItem } from "../contract";
 import { landingIcon } from "../icons";
 import { fold } from "../schedule";
 import { PixDialog } from "./PixDialog";
@@ -36,6 +36,8 @@ interface LandingRendererProps {
   editSelectedId?: string;
   /** Bio em modo jornada: abre na conversa. Sem isto (ou se ela falhar), abre nos links. */
   journey?: Journey;
+  /** Aberto ou fechado agora, para quem usa a agenda. */
+  openStatus?: OpenStatus | null;
 }
 
 export type BioTarget = { type: "profile" } | { type: "link"; id: string } | { type: "product"; id: string };
@@ -413,7 +415,7 @@ function ProductCard({ product, t, onClick }: { product: ProductItem; t: Palette
 const SITE_URL: string = import.meta.env.VITE_SITE_URL ?? "https://nexo.app";
 
 /** Link na bio: coluna estreita para o celular, com busca, links, produtos, Pix e o bot. */
-function BioRenderer({ title, theme, sections, settings, slug, canAsk, onChat, onAsk, onItemClick, onEditSelect, editSelectedId, journey }: LandingRendererProps) {
+function BioRenderer({ title, theme, sections, settings, slug, canAsk, onChat, onAsk, onItemClick, onEditSelect, editSelectedId, journey, openStatus }: LandingRendererProps) {
   const t = PALETTE;
   const look = resolveLook(getTheme(theme), settings?.look, settings?.fontHeading);
   const buttons = { style: look.buttonStyle, shape: look.buttonShape };
@@ -433,9 +435,14 @@ function BioRenderer({ title, theme, sections, settings, slug, canAsk, onChat, o
   const name = hero?.headline || title;
   const initials = name.split(/\s+/).filter((w) => w.length > 2).slice(0, 2).map((w) => w[0]?.toUpperCase()).join("");
   const firstChat = links.findIndex((l) => l.kind === "chat");
+  // Redes sociais viram ícones no perfil; só voltam para a lista quando a pessoa busca.
+  const socials = links.filter((l) => (l.kind === "instagram" || l.kind === "tiktok" || l.kind === "youtube") && l.url?.startsWith("https://"));
   const hasJourney = Boolean(journey && journey.status !== "failed");
   // No editor, escolher um link ou produto mostra a lista, onde ele aparece selecionado.
   const inConversation = hasJourney && !linksOpen && !(editSelectedId && editSelectedId !== "profile");
+  // No celular, depois da primeira resposta o perfil encolhe: a etapa é que importa. No computador ele tem coluna própria.
+  const compact = inConversation && Boolean(journey?.entries.some((e) => e.from === "user"));
+  const whenFull = compact ? "hidden @4xl:flex" : "flex";
   const openChat = () => (hasJourney ? setLinksOpen(false) : onChat());
   const askQuestion = (question: string) => {
     if (hasJourney) setLinksOpen(false);
@@ -447,7 +454,7 @@ function BioRenderer({ title, theme, sections, settings, slug, canAsk, onChat, o
     const hay = fold(text);
     return words.every((w) => hay.includes(w));
   };
-  const shownLinks = words.length ? links.filter((l) => matches(`${l.label} ${l.message ?? ""}`)) : links;
+  const shownLinks = words.length ? links.filter((l) => matches(`${l.label} ${l.message ?? ""}`)) : links.filter((l) => !socials.includes(l));
   const shownProducts = words.length ? products.filter((p) => matches(`${p.name} ${p.price ?? ""}`)) : products;
   const empty = words.length > 0 && shownLinks.length === 0 && shownProducts.length === 0;
   const showBadge = settings?.showBadge !== false;
@@ -467,20 +474,54 @@ function BioRenderer({ title, theme, sections, settings, slug, canAsk, onChat, o
   return (
     <div className={`nx-landing @container relative isolate min-h-full w-full ${t.page}`} style={look.vars}>
       <Backdrop bg={look.bg} />
-      <div className={`mx-auto flex min-h-full max-w-[460px] flex-col items-center px-4 pb-8 pt-12 text-center ${hasJourney ? "@4xl:grid @4xl:max-w-5xl @4xl:grid-cols-[minmax(0,340px)_minmax(0,1fr)] @4xl:grid-rows-[auto_1fr] @4xl:items-start @4xl:gap-x-14 @4xl:px-8 @4xl:pt-20" : ""}`}>
+      <div className={`mx-auto flex min-h-full max-w-[460px] flex-col items-center px-4 pb-8 ${isImageUrl(hero?.coverUrl) ? "pt-4" : "pt-10"} text-center ${hasJourney ? "@4xl:grid @4xl:max-w-5xl @4xl:grid-cols-[minmax(0,340px)_minmax(0,1fr)] @4xl:grid-rows-[auto_1fr] @4xl:items-start @4xl:gap-x-14 @4xl:px-8 @4xl:pt-20" : ""}`}>
         <div className={`flex w-full flex-col items-center ${hasJourney ? "@4xl:sticky @4xl:top-20" : ""} ${ring("profile")}`} {...pick({ type: "profile" })}>
-        <motion.span
-          initial={reduceMotion ? false : { scale: 0.8, opacity: 0 }}
-          animate={{ scale: 1, opacity: 1 }}
-          transition={{ type: "spring", stiffness: 300, damping: 20 }}
-          className={`flex h-24 w-24 items-center justify-center rounded-full border-4 text-[32px] font-extrabold ${t.primary} ${t.line}`}
-          aria-hidden
-        >
-          {isImageUrl(hero?.imageUrl) ? <img src={imageSrc(hero.imageUrl)} alt="" className="h-full w-full rounded-full object-cover" /> : initials}
+        {isImageUrl(hero?.coverUrl) && (
+          <motion.span initial={reduceMotion ? false : { opacity: 0, scale: 1.06 }} animate={{ opacity: 1, scale: 1 }} transition={{ duration: 0.7, ease: "easeOut" }} className="mb-[-52px] block aspect-[5/2] w-full overflow-hidden rounded-3xl">
+            <img src={imageSrc(hero.coverUrl)} alt="" className="h-full w-full object-cover" />
+          </motion.span>
+        )}
+        <motion.span initial={reduceMotion ? false : { scale: 0.7, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} transition={{ type: "spring", stiffness: 280, damping: 18 }} className={`relative flex h-[108px] w-[108px] items-center justify-center transition-transform duration-300 ${compact ? "-mb-6 origin-top scale-[0.6] @4xl:mb-0 @4xl:scale-100" : ""}`} aria-hidden>
+          {/* O anel gira devagar nas cores do tema: é o que faz o perfil parecer vivo. */}
+          <motion.span animate={reduceMotion ? undefined : { rotate: 360 }} transition={{ duration: 7, ease: "linear", repeat: Infinity }} className="absolute inset-0 rounded-full [background:conic-gradient(from_0deg,var(--t-accent),transparent_35%,var(--t-accent)_60%,transparent_85%,var(--t-accent))]" />
+          <span className="absolute inset-[3px] rounded-full bg-[var(--t-page)]" />
+          <motion.span animate={reduceMotion ? undefined : { y: [0, -3, 0] }} transition={{ duration: 4.5, ease: "easeInOut", repeat: Infinity }} className={`relative flex h-[94px] w-[94px] items-center justify-center overflow-hidden rounded-full text-[32px] font-extrabold ${t.primary}`}>
+            {isImageUrl(hero?.imageUrl) ? <img src={imageSrc(hero.imageUrl)} alt="" className="h-full w-full object-cover" /> : initials}
+          </motion.span>
         </motion.span>
-        <h1 className={`mt-5 break-words text-[26px] font-extrabold leading-tight tracking-tight ${heading}`}>{name}</h1>
+        <motion.h1 initial={reduceMotion ? false : { opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.4, delay: 0.08 }} className={`mt-4 break-words font-extrabold leading-tight tracking-tight ${compact ? "text-[20px] @4xl:text-[26px]" : "text-[26px]"} ${heading}`}>{name}</motion.h1>
         {hero?.badge && <p className={`mt-1 text-[14px] font-semibold ${t.accent}`}>{hero.badge}</p>}
-        {hero?.subheadline && <p className={`mt-2 text-[15px] leading-relaxed ${t.muted}`}>{hero.subheadline}</p>}
+        {openStatus && (
+          <motion.span initial={reduceMotion ? false : { opacity: 0, scale: 0.8 }} animate={{ opacity: 1, scale: 1 }} transition={{ type: "spring", stiffness: 420, damping: 24, delay: 0.16 }} className={`mt-2.5 inline-flex items-center gap-1.5 rounded-full border px-3 py-1 text-[13px] font-semibold ${t.card}`}>
+            <span className="relative flex h-2 w-2">
+              {openStatus.open && !reduceMotion && <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-emerald-400 opacity-70" />}
+              <span className={`relative inline-flex h-2 w-2 rounded-full ${openStatus.open ? "bg-emerald-400" : "bg-[var(--t-muted)]"}`} />
+            </span>
+            {openStatus.open ? `Aberto até ${openStatus.until}` : openStatus.next ? `Fechado · abre ${openStatus.next}` : "Fechado agora"}
+          </motion.span>
+        )}
+        {hero?.subheadline && <motion.p initial={reduceMotion ? false : { opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.4, delay: 0.14 }} className={`mt-2.5 text-[15px] leading-relaxed ${compact ? "hidden @4xl:block" : ""} ${t.muted}`}>{hero.subheadline}</motion.p>}
+        {hero?.highlights && hero.highlights.length > 0 && (
+          <ul aria-label="Destaques" className={`mt-3 flex-wrap justify-center gap-1.5 ${whenFull}`}>
+            {hero.highlights.map((h, i) => (
+              <motion.li key={h} initial={reduceMotion ? false : { opacity: 0, y: 8, scale: 0.9 }} animate={{ opacity: 1, y: 0, scale: 1 }} transition={{ type: "spring", stiffness: 420, damping: 26, delay: 0.2 + i * 0.05 }} className={`rounded-full border px-2.5 py-1 text-[12.5px] font-semibold ${t.badge}`}>
+                {h}
+              </motion.li>
+            ))}
+          </ul>
+        )}
+        {socials.length > 0 && (
+          <div className={`mt-3.5 flex-wrap justify-center gap-2 ${whenFull}`}>
+            {socials.map((item, i) => {
+              const Icon = LINK_ICONS[item.kind] ?? Link2;
+              return (
+                <motion.a key={item.id} href={item.url} target="_blank" rel="noopener noreferrer" aria-label={item.label} title={item.label} onClick={() => onItemClick?.(item.id)} initial={reduceMotion ? false : { opacity: 0, scale: 0.6 }} animate={{ opacity: 1, scale: 1 }} transition={{ type: "spring", stiffness: 460, damping: 22, delay: 0.24 + i * 0.05 }} whileHover={reduceMotion ? undefined : { y: -3, scale: 1.08 }} whileTap={reduceMotion ? undefined : { scale: 0.92 }} className={`flex h-11 w-11 items-center justify-center rounded-full border ${t.card}`}>
+                  <Icon size={19} />
+                </motion.a>
+              );
+            })}
+          </div>
+        )}
         </div>
 
         <div className={`flex w-full flex-col items-center ${hasJourney ? "@4xl:col-start-2 @4xl:row-span-2 @4xl:row-start-1" : ""}`}>
@@ -522,7 +563,7 @@ function BioRenderer({ title, theme, sections, settings, slug, canAsk, onChat, o
         {!inConversation && <div className="mt-5 flex w-full flex-col gap-3">
           {shownLinks.map((item, i) => (
             <motion.div key={item.id} initial={reduceMotion ? false : { opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: words.length ? 0 : 0.1 + i * 0.06 }} className={ring(item.id)} {...pick({ type: "link", id: item.id })}>
-              <LinkButton item={item} t={t} look={buttons} onChat={openChat} onPix={setPix} onClick={onItemClick} primary={!words.length && i === firstChat} />
+              <LinkButton item={item} t={t} look={buttons} onChat={openChat} onPix={setPix} onClick={onItemClick} primary={!words.length && item.id === links[firstChat]?.id} />
             </motion.div>
           ))}
 
