@@ -5,7 +5,8 @@ import { DesktopAgenda } from "../../features/agenda/DesktopAgenda";
 import { HoursView } from "../../features/agenda/HoursView";
 import { MobileAgenda } from "../../features/agenda/MobileAgenda";
 import { ServicesView } from "../../features/agenda/ServicesView";
-import { dayIn } from "../../features/agenda/types";
+import { MoveBookingSheet, NewBookingSheet } from "../../features/agenda/BookingSheets";
+import { type Booking, dayIn } from "../../features/agenda/types";
 import { Header } from "../../shared/components/layout/Header";
 import { Segmented } from "../../shared/components/ui/Segmented";
 import { useIsDesktop } from "../../shared/hooks/useIsDesktop";
@@ -32,6 +33,8 @@ function AgendaPage() {
   const [picked, setPicked] = useState<string | null>(null);
   const canEdit = role.canManage;
   const desktop = useIsDesktop();
+  const [creating, setCreating] = useState<{ date: string; time?: string } | null>(null);
+  const [moving, setMoving] = useState<Booking | null>(null);
   const date = picked ?? dia ?? (agenda ? dayIn(agenda.config.timeZone) : "");
 
   return (
@@ -47,15 +50,17 @@ function AgendaPage() {
             {!desktop && <Segmented label="Parte da agenda" fullWidth value={tab} onChange={setTab} options={[...TABS]} />}
             {tab === "dia" &&
               (desktop ? (
-                <DesktopAgenda agenda={agenda} date={date} onDate={setPicked} onSetup={() => setTab("servicos")} />
+                <DesktopAgenda agenda={agenda} date={date} onDate={setPicked} onSetup={() => setTab("servicos")} onNew={(d, time) => setCreating({ date: d, time })} onMove={setMoving} />
               ) : (
-                <MobileAgenda agenda={agenda} date={date} onDate={setPicked} onSetup={() => setTab("servicos")} />
+                <MobileAgenda agenda={agenda} date={date} onDate={setPicked} onSetup={() => setTab("servicos")} onNew={(d, time) => setCreating({ date: d, time })} onMove={setMoving} />
               ))}
             {tab === "servicos" && <ServicesView services={agenda.services} canEdit={canEdit} />}
             {tab === "horarios" && <HoursView key={agenda.config.workspaceId} agenda={agenda} canEdit={canEdit} />}
           </div>
         )}
       </div>
+      {creating && agenda && <NewBookingSheet agenda={agenda} date={creating.date} time={creating.time} onClose={() => setCreating(null)} />}
+      {moving && agenda && <MoveBookingSheet booking={moving} timeZone={agenda.config.timeZone} onClose={() => setMoving(null)} />}
     </div>
   );
 }

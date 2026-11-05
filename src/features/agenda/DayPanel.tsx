@@ -6,8 +6,8 @@ import { useGetBookings } from "../../api/queries/useGetBookings";
 import { Badge } from "../../shared/components/ui/Badge";
 import { Button } from "../../shared/components/ui/Button";
 import { toast } from "../../shared/components/ui/toast-store";
-import { Calendar, CheckCircle2, ChevronDown, Clock, Lock, Phone, WhatsApp, X } from "../../shared/icons";
-import { type AgendaData, type Booking, dayIn, durationLabel, longDay, timeIn, weekdayOf, whatsappOfCustomer } from "./types";
+import { Calendar, CheckCircle2, ChevronDown, Clock, Lock, Phone, Plus, WhatsApp, X } from "../../shared/icons";
+import { type AgendaData, type Booking, dayIn, durationLabel, longDay, money, revenueOf, timeIn, weekdayOf, whatsappOfCustomer } from "./types";
 
 const toMinutes = (hhmm: string) => Number(hhmm.slice(0, 2)) * 60 + Number(hhmm.slice(3, 5));
 const clock = (m: number) => `${String(Math.floor(m / 60)).padStart(2, "0")}:${String(m % 60).padStart(2, "0")}`;
@@ -26,7 +26,7 @@ function reminderLink(booking: Booking, timeZone: string) {
   return `${whatsappOfCustomer(booking.customerPhone)}?text=${encodeURIComponent(text)}`;
 }
 
-function PersonRow({ booking, timeZone, open, onToggle }: { booking: Booking; timeZone: string; open: boolean; onToggle: () => void }) {
+function PersonRow({ booking, timeZone, open, onToggle, onMove }: { booking: Booking; timeZone: string; open: boolean; onToggle: () => void; onMove: (b: Booking) => void }) {
   const { mutateAsync, isPending, variables } = useBookingAction();
   const reduce = useReducedMotion();
   const cancelled = booking.status === "CANCELLED";
@@ -51,6 +51,7 @@ function PersonRow({ booking, timeZone, open, onToggle }: { booking: Booking; ti
           <span className={`truncate text-[14.5px] font-semibold text-text-primary ${cancelled ? "line-through" : ""}`}>{booking.customerName}</span>
           <span className="truncate text-[13px] text-text-secondary">
             {booking.serviceName} · {durationLabel(minutes)}
+            {booking.priceCents != null && ` · ${money(booking.priceCents)}`}
           </span>
         </span>
         {booking.status === "PENDING" && !open && <span className="h-2 w-2 shrink-0 rounded-full bg-warning" aria-label="Para confirmar" />}
@@ -62,9 +63,11 @@ function PersonRow({ booking, timeZone, open, onToggle }: { booking: Booking; ti
             <div className="flex flex-col gap-2.5 border-t border-border-ui/60 p-2.5">
               <div className="flex flex-wrap items-center gap-2">
                 {STATUS[booking.status]}
-                <span className="inline-flex items-center gap-1 text-[13px] tabular-nums text-text-secondary">
-                  <Phone size={13} /> {booking.customerPhone}
-                </span>
+                {booking.customerPhone && (
+                  <span className="inline-flex items-center gap-1 text-[13px] tabular-nums text-text-secondary">
+                    <Phone size={13} /> {booking.customerPhone}
+                  </span>
+                )}
               </div>
               {booking.note && <p className="whitespace-pre-wrap break-words rounded-xl bg-panel-2 px-3 py-2 text-[13.5px] text-text-primary">{booking.note}</p>}
               <div className="flex flex-wrap gap-2">
@@ -73,11 +76,18 @@ function PersonRow({ booking, timeZone, open, onToggle }: { booking: Booking; ti
                     Confirmar
                   </Button>
                 )}
-                <a href={upcoming ? reminderLink(booking, timeZone) : whatsappOfCustomer(booking.customerPhone)} target="_blank" rel="noopener noreferrer" className="flex h-11 items-center gap-1.5 rounded-xl border border-border-ui bg-panel px-3 text-[14px] font-semibold text-text-primary hover:bg-panel-hover md:h-9">
-                  <WhatsApp size={16} /> {upcoming ? "Lembrar" : "WhatsApp"}
-                </a>
+                {booking.customerPhone && (
+                  <a href={upcoming ? reminderLink(booking, timeZone) : whatsappOfCustomer(booking.customerPhone)} target="_blank" rel="noopener noreferrer" className="flex h-11 items-center gap-1.5 rounded-xl border border-border-ui bg-panel px-3 text-[14px] font-semibold text-text-primary hover:bg-panel-hover md:h-9">
+                    <WhatsApp size={16} /> {upcoming ? "Lembrar" : "WhatsApp"}
+                  </a>
+                )}
                 {!cancelled && (
-                  <Button variant="ghost" icon={X} className="ml-auto h-11 md:h-9" loading={isPending && variables?.action === "cancel"} onClick={() => void run("cancel")}>
+                  <button type="button" onClick={() => onMove(booking)} className="flex h-11 items-center gap-1.5 rounded-xl border border-border-ui bg-panel px-3 text-[14px] font-semibold text-text-primary hover:bg-panel-hover md:h-9">
+                    <Clock size={15} /> Remarcar
+                  </button>
+                )}
+                {!cancelled && (
+                  <Button variant="ghost" icon={X} className="h-11 md:h-9" loading={isPending && variables?.action === "cancel"} onClick={() => void run("cancel")}>
                     Cancelar
                   </Button>
                 )}
@@ -123,7 +133,7 @@ function buildDay(date: string, bookings: Booking[], agenda: AgendaData, today: 
 }
 
 /** O dia escolhido: as pessoas entram em sequência, cada uma no seu horário. Serve ao computador e ao celular. */
-export function DayPanel({ agenda, date, direction, activeId, onActive, onSetup, className = "" }: { agenda: AgendaData; date: string; direction: number; activeId: string | null; onActive: (id: string | null) => void; onSetup: () => void; className?: string }) {
+export function DayPanel({ agenda, date, direction, activeId, onActive, onSetup, onNew, onMove, className = "" }: { agenda: AgendaData; date: string; direction: number; activeId: string | null; onActive: (id: string | null) => void; onSetup: () => void; onNew: (date: string, time?: string) => void; onMove: (b: Booking) => void; className?: string }) {
   const { timeZone } = agenda.config;
   const { blocks, services } = agenda;
   const reduce = useReducedMotion();
@@ -152,6 +162,7 @@ export function DayPanel({ agenda, date, direction, activeId, onActive, onSetup,
               <span className="font-semibold text-text-primary">{day.live.length === 1 ? "1 pessoa" : `${day.live.length} pessoas`}</span>
               {pendingCount > 0 && <span className="font-semibold text-warning-strong">· {pendingCount} para confirmar</span>}
               {day.next && <span>· próxima às {timeIn(day.next.startsAt, timeZone)}</span>}
+              {revenueOf(day.live) > 0 && <span>· {money(revenueOf(day.live))} previstos</span>}
             </p>
             {day.openMinutes > 0 && blocked.length === 0 && (
               <div className="flex items-center gap-2" title="Quanto do horário de atendimento já está reservado">
@@ -160,6 +171,11 @@ export function DayPanel({ agenda, date, direction, activeId, onActive, onSetup,
                 </span>
                 <span className="text-[12px] font-semibold tabular-nums text-text-secondary">{occupation}% ocupado</span>
               </div>
+            )}
+            {services.length > 0 && (
+              <Button variant="secondary" icon={Plus} className="h-11 md:h-9" onClick={() => onNew(date)}>
+                Nova reserva
+              </Button>
             )}
           </header>
 
@@ -210,7 +226,7 @@ export function DayPanel({ agenda, date, direction, activeId, onActive, onSetup,
                       <>
                         <span className={`pt-[18px] text-right text-[13px] font-bold tabular-nums ${item.booking.status === "CANCELLED" ? "text-text-secondary/60 line-through" : "text-text-primary"}`}>{clock(item.at)}</span>
                         <div className="py-1">
-                          <PersonRow booking={item.booking} timeZone={timeZone} open={activeId === item.booking.id} onToggle={() => onActive(activeId === item.booking.id ? null : item.booking.id)} />
+                          <PersonRow booking={item.booking} timeZone={timeZone} open={activeId === item.booking.id} onToggle={() => onActive(activeId === item.booking.id ? null : item.booking.id)} onMove={onMove} />
                         </div>
                       </>
                     )}
@@ -218,9 +234,10 @@ export function DayPanel({ agenda, date, direction, activeId, onActive, onSetup,
                       <>
                         <span className="pt-2.5 text-right text-[12px] tabular-nums text-text-secondary/70">{clock(item.at)}</span>
                         <div className="py-1">
-                          <span className="flex min-h-8 items-center gap-1.5 rounded-xl border border-dashed border-border-ui/80 px-3 text-[12.5px] text-text-secondary">
+                          <button type="button" aria-label={`Marcar às ${clock(item.at)}`} onClick={() => onNew(date, clock(item.at))} className="group flex min-h-8 w-full items-center gap-1.5 rounded-xl border border-dashed border-border-ui/80 px-3 text-left text-[12.5px] text-text-secondary transition-colors hover:border-primary/50 hover:bg-primary/5 hover:text-primary-strong">
                             <Clock size={13} /> Livre até {clock(item.end)}
-                          </span>
+                            <Plus size={13} className="ml-auto opacity-60 group-hover:opacity-100" />
+                          </button>
                         </div>
                       </>
                     )}

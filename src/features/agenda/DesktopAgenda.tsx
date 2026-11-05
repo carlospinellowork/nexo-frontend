@@ -1,10 +1,14 @@
 import { motion, useReducedMotion } from "motion/react";
-import { useEffect, useMemo, useState } from "react";
+import { isAxiosError } from "axios";
+import { useEffect, useMemo, useRef, useState } from "react";
+import { apiErrorMessage } from "../../api/instance";
+import { useRescheduleBooking } from "../../api/mutations/useAgendaMutations";
 import { useGetBookingsRange } from "../../api/queries/useGetBookingsRange";
 import { Segmented } from "../../shared/components/ui/Segmented";
-import { CalendarCheck, ChevronLeft, ChevronRight, Clock, Lock, Users } from "../../shared/icons";
+import { toast } from "../../shared/components/ui/toast-store";
+import { CalendarCheck, ChartLine, ChevronLeft, ChevronRight, Clock, Lock, Users } from "../../shared/icons";
 import { DayPanel } from "./DayPanel";
-import { type AgendaBlock, type AgendaData, type Booking, dayIn, shiftDay, timeIn, weekdayOf } from "./types";
+import { type AgendaBlock, type AgendaData, type Booking, dayIn, money, revenueOf, shiftDay, timeIn, weekdayOf } from "./types";
 
 const WEEKDAYS = ["Dom", "Seg", "Ter", "Qua", "Qui", "Sex", "Sáb"];
 const HOUR_PX = 60;
@@ -147,8 +151,77 @@ function useNow() {
   return now;
 }
 
+const toClock = (m: number) => `${String(Math.floor(m / 60)).padStart(2, "0")}:${String(m % 60).padStart(2, "0")}`;
+
+/** Reserva na grade: tocar abre os detalhes; arrastar remarca, mostrando o novo horário enquanto move. */
+function GridBlock({ booking: b, index, lane, lanes, timeZone, top, active, columnWidth, step, date, onSelect, onDrop }: { booking: Booking; index: number; lane: number; lanes: number; timeZone: string; top: (m: number) => number; active: boolean; columnWidth: () => number; step: number; date: string; onSelect: (b: Booking) => void; onDrop: (b: Booking, date: string, time: string) => void }) {
+  const reduce = useReducedMotion();
+  const dragged = useRef(false);
+  const [preview, setPreview] = useState<string | null>(null);
+  const startMinutes = toMinutes(timeIn(b.startsAt, timeZone));
+  const endMinutes = toMinutes(timeIn(b.endsAt, timeZone));
+  const y = top(startMinutes) + 4;
+  const height = Math.max(24, top(endMinutes) - top(startMinutes) - 2);
+  const canDrag = b.status !== "CANCELLED";
+  const target = (dx: number, dy: number) => {
+    const days = Math.round(dx / columnWidth());
+    const minutes = Math.round(((dy / HOUR_PX) * 60) / step) * step;
+    return { date: shiftDay(date, days), time: toClock(Math.min(23 * 60 + 59, Math.max(0, startMinutes + minutes))), moved: days !== 0 || minutes !== 0 };
+  };
+  return (
+    <motion.button
+      type="button"
+      drag={canDrag}
+      dragMomentum={false}
+      dragElastic={0}
+      dragSnapToOrigin
+      onDragStart={() => {
+        dragged.current = true;
+      }}
+      onDrag={(_, info) => {
+        const t = target(info.offset.x, info.offset.y);
+        setPreview(`${WEEKDAYS[weekdayOf(t.date)]} ${t.time}`);
+      }}
+      onDragEnd={(_, info) => {
+        setPreview(null);
+        const t = target(info.offset.x, info.offset.y);
+        if (t.moved) onDrop(b, t.date, t.time);
+        // O clique que vem depois de soltar não abre os detalhes.
+        setTimeout(() => {
+          dragged.current = false;
+        }, 0);
+      }}
+      whileDrag={{ scale: 1.04, zIndex: 40, boxShadow: "0 12px 28px rgba(0,0,0,.22)", cursor: "grabbing" }}
+      initial={reduce ? false : { opacity: 0, scale: 0.94 }}
+      animate={{ opacity: 1, scale: 1 }}
+      transition={{ type: "spring", stiffness: 420, damping: 30, delay: reduce ? 0 : index * 0.03 }}
+      onClick={(e) => {
+        e.stopPropagation();
+        if (!dragged.current) onSelect(b);
+      }}
+      aria-label={`${timeIn(b.startsAt, timeZone)}, ${b.customerName}, ${b.serviceName}. Arraste para remarcar.`}
+      className={`absolute z-10 flex touch-none flex-col rounded-lg border-l-[3px] px-2 py-1 text-left transition-colors ${canDrag ? "cursor-grab" : ""} ${preview ? "" : "overflow-hidden"} ${BLOCK_STYLE[b.status]} ${active ? "ring-2 ring-primary ring-offset-1 ring-offset-panel" : ""}`}
+      style={{ top: y, height, left: `calc(${(lane / lanes) * 100}% + 2px)`, width: `calc(${100 / lanes}% - 4px)` }}
+    >
+      {preview && <span className="absolute -top-7 left-0 z-50 whitespace-nowrap rounded-lg bg-primary px-2 py-1 text-[12px] font-bold text-white shadow-float">{preview}</span>}
+      {height > 40 ? (
+        <>
+          <span className="truncate text-[11.5px] font-semibold tabular-nums leading-tight text-text-secondary">{timeIn(b.startsAt, timeZone)}</span>
+          <span className="truncate text-[12.5px] font-bold leading-snug">{b.customerName}</span>
+          {height > 64 && <span className="truncate text-[11.5px] leading-tight text-text-secondary">{b.serviceName}</span>}
+        </>
+      ) : (
+        <span className="truncate text-[12px] font-bold leading-tight">
+          <span className="tabular-nums">{timeIn(b.startsAt, timeZone)}</span> {b.customerName.split(/\s+/)[0]}
+        </span>
+      )}
+    </motion.button>
+  );
+}
+
 /** A semana (ou o dia) em grade de horários: a altura de cada reserva é a duração dela. */
-function TimeGrid({ agenda, days, bookings, today, selected, direction, activeId, onSelect, onDay }: { agenda: AgendaData; days: string[]; bookings: Map<string, Booking[]>; today: string; selected: string; direction: number; activeId: string | null; onSelect: (b: Booking) => void; onDay: (date: string) => void }) {
+function TimeGrid({ agenda, days, bookings, today, selected, direction, activeId, onSelect, onDay, onEmpty, onDrop }: { agenda: AgendaData; days: string[]; bookings: Map<string, Booking[]>; today: string; selected: string; direction: number; activeId: string | null; onSelect: (b: Booking) => void; onDay: (date: string) => void; onEmpty: (date: string, time: string) => void; onDrop: (b: Booking, date: string, time: string) => void }) {
+  const gridRef = useRef<HTMLDivElement>(null);
   const { timeZone, hours } = agenda.config;
   const reduce = useReducedMotion();
   const now = useNow();
@@ -177,7 +250,7 @@ function TimeGrid({ agenda, days, bookings, today, selected, direction, activeId
         })}
       </div>
 
-      <motion.div key={days[0] + days.length} initial={reduce ? false : { opacity: 0, x: direction * 28 }} animate={{ opacity: 1, x: 0 }} transition={{ type: "spring", stiffness: 380, damping: 34 }} className="relative grid" style={{ gridTemplateColumns: columns, height: top(end) + 8 }}>
+      <motion.div key={days[0] + days.length} initial={reduce ? false : { opacity: 0, x: direction * 28 }} animate={{ opacity: 1, x: 0 }} transition={{ type: "spring", stiffness: 380, damping: 34 }} ref={gridRef} className="relative grid" style={{ gridTemplateColumns: columns, height: top(end) + 8 }}>
         <div className="relative">
           {hourMarks.map((m) => (
             <span key={m} className="absolute right-2 -translate-y-1/2 text-[11.5px] tabular-nums text-text-secondary" style={{ top: top(m) + 4 }}>
@@ -191,7 +264,18 @@ function TimeGrid({ agenda, days, bookings, today, selected, direction, activeId
           const list = withLanes(bookings.get(date) ?? []);
           const nowMinutes = toMinutes(timeIn(now.toISOString(), timeZone));
           return (
-            <div key={date} className="relative border-l border-border-ui/50 bg-text-secondary/5">
+            <div
+              key={date}
+              data-day
+              onClick={(e) => {
+                if (blocked) return;
+                const rect = e.currentTarget.getBoundingClientRect();
+                const raw = start + ((e.clientY - rect.top - 4) / HOUR_PX) * 60;
+                const step = agenda.config.stepMinutes;
+                onEmpty(date, toClock(Math.max(start, Math.floor(raw / step) * step)));
+              }}
+              className={`relative border-l border-border-ui/50 bg-text-secondary/5 ${blocked ? "" : "cursor-cell"}`}
+            >
               {!blocked &&
                 open.map((h) => (
                   <span key={h.start} aria-hidden className="absolute inset-x-0 bg-panel" style={{ top: top(toMinutes(h.start)) + 4, height: top(toMinutes(h.end)) - top(toMinutes(h.start)) }} />
@@ -206,36 +290,9 @@ function TimeGrid({ agenda, days, bookings, today, selected, direction, activeId
                   </span>
                 </span>
               )}
-              {list.map(({ booking: b, lane, lanes }, i) => {
-                const y = top(minutesOf(b.startsAt)) + 4;
-                const height = Math.max(24, top(minutesOf(b.endsAt)) - top(minutesOf(b.startsAt)) - 2);
-                return (
-                  <motion.button
-                    key={b.id}
-                    type="button"
-                    initial={reduce ? false : { opacity: 0, scale: 0.94 }}
-                    animate={{ opacity: 1, scale: 1 }}
-                    transition={{ type: "spring", stiffness: 420, damping: 30, delay: reduce ? 0 : i * 0.03 }}
-                    whileHover={reduce ? undefined : { y: -1 }}
-                    onClick={() => onSelect(b)}
-                    aria-label={`${timeIn(b.startsAt, timeZone)}, ${b.customerName}, ${b.serviceName}`}
-                    className={`absolute z-10 flex flex-col overflow-hidden rounded-lg border-l-[3px] px-2 py-1 text-left transition-colors ${BLOCK_STYLE[b.status]} ${activeId === b.id ? "ring-2 ring-primary ring-offset-1 ring-offset-panel" : ""}`}
-                    style={{ top: y, height, left: `calc(${(lane / lanes) * 100}% + 2px)`, width: `calc(${100 / lanes}% - 4px)` }}
-                  >
-                    {height > 40 ? (
-                      <>
-                        <span className="truncate text-[11.5px] font-semibold tabular-nums leading-tight text-text-secondary">{timeIn(b.startsAt, timeZone)}</span>
-                        <span className="truncate text-[12.5px] font-bold leading-snug">{b.customerName}</span>
-                        {height > 64 && <span className="truncate text-[11.5px] leading-tight text-text-secondary">{b.serviceName}</span>}
-                      </>
-                    ) : (
-                      <span className="truncate text-[12px] font-bold leading-tight">
-                        <span className="tabular-nums">{timeIn(b.startsAt, timeZone)}</span> {b.customerName.split(/\s+/)[0]}
-                      </span>
-                    )}
-                  </motion.button>
-                );
-              })}
+              {list.map(({ booking: b, lane, lanes }, i) => (
+                <GridBlock key={b.id} booking={b} index={i} lane={lane} lanes={lanes} timeZone={timeZone} top={top} active={activeId === b.id} columnWidth={() => gridRef.current?.querySelector<HTMLElement>("[data-day]")?.offsetWidth ?? 100} step={agenda.config.stepMinutes} date={date} onSelect={onSelect} onDrop={onDrop} />
+              ))}
               {date === today && nowMinutes >= start && nowMinutes <= end && (
                 <span aria-hidden className="absolute inset-x-0 z-[15] flex items-center" style={{ top: top(nowMinutes) + 4 }}>
                   <motion.span animate={reduce ? undefined : { scale: [1, 1.35, 1] }} transition={{ duration: 2.4, repeat: Infinity }} className="-ml-1 h-2 w-2 shrink-0 rounded-full bg-danger" />
@@ -257,16 +314,18 @@ function WeekPulse({ agenda, today, onPick }: { agenda: AgendaData; today: strin
   const { timeZone } = agenda.config;
   const live = (data ?? []).filter((b) => b.status !== "CANCELLED");
   const pending = live.filter((b) => b.status === "PENDING");
+  const revenue = revenueOf(live);
   const todayCount = live.filter((b) => dayIn(timeZone, new Date(b.startsAt)) === today).length;
   const stats = [
     { label: "Hoje", value: todayCount, icon: Clock, date: today, warn: false },
     { label: "Esta semana", value: live.length, icon: CalendarCheck, date: today, warn: false },
     { label: "Para confirmar", value: pending.length, icon: Users, date: pending[0] ? dayIn(timeZone, new Date(pending[0].startsAt)) : today, warn: pending.length > 0 },
+    ...(revenue > 0 ? [{ label: "Previsto na semana", value: money(revenue), icon: ChartLine, date: today, warn: false }] : []),
   ];
   return (
     <div className="flex items-center gap-2">
       {stats.map((s) => (
-        <button key={s.label} type="button" title={s.label} aria-label={`${s.label}: ${s.value}`} onClick={() => onPick(s.date)} className={`flex h-9 items-center gap-1.5 rounded-xl border px-2.5 text-[12.5px] font-medium transition-colors ${s.warn ? "border-warning/40 bg-warning/10 text-warning-strong hover:bg-warning/16" : "border-border-ui/70 bg-panel text-text-secondary hover:bg-panel-hover"}`}>
+        <button key={s.label} type="button" title={s.label} aria-label={`${s.label}: ${s.value}`} onClick={() => onPick(s.date)} className={`h-9 items-center ${s.label === "Previsto na semana" ? "hidden 2xl:flex" : "flex"} gap-1.5 rounded-xl border px-2.5 text-[12.5px] font-medium transition-colors ${s.warn ? "border-warning/40 bg-warning/10 text-warning-strong hover:bg-warning/16" : "border-border-ui/70 bg-panel text-text-secondary hover:bg-panel-hover"}`}>
           <s.icon size={14} />
           <span className="hidden 2xl:inline">{s.label}</span>
           <span className={`font-display text-[15px] font-bold tabular-nums ${s.warn ? "" : "text-text-primary"}`}>{s.value}</span>
@@ -277,11 +336,12 @@ function WeekPulse({ agenda, today, onPick }: { agenda: AgendaData; today: strin
 }
 
 /** A agenda no computador: o calendário de um lado e, do outro, as pessoas do dia escolhido. */
-export function DesktopAgenda({ agenda, date, onDate, onSetup }: { agenda: AgendaData; date: string; onDate: (date: string) => void; onSetup: () => void }) {
+export function DesktopAgenda({ agenda, date, onDate, onSetup, onNew, onMove }: { agenda: AgendaData; date: string; onDate: (date: string) => void; onSetup: () => void; onNew: (date: string, time?: string) => void; onMove: (b: Booking) => void }) {
   const { timeZone } = agenda.config;
   const [view, setView] = useState<"month" | "week">("month");
   const [activeId, setActiveId] = useState<string | null>(null);
   const [direction, setDirection] = useState(1);
+  const { mutateAsync: reschedule } = useRescheduleBooking();
   const [month, setMonth] = useState(monthOf(date));
   const today = dayIn(timeZone);
   const from = weekStart(date);
@@ -358,10 +418,16 @@ export function DesktopAgenda({ agenda, date, onDate, onSetup }: { agenda: Agend
               setActiveId(b.id);
             }}
             onDay={pick}
+            onEmpty={onNew}
+            onDrop={(b, nextDate, time) => {
+              reschedule({ id: b.id, date: nextDate, time })
+                .then(() => toast.success(`${b.customerName} remarcado para ${time}. Avise pelo WhatsApp.`))
+                .catch((err: unknown) => toast.error(isAxiosError(err) && err.response?.status === 409 ? "Esse horário já está ocupado." : apiErrorMessage(err, "Não foi possível remarcar.")));
+            }}
           />
         )}
       </div>
-      <DayPanel agenda={agenda} date={date} direction={direction} activeId={activeId} onActive={setActiveId} onSetup={onSetup} className="min-h-0 overflow-y-auto rounded-2xl border border-border-ui/70 bg-panel shadow-card" />
+      <DayPanel agenda={agenda} date={date} direction={direction} activeId={activeId} onActive={setActiveId} onSetup={onSetup} onNew={onNew} onMove={onMove} className="min-h-0 overflow-y-auto rounded-2xl border border-border-ui/70 bg-panel shadow-card" />
     </div>
   );
 }

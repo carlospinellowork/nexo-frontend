@@ -3,13 +3,13 @@ import { useMemo, useState } from "react";
 import { useGetBookingsRange } from "../../api/queries/useGetBookingsRange";
 import { ChevronLeft, ChevronRight } from "../../shared/icons";
 import { DayPanel } from "./DayPanel";
-import { type AgendaData, dayIn, shiftDay, weekdayOf } from "./types";
+import { type AgendaData, type Booking, dayIn, shiftDay, weekdayOf } from "./types";
 
 const LETTERS = ["D", "S", "T", "Q", "Q", "S", "S"];
 const weekStart = (date: string) => shiftDay(date, -((weekdayOf(date) + 6) % 7));
 
 /** A agenda no celular: uma faixa com a semana ao alcance do polegar e, embaixo, as pessoas do dia. */
-export function MobileAgenda({ agenda, date, onDate, onSetup }: { agenda: AgendaData; date: string; onDate: (date: string) => void; onSetup: () => void }) {
+export function MobileAgenda({ agenda, date, onDate, onSetup, onNew, onMove }: { agenda: AgendaData; date: string; onDate: (date: string) => void; onSetup: () => void; onNew: (date: string, time?: string) => void; onMove: (b: Booking) => void }) {
   const { timeZone } = agenda.config;
   const reduce = useReducedMotion();
   const [activeId, setActiveId] = useState<string | null>(null);
@@ -59,7 +59,7 @@ export function MobileAgenda({ agenda, date, onDate, onSetup }: { agenda: Agenda
           <ChevronRight size={18} />
         </button>
       </section>
-      <DayPanel agenda={agenda} date={date} direction={direction} activeId={activeId} onActive={setActiveId} onSetup={onSetup} className="overflow-hidden rounded-2xl border border-border-ui/70 bg-panel shadow-card" />
+      <DayPanel agenda={agenda} date={date} direction={direction} activeId={activeId} onActive={setActiveId} onSetup={onSetup} onNew={onNew} onMove={onMove} className="overflow-hidden rounded-2xl border border-border-ui/70 bg-panel shadow-card" />
     </div>
   );
 }

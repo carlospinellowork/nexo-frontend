@@ -19,6 +19,10 @@ export interface AgendaServiceItem {
   name: string;
   durationMinutes: number;
   active: boolean;
+  priceCents: number | null;
+  description: string | null;
+  imageUrl: string | null;
+  icon: string | null;
 }
 
 export interface AgendaBlock {
@@ -37,6 +41,7 @@ export interface AgendaData {
 export interface Booking {
   id: string;
   serviceName: string;
+  priceCents: number | null;
   startsAt: string;
   endsAt: string;
   status: "PENDING" | "CONFIRMED" | "CANCELLED";
@@ -56,6 +61,10 @@ export function whatsappOfCustomer(phone: string) {
   const digits = phone.replace(/\D/g, "");
   return `https://wa.me/${digits.length <= 11 ? `55${digits}` : digits}`;
 }
+
+export const money = (cents: number) => (cents / 100).toLocaleString("pt-BR", { style: "currency", currency: "BRL", minimumFractionDigits: cents % 100 ? 2 : 0 });
+/** Soma o previsto: canceladas não entram. Devolve 0 se ninguém cadastrou preço. */
+export const revenueOf = (list: Booking[]) => list.reduce((sum, b) => sum + (b.status === "CANCELLED" ? 0 : (b.priceCents ?? 0)), 0);
 
 export const weekdayOf = (date: string) => new Date(`${date}T12:00:00Z`).getUTCDay();
 
