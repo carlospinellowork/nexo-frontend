@@ -1,6 +1,6 @@
 import { ArrowDown, ArrowUp, Bot, CheckCircle2, ExternalLink, Globe, GripVertical, type IconComponent, Instagram, Link2, MessageCircle, Music2, Pencil, Plus, QrCode, Rocket, Save, ChevronDown, Paintbrush, ShoppingBag, Smartphone, Star, Trash2, UserRound, WhatsApp, Youtube } from "../../shared/icons";
 import { Reorder, useDragControls } from "motion/react";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { apiErrorMessage } from "../../api/instance";
 import { usePublishLandingPage } from "../../api/mutations/usePublishLandingPage";
 import { type UpdateLandingPagePayload, useUpdateLandingPage } from "../../api/mutations/useUpdateLandingPage";
@@ -13,6 +13,8 @@ import { type BioTarget, LandingRenderer } from "../landing/components/LandingRe
 import { ClickCount, Field, LinkFields, ProductFields, ScheduleBadge } from "../landing/components/SectionEditor";
 import { LookEditor } from "../landing/components/LookEditor";
 import { ThemePicker } from "../landing/components/ThemePicker";
+import { previewJourneyTransport } from "../landing/journey/transports";
+import { useJourney } from "../landing/journey/useJourney";
 import { PhotoTheme } from "../landing/look/PhotoTheme";
 import { type LandingPageRecord, type LandingPageSettings, type LandingSection, type LandingTheme, type LinkItem, type LinkKind, MAX, type ProductItem, themeBg, themeIsDark } from "../landing/contract";
 import { BioBotTab } from "./BioBotTab";
@@ -110,6 +112,9 @@ export function BioEditor({ page, openInstagram = false }: { page: LandingPageRe
   const [pane, setPane] = useState<"edit" | "preview">("edit");
   const [selection, setSelection] = useState<Selection>(null);
   const [adding, setAdding] = useState(false);
+  const previewChatId = draft.settings.journeyFirst ? page.chatId : null;
+  const previewTransport = useMemo(() => (previewChatId ? previewJourneyTransport(previewChatId) : null), [previewChatId]);
+  const previewJourney = useJourney(previewTransport);
 
   // Carrega a versão do servidor uma vez por página; depois a tela é a fonte do rascunho.
   const loadedFor = useRef(page.id);
@@ -335,7 +340,7 @@ export function BioEditor({ page, openInstagram = false }: { page: LandingPageRe
               </div>
             )}
 
-            {tab === "bot" && <BioBotTab page={page} ensureSaved={ensureSaved} />}
+            {tab === "bot" && <BioBotTab page={page} ensureSaved={ensureSaved} journeyFirst={Boolean(draft.settings.journeyFirst)} onJourneyFirst={(journeyFirst) => change({ settings: { ...draft.settings, journeyFirst } })} />}
 
             {tab === "page" && (
               <div className="flex flex-col gap-5">
@@ -386,6 +391,7 @@ export function BioEditor({ page, openInstagram = false }: { page: LandingPageRe
                 onAsk={() => undefined}
                 onEditSelect={setSelection}
                 editSelectedId={selectedId}
+                journey={previewChatId ? previewJourney : undefined}
               />
           </PhoneFrame>
         </div>

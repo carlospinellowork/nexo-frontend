@@ -14,6 +14,8 @@ export interface Results {
   perDay: { date: string; count: number }[];
   byChannel: Record<string, number>;
   dropOff: { chat: string; nodeId: string; label: string; count: number }[];
+  /** Por bio em modo jornada: quem respondeu, quem chegou ao fim e quem tocou no WhatsApp. */
+  journeys: { pageId: string; title: string; started: number; finished: number; whatsapp: number }[];
 }
 
 export const useGetResults = (days: number) => {

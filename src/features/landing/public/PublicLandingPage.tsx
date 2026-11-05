@@ -1,8 +1,10 @@
 import { Globe, Loader2 } from "../../../shared/icons";
-import { useEffect } from "react";
+import { useEffect, useMemo } from "react";
 import { API_ORIGIN } from "../../../api/instance";
 import { useGetPublicLandingPage } from "../../../api/queries/useGetPublicLandingPage";
 import { LandingRenderer } from "../components/LandingRenderer";
+import { publicJourneyTransport } from "../journey/transports";
+import { useJourney } from "../journey/useJourney";
 import { trackClick } from "../trackClick";
 
 declare global {
@@ -37,7 +39,12 @@ function setMeta(name: string, content: string) {
 /** Página ou bio publicada, para visitantes (em /p/:slug e, no endereço curto das bios, em /:slug). */
 export function PublicLandingPage({ slug }: { slug: string }) {
   const { data: page, isLoading, isError } = useGetPublicLandingPage(slug);
-  useChatWidget(page?.chat?.id);
+  const journeyFirst = Boolean(page?.settings.journeyFirst && page.chat);
+  const transport = useMemo(() => (journeyFirst ? publicJourneyTransport(slug) : null), [journeyFirst, slug]);
+  const journey = useJourney(transport);
+  const inPage = journeyFirst && journey.status !== "failed";
+  // Na jornada, a conversa fica na própria página: sem o botão flutuante.
+  useChatWidget(page && !inPage ? page.chat?.id : undefined);
 
   useEffect(() => {
     if (!page) return;
@@ -73,7 +80,8 @@ export function PublicLandingPage({ slug }: { slug: string }) {
         slug={page.slug}
         canAsk={!!page.chat}
         onChat={() => window.NexoChat?.open()}
-        onAsk={(question) => window.NexoChat?.open(question)}
+        onAsk={(question) => (inPage ? void journey.ask(question) : window.NexoChat?.open(question))}
+        journey={inPage ? journey : undefined}
         onItemClick={(itemId) => trackClick(page.slug, itemId)}
       />
     </div>

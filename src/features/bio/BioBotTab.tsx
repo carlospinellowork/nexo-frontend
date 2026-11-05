@@ -6,6 +6,7 @@ import { apiErrorMessage } from "../../api/instance";
 import { useRegenerateBioBot } from "../../api/mutations/useBioMutations";
 import { Button } from "../../shared/components/ui/Button";
 import { inputClass, textareaClass } from "../../shared/components/ui/styles";
+import { Switch } from "../../shared/components/ui/Switch";
 import { toast } from "../../shared/components/ui/toast-store";
 import { useFlowStore } from "../flow/store/flow.store";
 import type { LandingPageRecord } from "../landing/contract";
@@ -23,7 +24,7 @@ interface Row {
 const newKey = () => crypto.randomUUID().slice(0, 6);
 
 /** Aba "Perguntas do bot": edita as perguntas e respostas e gera o fluxo de novo. */
-export function BioBotTab({ page, ensureSaved }: { page: LandingPageRecord; ensureSaved: () => Promise<boolean> }) {
+export function BioBotTab({ page, ensureSaved, journeyFirst, onJourneyFirst }: { page: LandingPageRecord; ensureSaved: () => Promise<boolean>; journeyFirst: boolean; onJourneyFirst: (on: boolean) => void }) {
   const navigate = useNavigate();
   const setSelectedChatId = useFlowStore((s) => s.setSelectedChatId);
   const { mutateAsync: regenerate, isPending } = useRegenerateBioBot();
@@ -57,6 +58,15 @@ export function BioBotTab({ page, ensureSaved }: { page: LandingPageRecord; ensu
 
   return (
     <div className="flex flex-col gap-3">
+      {page.chat && (
+        <div className="flex flex-col gap-1.5 rounded-2xl border border-border-ui bg-panel p-3">
+          <div className="flex items-center gap-3">
+            <span className="flex-1 text-[14px] font-semibold text-text-primary">Abrir a bio na conversa</span>
+            <Switch checked={journeyFirst} label="Abrir a bio na conversa" onChange={onJourneyFirst} />
+          </div>
+          <p className="text-[13px] leading-snug text-text-secondary">Quem abre o seu link fala direto com o bot, com um toque para ver todos os links. Para valer, publique a bio.</p>
+        </div>
+      )}
       <p className="flex gap-2 text-[13px] leading-snug text-text-secondary">
         <Bot size={16} className="mt-px shrink-0 text-primary" />O bot da sua bio responde com estas perguntas. Ao atualizar, o Nexo cria o fluxo de novo e publica na hora.
       </p>

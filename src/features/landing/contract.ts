@@ -210,6 +210,8 @@ export interface LandingPageSettings {
   layout?: "page" | "bio";
   /** Selo "feito com Nexo" na bio. Hoje sempre aparece; planos futuros poderão desligar. */
   showBadge?: boolean;
+  /** A bio abre direto na conversa com o bot (jornada), com um toque para ver todos os links. */
+  journeyFirst?: boolean;
   /** Assistente da bio (gerido pelo servidor). */
   bio?: { audience: "creator" | "seller" | "business"; kit?: "beleza" | "comida" | "artista" | "influencer" | "saude"; faqs: { id: string; question: string; answer: string }[]; flowSignature?: string };
 }

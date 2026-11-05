@@ -1,4 +1,4 @@
-import { CheckCircle2, ChevronDown, Globe, type IconComponent, Instagram, Link2, MessageCircle, Music2, Phone, QrCode, Search, ShoppingBag, Sparkles, Spotify, Star, WhatsApp, X, Youtube } from "../../../shared/icons";
+import { ArrowLeft, CheckCircle2, ChevronDown, Globe, type IconComponent, Instagram, Link2, MessageCircle, Music2, Phone, QrCode, Search, ShoppingBag, Sparkles, Spotify, Star, WhatsApp, X, Youtube } from "../../../shared/icons";
 import { AnimatePresence, motion, useReducedMotion } from "motion/react";
 import { useEffect, useId, useRef, useState } from "react";
 import { SealPill } from "../../../shared/components/ui/NexoSeal";
@@ -12,6 +12,8 @@ import { buttonClass, PALETTE, type Palette, resolveLook } from "../look/resolve
 import { getTheme } from "../look/themes";
 import type { ButtonShape, ButtonStyle } from "../look/types";
 import { imageSrc, isImageUrl } from "../../uploads/image";
+import { JourneyView } from "../journey/JourneyView";
+import type { Journey } from "../journey/useJourney";
 
 // As páginas dos clientes têm paletas próprias (não seguem o tema do painel): ver ../look.
 interface LandingRendererProps {
@@ -32,6 +34,8 @@ interface LandingRendererProps {
   /** Modo editor da bio: tocar no perfil, em um link ou produto seleciona em vez de abrir. */
   onEditSelect?: (target: BioTarget) => void;
   editSelectedId?: string;
+  /** Bio em modo jornada: abre na conversa. Sem isto (ou se ela falhar), abre nos links. */
+  journey?: Journey;
 }
 
 export type BioTarget = { type: "profile" } | { type: "link"; id: string } | { type: "product"; id: string };
@@ -409,7 +413,7 @@ function ProductCard({ product, t, onClick }: { product: ProductItem; t: Palette
 const SITE_URL: string = import.meta.env.VITE_SITE_URL ?? "https://nexo.app";
 
 /** Link na bio: coluna estreita para o celular, com busca, links, produtos, Pix e o bot. */
-function BioRenderer({ title, theme, sections, settings, slug, canAsk, onChat, onAsk, onItemClick, onEditSelect, editSelectedId }: LandingRendererProps) {
+function BioRenderer({ title, theme, sections, settings, slug, canAsk, onChat, onAsk, onItemClick, onEditSelect, editSelectedId, journey }: LandingRendererProps) {
   const t = PALETTE;
   const look = resolveLook(getTheme(theme), settings?.look, settings?.fontHeading);
   const buttons = { style: look.buttonStyle, shape: look.buttonShape };
@@ -418,6 +422,7 @@ function BioRenderer({ title, theme, sections, settings, slug, canAsk, onChat, o
   const reduceMotion = useReducedMotion();
   const [query, setQuery] = useState("");
   const [pix, setPix] = useState<LinkItem | null>(null);
+  const [linksOpen, setLinksOpen] = useState(false);
   const searchId = useId();
   const visible = sections.filter((s) => s.enabled);
   const hero = visible.find((s): s is Extract<LandingSection, { type: "hero" }> => s.type === "hero")?.data;
@@ -428,6 +433,14 @@ function BioRenderer({ title, theme, sections, settings, slug, canAsk, onChat, o
   const name = hero?.headline || title;
   const initials = name.split(/\s+/).filter((w) => w.length > 2).slice(0, 2).map((w) => w[0]?.toUpperCase()).join("");
   const firstChat = links.findIndex((l) => l.kind === "chat");
+  const hasJourney = Boolean(journey && journey.status !== "failed");
+  // No editor, escolher um link ou produto mostra a lista, onde ele aparece selecionado.
+  const inConversation = hasJourney && !linksOpen && !(editSelectedId && editSelectedId !== "profile");
+  const openChat = () => (hasJourney ? setLinksOpen(false) : onChat());
+  const askQuestion = (question: string) => {
+    if (hasJourney) setLinksOpen(false);
+    onAsk?.(question);
+  };
 
   const words = fold(query).split(/\s+/).filter(Boolean);
   const matches = (text: string) => {
@@ -470,7 +483,16 @@ function BioRenderer({ title, theme, sections, settings, slug, canAsk, onChat, o
         {hero?.subheadline && <p className={`mt-2 text-[15px] leading-relaxed ${t.muted}`}>{hero.subheadline}</p>}
         </div>
 
-        {(links.length > 0 || products.length > 0) && (
+        {inConversation && journey && <JourneyView journey={journey} t={t} optionClass={buttonClass(buttons.style, buttons.shape)} onViewLinks={links.length > 0 || products.length > 0 ? () => setLinksOpen(true) : undefined} />}
+
+        {!inConversation && hasJourney && (
+          <button type="button" onClick={() => setLinksOpen(false)} className={`mt-5 flex min-h-11 items-center gap-1.5 self-start text-[14px] font-semibold ${t.muted}`}>
+            <ArrowLeft size={16} />
+            Voltar para a conversa
+          </button>
+        )}
+
+        {!inConversation && (links.length > 0 || products.length > 0) && (
           <div className="mt-6 w-full">
             <label htmlFor={searchId} className="sr-only">
               Procurando algo?
@@ -496,10 +518,10 @@ function BioRenderer({ title, theme, sections, settings, slug, canAsk, onChat, o
           </div>
         )}
 
-        <div className="mt-5 flex w-full flex-col gap-3">
+        {!inConversation && <div className="mt-5 flex w-full flex-col gap-3">
           {shownLinks.map((item, i) => (
             <motion.div key={item.id} initial={reduceMotion ? false : { opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: words.length ? 0 : 0.1 + i * 0.06 }} className={ring(item.id)} {...pick({ type: "link", id: item.id })}>
-              <LinkButton item={item} t={t} look={buttons} onChat={onChat} onPix={setPix} onClick={onItemClick} primary={!words.length && i === firstChat} />
+              <LinkButton item={item} t={t} look={buttons} onChat={openChat} onPix={setPix} onClick={onItemClick} primary={!words.length && i === firstChat} />
             </motion.div>
           ))}
 
@@ -520,7 +542,7 @@ function BioRenderer({ title, theme, sections, settings, slug, canAsk, onChat, o
               {canAsk ? (
                 <button
                   type="button"
-                  onClick={() => onAsk?.(query.trim())}
+                  onClick={() => askQuestion(query.trim())}
                   className={`mt-4 flex min-h-12 w-full items-center justify-center gap-2 rounded-xl px-4 text-[15px] font-semibold ${t.primary}`}
                 >
                   <MessageCircle size={18} />
@@ -531,7 +553,7 @@ function BioRenderer({ title, theme, sections, settings, slug, canAsk, onChat, o
               )}
             </div>
           )}
-        </div>
+        </div>}
 
         <div className="mt-auto flex flex-col items-center gap-2 pt-12">
           {footer?.companyName && <span className={`text-[12px] font-semibold ${t.muted}`}>{footer.companyName}</span>}

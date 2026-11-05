@@ -71,6 +71,32 @@ function ResultsPage() {
               <DailyBars data={data.perDay} label={`Conversas por dia nos últimos ${data.days} dias`} />
             </section>
 
+            {data.journeys.length > 0 && (
+              <section className="rounded-2xl border border-border-ui/70 bg-panel p-4 shadow-card">
+                <h2 className="text-[16px] font-bold tracking-tight text-text-primary">Jornadas da bio</h2>
+                <p className="mb-4 text-[13px] text-text-secondary">Conta quem respondeu. Quem só abriu a bio fica de fora.</p>
+                <ul className="flex flex-col gap-2">
+                  {data.journeys.map((j) => (
+                    <li key={j.pageId} className="flex flex-col gap-2 rounded-2xl bg-panel-2 px-3 py-2.5">
+                      <span className="truncate text-[14px] font-semibold text-text-primary">{j.title}</span>
+                      <dl className="grid grid-cols-3 gap-2">
+                        {[
+                          { label: "Começaram", value: j.started },
+                          { label: "Terminaram", value: j.finished },
+                          { label: "No WhatsApp", value: j.whatsapp },
+                        ].map((n) => (
+                          <div key={n.label} className="flex flex-col">
+                            <dt className="text-[12px] text-text-secondary">{n.label}</dt>
+                            <dd className="font-display text-[20px] font-bold tabular-nums text-text-primary">{fmt(n.value)}</dd>
+                          </div>
+                        ))}
+                      </dl>
+                    </li>
+                  ))}
+                </ul>
+              </section>
+            )}
+
             <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
               <section className="rounded-2xl border border-border-ui/70 bg-panel p-4 shadow-card">
                 <h2 className="text-[16px] font-bold tracking-tight text-text-primary">Onde as pessoas param</h2>
