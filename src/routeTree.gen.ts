@@ -31,6 +31,7 @@ import { Route as AppQrCodesRouteImport } from './pages/_app/qr-codes'
 import { Route as AppResultsRouteImport } from './pages/_app/results'
 import { Route as AppSimulateRouteImport } from './pages/_app/simulate'
 import { Route as PSlugRouteImport } from './pages/p/$slug'
+import { Route as ReservaTokenRouteImport } from './pages/reserva.$token'
 
 const SlugRoute = SlugRouteImport.update({
   id: '/$slug',
@@ -141,6 +142,11 @@ const PSlugRoute = PSlugRouteImport.update({
   path: '/p/$slug',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ReservaTokenRoute = ReservaTokenRouteImport.update({
+  id: '/reserva/$token',
+  path: '/reserva/$token',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof AppIndexRoute
@@ -164,6 +170,7 @@ export interface FileRoutesByFullPath {
   '/results': typeof AppResultsRoute
   '/simulate': typeof AppSimulateRoute
   '/p/$slug': typeof PSlugRoute
+  '/reserva/$token': typeof ReservaTokenRoute
 }
 export interface FileRoutesByTo {
   '/$slug': typeof SlugRoute
@@ -186,6 +193,7 @@ export interface FileRoutesByTo {
   '/results': typeof AppResultsRoute
   '/simulate': typeof AppSimulateRoute
   '/p/$slug': typeof PSlugRoute
+  '/reserva/$token': typeof ReservaTokenRoute
   '/': typeof AppIndexRoute
 }
 export interface FileRoutesById {
@@ -211,6 +219,7 @@ export interface FileRoutesById {
   '/_app/results': typeof AppResultsRoute
   '/_app/simulate': typeof AppSimulateRoute
   '/p/$slug': typeof PSlugRoute
+  '/reserva/$token': typeof ReservaTokenRoute
   '/_app/': typeof AppIndexRoute
 }
 export interface FileRouteTypes {
@@ -237,6 +246,7 @@ export interface FileRouteTypes {
     | '/results'
     | '/simulate'
     | '/p/$slug'
+    | '/reserva/$token'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/$slug'
@@ -259,6 +269,7 @@ export interface FileRouteTypes {
     | '/results'
     | '/simulate'
     | '/p/$slug'
+    | '/reserva/$token'
     | '/'
   id:
     | '__root__'
@@ -283,6 +294,7 @@ export interface FileRouteTypes {
     | '/_app/results'
     | '/_app/simulate'
     | '/p/$slug'
+    | '/reserva/$token'
     | '/_app/'
   fileRoutesById: FileRoutesById
 }
@@ -295,6 +307,7 @@ export interface RootRouteChildren {
   RedefinirSenhaRoute: typeof RedefinirSenhaRoute
   TermosRoute: typeof TermosRoute
   PSlugRoute: typeof PSlugRoute
+  ReservaTokenRoute: typeof ReservaTokenRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -453,6 +466,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof PSlugRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/reserva/$token': {
+      id: '/reserva/$token'
+      path: '/reserva/$token'
+      fullPath: '/reserva/$token'
+      preLoaderRoute: typeof ReservaTokenRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
@@ -503,6 +523,7 @@ const rootRouteChildren: RootRouteChildren = {
   RedefinirSenhaRoute: RedefinirSenhaRoute,
   TermosRoute: TermosRoute,
   PSlugRoute: PSlugRoute,
+  ReservaTokenRoute: ReservaTokenRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

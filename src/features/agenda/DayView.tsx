@@ -15,6 +15,13 @@ const STATUS = {
   CANCELLED: <Badge tone="neutral">Cancelada</Badge>,
 };
 
+/** Abre o WhatsApp do cliente com o lembrete escrito: é o dono que envia, sem API e sem custo. */
+function reminderLink(booking: Booking, timeZone: string) {
+  const day = new Date(booking.startsAt).toLocaleDateString("pt-BR", { timeZone, weekday: "long", day: "2-digit", month: "2-digit" });
+  const text = `Oi, ${booking.customerName}! Passando para lembrar do seu horário de ${booking.serviceName}: ${day}, às ${timeIn(booking.startsAt, timeZone)}. Até lá!`;
+  return `${whatsappOfCustomer(booking.customerPhone)}?text=${encodeURIComponent(text)}`;
+}
+
 function BookingCard({ booking, timeZone }: { booking: Booking; timeZone: string }) {
   const { mutateAsync, isPending, variables } = useBookingAction();
   const run = async (action: "confirm" | "cancel") => {
@@ -27,6 +34,7 @@ function BookingCard({ booking, timeZone }: { booking: Booking; timeZone: string
     }
   };
   const cancelled = booking.status === "CANCELLED";
+  const upcoming = !cancelled && Date.parse(booking.startsAt) > Date.now();
   return (
     <li className={`flex flex-col gap-2.5 rounded-2xl border border-border-ui/70 bg-panel p-3 shadow-card ${cancelled ? "opacity-60" : ""}`}>
       <div className="flex items-center gap-2">
@@ -40,8 +48,8 @@ function BookingCard({ booking, timeZone }: { booking: Booking; timeZone: string
         {booking.note && <span className="mt-1 whitespace-pre-wrap break-words text-[14px] text-text-secondary">{booking.note}</span>}
       </div>
       <div className="flex flex-wrap gap-2">
-        <a href={whatsappOfCustomer(booking.customerPhone)} target="_blank" rel="noopener noreferrer" className="flex h-11 items-center gap-1.5 rounded-xl border border-border-ui px-3 text-[14px] font-semibold text-text-primary hover:bg-panel-hover">
-          <WhatsApp size={16} /> WhatsApp
+        <a href={upcoming ? reminderLink(booking, timeZone) : whatsappOfCustomer(booking.customerPhone)} target="_blank" rel="noopener noreferrer" className="flex h-11 items-center gap-1.5 rounded-xl border border-border-ui px-3 text-[14px] font-semibold text-text-primary hover:bg-panel-hover">
+          <WhatsApp size={16} /> {upcoming ? "Lembrar" : "WhatsApp"}
         </a>
         {booking.status === "PENDING" && (
           <Button icon={CheckCircle2} className="h-11" loading={isPending && variables?.action === "confirm"} onClick={() => void run("confirm")}>
