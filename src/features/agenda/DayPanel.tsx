@@ -6,6 +6,7 @@ import { useGetBookings } from "../../api/queries/useGetBookings";
 import { Badge } from "../../shared/components/ui/Badge";
 import { Button } from "../../shared/components/ui/Button";
 import { toast } from "../../shared/components/ui/toast-store";
+import { useWorkspaceRole } from "../../shared/hooks/useWorkspaceRole";
 import { Calendar, CheckCircle2, ChevronDown, Clock, Lock, Phone, Plus, WhatsApp, X } from "../../shared/icons";
 import { type AgendaData, type Booking, dayIn, durationLabel, longDay, money, revenueOf, timeIn, weekdayOf, whatsappOfCustomer } from "./types";
 
@@ -138,6 +139,8 @@ function buildDay(date: string, bookings: Booking[], agenda: AgendaData, today: 
 export function DayPanel({ agenda, date, direction, activeId, onActive, onSetup, onNew, onMove, onCancelled, className = "" }: { agenda: AgendaData; date: string; direction: number; activeId: string | null; onActive: (id: string | null) => void; onSetup: () => void; onNew: (date: string, time?: string) => void; onMove: (b: Booking) => void; onCancelled: (b: Booking) => void; className?: string }) {
   const { timeZone } = agenda.config;
   const { blocks, services } = agenda;
+  // Atendente não cadastra serviços: a tela vazia não oferece o que ela não pode fazer.
+  const { canManage } = useWorkspaceRole();
   const reduce = useReducedMotion();
   const today = dayIn(timeZone);
   const { data, isPlaceholderData, isLoading } = useGetBookings(date);
@@ -209,11 +212,15 @@ export function DayPanel({ agenda, date, direction, activeId, onActive, onSetup,
 
             {!services.length && (
               <div className="flex flex-col gap-2 rounded-2xl border border-border-ui/70 p-4">
-                <p className="text-[15px] font-semibold text-text-primary">Comece pelos seus serviços</p>
-                <p className="text-[14px] leading-snug text-text-secondary">Diga o que você atende e quanto tempo leva. O Nexo calcula os horários livres sozinho.</p>
-                <Button className="mt-1 h-11 self-start md:h-9" onClick={onSetup}>
-                  Cadastrar serviços
-                </Button>
+                <p className="text-[15px] font-semibold text-text-primary">{canManage ? "Comece pelos seus serviços" : "A agenda ainda não tem serviços"}</p>
+                <p className="text-[14px] leading-snug text-text-secondary">
+                  {canManage ? "Diga o que você atende e quanto tempo leva. O Nexo calcula os horários livres sozinho." : "Quem administra a conta cadastra os serviços. Depois disso, as reservas aparecem aqui."}
+                </p>
+                {canManage && (
+                  <Button className="mt-1 h-11 self-start md:h-9" onClick={onSetup}>
+                    Cadastrar serviços
+                  </Button>
+                )}
               </div>
             )}
 

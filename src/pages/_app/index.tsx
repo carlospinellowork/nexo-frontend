@@ -20,6 +20,7 @@ import { ReferralCard } from "../../features/growth/ReferralCard";
 import { HomeHero } from "../../features/home/HomeHero";
 import { InstallCard } from "../../features/pwa/InstallApp";
 import { PushCard } from "../../features/push/PushPrompt";
+import { OriginsWeek } from "../../features/home/OriginsWeek";
 import { QuickActions } from "../../features/home/QuickActions";
 import { StatTile } from "../../features/home/StatTile";
 import { WhatsappPulse } from "../../features/home/WhatsappPulse";
@@ -128,6 +129,11 @@ function HomePage() {
           <StatTile label="Leads novos" value={leadsWeek} icon={Users} tone="green" to="/leads" />
           <StatTile label="Leituras de QR" value={qrWeek} icon={QrCode} tone="lagoon" to="/qr-codes" />
           <StatTile label="Cliques na bio" value={clicksWeek} icon={MousePointerClick} tone="rose" to="/minha-bio" hint={bio === null ? "crie a sua bio" : "nos últimos 7 dias"} />
+        </motion.div>
+
+        {/* Sem visitas na semana o cartão não aparece; empty:hidden tira o espaço vazio. */}
+        <motion.div variants={item} className="empty:hidden">
+          <OriginsWeek />
         </motion.div>
 
         <motion.div variants={item}>
