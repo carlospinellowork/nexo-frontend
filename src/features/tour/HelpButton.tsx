@@ -1,19 +1,11 @@
-import {
-  BookOpen,
-  CheckCircle2,
-  ChevronRight,
-  Compass,
-  HelpCircle,
-  Lightbulb,
-  MessageCircle,
-  Play,
-  Sparkles,
-  X,
-  Zap,
-} from "../../shared/icons";
+import { useNavigate } from "@tanstack/react-router";
 import { AnimatePresence, motion } from "motion/react";
 import { useState } from "react";
-import { startTour } from "./driver-service";
+import { Sheet } from "../../shared/components/ui/Sheet";
+import { inputClass } from "../../shared/components/ui/styles";
+import { BookOpen, ChevronDown, ChevronRight, HelpCircle, Play, Search } from "../../shared/icons";
+import { startTour, TOUR_STEPS } from "./driver-service";
+import { type HelpTopic, searchHelp } from "./helpTopics";
 import type { TourKey } from "./tour-store";
 
 interface HelpButtonProps {
@@ -21,70 +13,46 @@ interface HelpButtonProps {
   screenTitle?: string;
 }
 
-const GUIDES = [
-  {
-    id: "first-bot",
-    title: "Como montar seu primeiro bot em 3 minutos",
-    icon: Sparkles,
-    badge: "Essencial",
-    summary:
-      "Aprenda o ciclo básico: Início, Pergunta, Botões de opção, Resposta e Falar com humano.",
-    content: [
-      "1. Todo fluxo começa no bloco 'Início'.",
-      "2. Adicione um bloco 'Pergunta' para solicitar o nome do cliente e salve na variável 'nome'.",
-      "3. Use um bloco 'Botões de opção' com serviços (ex.: Orçamento, Dúvidas, Suporte).",
-      "4. Conecte cada botão à sua resposta específica usando o botão '+' na saída da opção.",
-      "5. Interpole dados usando {{nome}} para criar um atendimento personalizado.",
-    ],
-  },
-  {
-    id: "whatsapp-buttons",
-    title: "Como funcionam os botões no WhatsApp",
-    icon: MessageCircle,
-    badge: "WhatsApp Oficial",
-    summary:
-      "Regras oficiais da Cloud API da Meta: até 3 botões rápidos, mais de 3 viram lista.",
-    content: [
-      "Até 3 opções: aparecem como botões interativos clicáveis diretamente no WhatsApp.",
-      "Mais de 3 opções (até 10): o Nexo converte automaticamente para um menu de lista elegante.",
-      "Rótulos de botão podem ter até 24 caracteres (limite oficial do WhatsApp).",
-      "O cliente pode tocar no botão ou digitar o número/texto da opção.",
-    ],
-  },
-  {
-    id: "ai-agent",
-    title: "Configurando o Agente de IA com Conhecimento",
-    icon: Zap,
-    badge: "Inteligência",
-    summary:
-      "Deixe a IA responder dúvidas institucionais com base nas regras e manuais da sua empresa.",
-    content: [
-      "No bloco 'Agente de IA', cole as instruções da empresa e a base de conhecimento (preços, serviços, horários).",
-      "A IA só responde o que estiver no seu conhecimento e nunca inventa dados.",
-      "Se o cliente pedir um atendente ou ficar insatisfeito, a IA sai pela porta 'handoff' e transfere para a equipe.",
-    ],
-  },
-  {
-    id: "landing-pages",
-    title: "Landing Pages com Bot Integrado",
-    icon: Compass,
-    badge: "Vendas",
-    summary:
-      "Crie páginas de alta conversão conversando com a IA e publicando em um clique.",
-    content: [
-      "Descreva o seu ramo na criação por IA e ela monta capa, serviços, diferenciais e depoimentos.",
-      "Escolha o tema que mais combina com o seu público (como o Espresso & Champagne de luxo).",
-      "Vincule o fluxo do seu bot para que o widget de chat no canto da página atenda seus visitantes.",
-    ],
-  },
-];
+function Topic({ topic, open, onToggle, onGo }: { topic: HelpTopic; open: boolean; onToggle: () => void; onGo: (to: string) => void }) {
+  return (
+    <li className="rounded-xl border border-border-ui/70 bg-panel">
+      <button type="button" onClick={onToggle} aria-expanded={open} className="flex min-h-11 w-full items-center justify-between gap-3 px-3 py-2.5 text-left text-[14px] font-semibold text-text-primary">
+        {topic.q}
+        <ChevronDown size={16} className={`shrink-0 text-text-secondary transition-transform ${open ? "rotate-180" : ""}`} />
+      </button>
+      <AnimatePresence initial={false}>
+        {open && (
+          <motion.div initial={{ height: 0, opacity: 0 }} animate={{ height: "auto", opacity: 1 }} exit={{ height: 0, opacity: 0 }} className="overflow-hidden">
+            <div className="flex flex-col gap-2 px-3 pb-3">
+              <p className="text-[14px] leading-relaxed text-text-secondary">{topic.a}</p>
+              {topic.to && (
+                <button type="button" onClick={() => onGo(topic.to!)} className="flex items-center gap-1 self-start text-[13.5px] font-semibold text-primary-strong hover:underline">
+                  {topic.toLabel} <ChevronRight size={14} />
+                </button>
+              )}
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </li>
+  );
+}
 
+/** Ajuda de cada tela: o tour guiado dela e as dúvidas frequentes da jornada, com busca. */
 export function HelpButton({ tourKey, screenTitle }: HelpButtonProps) {
+  const navigate = useNavigate();
   const [menuOpen, setMenuOpen] = useState(false);
-  const [guideModalOpen, setGuideModalOpen] = useState(false);
-  const [selectedGuideId, setSelectedGuideId] = useState<string>("first-bot");
+  const [faqOpen, setFaqOpen] = useState(false);
+  const [query, setQuery] = useState("");
+  const [openTopic, setOpenTopic] = useState<string | null>(null);
+  const groups = searchHelp(query);
+  const hasTour = TOUR_STEPS[tourKey].length > 0;
 
-  const currentGuide = GUIDES.find((g) => g.id === selectedGuideId) || GUIDES[0];
+  const go = (to: string) => {
+    setFaqOpen(false);
+    void navigate({ to });
+  };
+  const item = "flex min-h-11 w-full items-center gap-2.5 rounded-xl px-3 text-left text-[13.5px] font-semibold text-text-primary transition-colors hover:bg-primary/10 md:min-h-9";
 
   return (
     <>
@@ -92,180 +60,79 @@ export function HelpButton({ tourKey, screenTitle }: HelpButtonProps) {
         <button
           type="button"
           onClick={() => setMenuOpen(!menuOpen)}
+          aria-expanded={menuOpen}
           className="flex h-10 min-w-10 items-center justify-center gap-1.5 rounded-xl border border-border-ui bg-panel-2 px-2.5 text-xs font-semibold text-text-secondary transition-all hover:border-primary/40 hover:bg-panel-hover hover:text-text-primary sm:h-8 sm:px-3"
-          title="Ajuda e Tutoriais"
+          title="Ajuda"
+          aria-label="Ajuda"
         >
           <HelpCircle size={15} className="text-primary" />
           <span className="hidden 2xl:inline">Ajuda</span>
         </button>
 
-        {/* Dropdown Menu */}
         <AnimatePresence>
           {menuOpen && (
             <>
-              <div
-                className="fixed inset-0 z-40"
-                onClick={() => setMenuOpen(false)}
-              />
+              <div className="fixed inset-0 z-40" onClick={() => setMenuOpen(false)} />
               <motion.div
                 initial={{ opacity: 0, scale: 0.95, y: 6 }}
                 animate={{ opacity: 1, scale: 1, y: 0 }}
                 exit={{ opacity: 0, scale: 0.95, y: 6 }}
                 className="absolute right-0 top-full z-50 mt-2 w-64 rounded-2xl border border-border-ui bg-panel p-2 shadow-float"
               >
-                <div className="px-3 py-2 border-b border-border-ui/60">
-                  <p className="text-xs font-bold text-text-primary">
-                    Central de Ajuda {screenTitle ? `— ${screenTitle}` : ""}
-                  </p>
-                  <p className="text-[11px] text-text-secondary">
-                    Tutoriais guiados e dicas práticas
-                  </p>
-                </div>
-
-                <div className="mt-1 space-y-1">
+                <p className="px-3 pb-1.5 pt-1 text-[12.5px] font-semibold text-text-secondary">Ajuda{screenTitle ? ` · ${screenTitle}` : ""}</p>
+                {hasTour && (
                   <button
                     type="button"
+                    className={item}
                     onClick={() => {
                       setMenuOpen(false);
                       startTour(tourKey, true);
                     }}
-                    className="flex w-full items-center gap-2.5 rounded-xl px-3 py-2 text-left text-xs font-semibold text-text-primary hover:bg-primary/10 hover:text-primary transition-colors"
                   >
-                    <Play size={14} className="text-primary" />
-                    <span>Fazer tour guiado desta tela</span>
+                    <Play size={15} className="text-primary" /> Ver o passo a passo desta tela
                   </button>
-
-                  <button
-                    type="button"
-                    onClick={() => {
-                      setMenuOpen(false);
-                      setGuideModalOpen(true);
-                    }}
-                    className="flex w-full items-center gap-2.5 rounded-xl px-3 py-2 text-left text-xs font-semibold text-text-primary hover:bg-primary/10 hover:text-primary transition-colors"
-                  >
-                    <BookOpen size={14} className="text-accent-strong" />
-                    <span>Dicas & Como montar seu bot</span>
-                  </button>
-                </div>
+                )}
+                <button
+                  type="button"
+                  className={item}
+                  onClick={() => {
+                    setMenuOpen(false);
+                    setFaqOpen(true);
+                  }}
+                >
+                  <BookOpen size={15} className="text-primary" /> Dúvidas frequentes
+                </button>
               </motion.div>
             </>
           )}
         </AnimatePresence>
       </div>
 
-      {/* Modal Completo de Guias e Dicas */}
-      <AnimatePresence>
-        {guideModalOpen && (
-          <div className="fixed inset-0 z-[80] flex items-end justify-center bg-black/40 backdrop-blur-[3px] md:items-center md:p-6" onMouseDown={(e) => e.target === e.currentTarget && setGuideModalOpen(false)}>
-            <motion.div
-              initial={{ opacity: 0, scale: 0.95, y: 12 }}
-              animate={{ opacity: 1, scale: 1, y: 0 }}
-              exit={{ opacity: 0, scale: 0.95, y: 12 }}
-              className="flex max-h-[90dvh] w-full max-w-3xl flex-col overflow-hidden rounded-t-2xl border border-border-ui bg-panel shadow-float md:max-h-[min(640px,86dvh)] md:flex-row md:rounded-2xl"
-            >
-              {/* Lateral com lista de tópicos */}
-              <div className="flex max-h-[38dvh] shrink-0 flex-col border-b border-border-ui bg-panel-2/50 p-3 md:max-h-none md:w-1/3 md:border-b-0 md:border-r">
-                <div className="flex items-center gap-2 px-2 pb-4 border-b border-border-ui">
-                  <Lightbulb size={18} className="text-warning" />
-                  <span className="font-bold text-sm text-text-primary">
-                    Guia Prático Nexo
-                  </span>
-                </div>
-
-                <div className="mt-3 flex-1 overflow-y-auto space-y-1.5">
-                  {GUIDES.map((g) => {
-                    const isSelected = g.id === selectedGuideId;
-                    const IconComp = g.icon;
-                    return (
-                      <button
-                        key={g.id}
-                        type="button"
-                        onClick={() => setSelectedGuideId(g.id)}
-                        className={`flex w-full items-center justify-between rounded-xl p-2.5 text-left text-xs font-semibold transition-all ${
-                          isSelected
-                            ? "bg-primary text-white shadow-sm"
-                            : "text-text-secondary hover:bg-panel-hover hover:text-text-primary"
-                        }`}
-                      >
-                        <div className="flex items-center gap-2 truncate">
-                          <IconComp size={15} />
-                          <span className="truncate">{g.title}</span>
-                        </div>
-                        <ChevronRight size={13} className="shrink-0 opacity-70" />
-                      </button>
-                    );
-                  })}
-                </div>
-
-                <button
-                  type="button"
-                  onClick={() => {
-                    setGuideModalOpen(false);
-                    startTour(tourKey, true);
-                  }}
-                  className="mt-3 flex items-center justify-center gap-2 rounded-xl border border-primary/30 bg-primary/10 py-2.5 text-xs font-bold text-primary hover:bg-primary hover:text-white transition-colors"
-                >
-                  <Play size={13} />
-                  <span>Ver Tour Interativo</span>
-                </button>
-              </div>
-
-              {/* Conteúdo do Tópico Selecionado */}
-              <div className="flex min-h-0 flex-1 flex-col justify-between overflow-y-auto p-4 md:p-5">
-                <div>
-                  <div className="flex items-start justify-between">
-                    <div>
-                      <span className="inline-block rounded-full bg-primary/10 px-2.5 py-0.5 text-[11px] font-bold text-primary uppercase tracking-wider">
-                        {currentGuide.badge}
-                      </span>
-                      <h3 className="mt-2 text-xl font-bold text-text-primary">
-                        {currentGuide.title}
-                      </h3>
-                      <p className="mt-1 text-xs text-text-secondary leading-relaxed">
-                        {currentGuide.summary}
-                      </p>
-                    </div>
-                    <button
-                      type="button"
-                      onClick={() => setGuideModalOpen(false)}
-                      className="rounded-full p-1.5 text-text-secondary hover:bg-panel-2"
-                    >
-                      <X size={18} />
-                    </button>
-                  </div>
-
-                  <div className="mt-6 space-y-3">
-                    {currentGuide.content.map((point, index) => (
-                      <div
-                        key={index}
-                        className="flex items-start gap-3 rounded-2xl border border-border-ui bg-panel-2/60 p-3.5"
-                      >
-                        <CheckCircle2
-                          size={16}
-                          className="mt-0.5 shrink-0 text-success-strong"
-                        />
-                        <p className="text-xs text-text-primary leading-relaxed">
-                          {point}
-                        </p>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-
-                <div className="mt-6 border-t border-border-ui pt-4 flex justify-end">
-                  <button
-                    type="button"
-                    onClick={() => setGuideModalOpen(false)}
-                    className="rounded-xl bg-primary px-5 py-2 text-xs font-bold text-white hover:bg-primary-strong transition-colors"
-                  >
-                    Entendi
-                  </button>
-                </div>
-              </div>
-            </motion.div>
-          </div>
-        )}
-      </AnimatePresence>
+      <Sheet
+        open={faqOpen}
+        title="Dúvidas frequentes"
+        onClose={() => setFaqOpen(false)}
+        width="md"
+        footer={<p className="text-[13px] leading-snug text-text-secondary">Não achou? Conte a sua dúvida em <b>Dar opinião</b>, no menu da sua conta. A resposta chega no seu e-mail.</p>}
+      >
+        <div className="flex flex-col gap-4">
+          <label className="relative">
+            <Search size={16} className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-text-secondary" />
+            <input className={`${inputClass} pl-9`} value={query} onChange={(e) => setQuery(e.target.value)} placeholder="Buscar: agenda, Instagram, QR..." aria-label="Buscar nas dúvidas" />
+          </label>
+          {groups.length === 0 && <p className="py-6 text-center text-[14px] text-text-secondary">Nada encontrado para &ldquo;{query}&rdquo;.</p>}
+          {groups.map((g) => (
+            <section key={g.title} className="flex flex-col gap-2">
+              <h3 className="text-[13px] font-semibold text-text-secondary">{g.title}</h3>
+              <ul className="flex flex-col gap-1.5">
+                {g.topics.map((t) => (
+                  <Topic key={t.q} topic={t} open={openTopic === t.q} onToggle={() => setOpenTopic(openTopic === t.q ? null : t.q)} onGo={go} />
+                ))}
+              </ul>
+            </section>
+          ))}
+        </div>
+      </Sheet>
     </>
   );
 }
