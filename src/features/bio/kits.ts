@@ -1,5 +1,5 @@
 import type { IconComponent } from "../../shared/icons";
-import { Lipstick, Mic, Stethoscope, UserStar, Utensils } from "../../shared/icons";
+import { GraduationCap, Lipstick, Mic, Scissors, Stethoscope, UserStar, Utensils, Wrench } from "../../shared/icons";
 import type { LandingTheme, LinkItem } from "../landing/contract";
 import { AUDIENCE_PRESETS, type AudiencePreset, type BioAudience } from "./presets";
 
@@ -9,7 +9,7 @@ import { AUDIENCE_PRESETS, type AudiencePreset, type BioAudience } from "./prese
  * exemplo e os temas que combinam. Mesma lista de ids em nexo-backend/src/domain/landing/contract.ts (BIO_KITS).
  */
 
-export const BIO_KITS = ["beleza", "comida", "artista", "influencer", "saude"] as const;
+export const BIO_KITS = ["beleza", "barbearia", "saude", "comida", "servicos", "aulas", "artista", "influencer"] as const;
 export type BioKit = (typeof BIO_KITS)[number];
 
 export interface Kit extends AudiencePreset {
@@ -36,9 +36,9 @@ export const KITS: Record<BioKit, Kit> = {
     icon: Lipstick,
     audience: "business",
     title: "Beleza",
-    description: "Salão, manicure, barbearia, estética",
+    description: "Salão, manicure, estética",
     defaultTheme: "salao",
-    themes: ["salao", "ouro-rose", "estetica", "barbearia"],
+    themes: ["salao", "ouro-rose", "estetica", "lavanda"],
     namePlaceholder: "Studio Joana Unhas",
     taglinePlaceholder: "Unhas em gel e alongamento, com hora marcada",
     linksPlaceholder: "instagram.com/seuperfil\ng.page/seusalao\n11 91234-5678",
@@ -56,7 +56,34 @@ export const KITS: Record<BioKit, Kit> = {
       { question: "Quais formas de pagamento?", hint: "Pix, dinheiro e cartão." },
       { question: "Atende a domicílio?", hint: "Não, só aqui no estúdio." },
     ],
-    matches: ["beleza", "salao", "manicure", "unha", "barbearia", "barbeiro", "estetica", "cabelo", "maquiagem", "sobrancelha", "cilios", "depilacao", "spa", "nail"],
+    matches: ["beleza", "salao", "manicure", "unha", "estetica", "cabelo", "maquiagem", "sobrancelha", "cilios", "depilacao", "spa", "nail"],
+  },
+  barbearia: {
+    id: "barbearia",
+    icon: Scissors,
+    audience: "business",
+    title: "Barbearia",
+    description: "Barbeiro, corte e barba",
+    defaultTheme: "barbearia",
+    themes: ["barbearia", "grafite", "carbono", "espresso-champagne"],
+    namePlaceholder: "Barbearia do Zé",
+    taglinePlaceholder: "Corte e barba com hora marcada",
+    linksPlaceholder: "instagram.com/suabarbearia\ng.page/suabarbearia\n11 91234-5678",
+    pixLabel: "Pagar com Pix",
+    offersProducts: false,
+    whatsappLabel: "Agendar corte",
+    whatsappMessage: "Oi! Vim pela sua bio e quero agendar um corte.\nServiço:\nDia e horário de preferência:",
+    contact: { question: "Como agendo um corte?", answer: "Pelo WhatsApp: toque em Agendar corte aqui embaixo e me diga o serviço e o dia que prefere." },
+    expressPicks: [0, 1],
+    suggestions: [
+      { question: "Quanto custa o corte?", hint: "Corte R$ 40, barba R$ 30, corte e barba R$ 60." },
+      { question: "Qual o horário de atendimento?", hint: "De terça a sábado, das 9h às 20h." },
+      { question: "Onde fica?", hint: "Rua das Palmeiras, 50, Centro." },
+      { question: "Atende sem hora marcada?", hint: "Quando sobra horário, por ordem de chegada." },
+      { question: "Quais formas de pagamento?", hint: "Pix, cartão e dinheiro." },
+      { question: "Faz pigmentação?", hint: "Faço, com hora marcada." },
+    ],
+    matches: ["barbearia", "barbeiro", "barber", "barba"],
   },
   comida: {
     id: "comida",
@@ -84,6 +111,60 @@ export const KITS: Record<BioKit, Kit> = {
       { question: "Tem opção vegetariana?", hint: "Temos o burger de grão-de-bico." },
     ],
     matches: ["comida", "restaurante", "lanchonete", "lanche", "doce", "doceria", "confeitaria", "bolo", "pizza", "pizzaria", "hamburguer", "delivery", "marmita", "cafe", "padaria", "acai", "gastronomia", "food", "bar"],
+  },
+  servicos: {
+    id: "servicos",
+    icon: Wrench,
+    audience: "business",
+    title: "Serviços em casa",
+    description: "Diarista, eletricista, técnico, reformas",
+    defaultTheme: "modern-blue",
+    themes: ["modern-blue", "clean-slate", "citrico", "ceu"],
+    namePlaceholder: "Zé Reparos",
+    taglinePlaceholder: "Elétrica e hidráulica em Campinas e região",
+    linksPlaceholder: "instagram.com/seuperfil\ng.page/seunegocio\n11 91234-5678",
+    pixLabel: "Pagar com Pix",
+    offersProducts: false,
+    whatsappLabel: "Pedir orçamento",
+    whatsappMessage: "Oi! Vim pela sua bio e quero um orçamento.\nServiço:\nBairro:",
+    contact: { question: "Como peço um orçamento?", answer: "Pelo WhatsApp: toque em Pedir orçamento aqui embaixo e conte o serviço e o bairro." },
+    expressPicks: [0, 1],
+    suggestions: [
+      { question: "Quais regiões você atende?", hint: "Campinas, Valinhos e Sumaré." },
+      { question: "Cobra a visita?", hint: "A visita para orçamento é grátis." },
+      { question: "Em quanto tempo você vem?", hint: "Em até 2 dias úteis; urgência no mesmo dia." },
+      { question: "Dá garantia?", hint: "90 dias de garantia no serviço." },
+      { question: "Quais formas de pagamento?", hint: "Pix, cartão em até 3x e dinheiro." },
+      { question: "Atende no fim de semana?", hint: "Sábado de manhã, com hora marcada." },
+    ],
+    matches: ["diarista", "faxina", "limpeza", "eletricista", "encanador", "pintor", "pedreiro", "reforma", "reformas", "tecnico", "manutencao", "conserto", "reparo", "reparos", "montador", "jardinagem", "jardineiro", "dedetizacao", "marido"],
+  },
+  aulas: {
+    id: "aulas",
+    icon: GraduationCap,
+    audience: "business",
+    title: "Aulas",
+    description: "Professor particular, idiomas, reforço",
+    defaultTheme: "caderno",
+    themes: ["caderno", "quadro-negro", "lavanda", "clean-slate"],
+    namePlaceholder: "Prof. Ana Inglês",
+    taglinePlaceholder: "Aulas de inglês online e presenciais",
+    linksPlaceholder: "instagram.com/seuperfil\nyoutube.com/@seucanal\n11 91234-5678",
+    pixLabel: "Pagar a aula com Pix",
+    offersProducts: false,
+    whatsappLabel: "Marcar aula",
+    whatsappMessage: "Oi! Vim pela sua bio e quero marcar uma aula.\nMatéria:\nDia de preferência:",
+    contact: { question: "Como marco uma aula?", answer: "Pelo WhatsApp: toque em Marcar aula aqui embaixo e diga a matéria e o dia que prefere." },
+    expressPicks: [0, 1],
+    suggestions: [
+      { question: "Quanto custa a aula?", hint: "R$ 80 a aula de 1 hora; pacote de 4 por R$ 280." },
+      { question: "Tem aula experimental?", hint: "A primeira aula, de 30 minutos, é grátis." },
+      { question: "É online ou presencial?", hint: "Os dois: online por vídeo ou na sua casa." },
+      { question: "Para qual idade?", hint: "A partir de 10 anos." },
+      { question: "Quais os horários?", hint: "De segunda a sexta, das 14h às 21h." },
+      { question: "Como pago?", hint: "Pix antes de cada aula ou do pacote." },
+    ],
+    matches: ["aula", "aulas", "professor", "professora", "reforco", "idioma", "idiomas", "ingles", "espanhol", "frances", "violao", "piano", "canto", "tutor", "explicadora", "alfabetizacao"],
   },
   artista: {
     id: "artista",
@@ -117,7 +198,7 @@ export const KITS: Record<BioKit, Kit> = {
     icon: UserStar,
     audience: "creator",
     title: "Influencer",
-    description: "Publis, parcerias, cupons e mídia kit",
+    description: "Publis, parcerias e cupons",
     defaultTheme: "aurora",
     themes: ["aurora", "chiclete", "ouro-rose", "estudio"],
     namePlaceholder: "Ana Souza",
@@ -143,7 +224,7 @@ export const KITS: Record<BioKit, Kit> = {
     id: "saude",
     icon: Stethoscope,
     audience: "business",
-    title: "Saúde e serviços",
+    title: "Saúde e bem-estar",
     description: "Clínica, personal, nutri, consultoria",
     defaultTheme: "clinica",
     themes: ["clinica", "clean-slate", "menta", "academia"],

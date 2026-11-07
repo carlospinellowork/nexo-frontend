@@ -495,7 +495,7 @@ export function BioWizard({ onLock, onCreated }: BioWizardProps) {
     // 0: público
     <div key="aud" className="flex flex-col gap-3">
       <h1 className="text-[26px] font-extrabold leading-tight tracking-tight text-text-primary">O que você faz?</h1>
-      <p className="text-[15px] text-text-secondary">Cada kit já vem com o botão do WhatsApp certo, as perguntas do seu público e temas que combinam. Dá para mudar tudo depois.</p>
+      <p className="text-[15px] text-text-secondary">Cada kit já vem com a conversa certa para o seu cliente, as perguntas do seu público e temas que combinam. Quem atende com hora marcada ganha a agenda pronta. Dá para mudar tudo depois.</p>
       <div className="mt-2 grid grid-cols-1 gap-2.5 min-[420px]:grid-cols-2">
         {BIO_KITS.map((id) => {
           const k = KITS[id];

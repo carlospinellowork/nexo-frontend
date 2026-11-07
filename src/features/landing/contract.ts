@@ -236,7 +236,7 @@ export interface LandingPageSettings {
   /** A bio abre direto na conversa com o bot (jornada), com um toque para ver todos os links. */
   journeyFirst?: boolean;
   /** Assistente da bio (gerido pelo servidor). */
-  bio?: { audience: "creator" | "seller" | "business"; kit?: "beleza" | "comida" | "artista" | "influencer" | "saude"; faqs: { id: string; question: string; answer: string }[]; flowSignature?: string; botMode?: "faq" | "journey"; journey?: JourneySpec };
+  bio?: { audience: "creator" | "seller" | "business"; kit?: "beleza" | "barbearia" | "saude" | "comida" | "servicos" | "aulas" | "artista" | "influencer"; faqs: { id: string; question: string; answer: string }[]; flowSignature?: string; botMode?: "faq" | "journey"; journey?: JourneySpec };
 }
 
 export const SECTION_LABELS: Record<SectionType, string> = {
