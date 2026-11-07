@@ -11,7 +11,6 @@ import { ToolTabs } from "../../shared/components/layout/ToolTabs";
 import { Button } from "../../shared/components/ui/Button";
 import { ChatSelect } from "../../shared/components/ui/ChatSelect";
 import { gestureFor } from "../../shared/components/ui/gestures";
-import { ProLock } from "../../features/plan/ProBadge";
 import { useActiveChat } from "../../shared/hooks/useActiveChat";
 
 export const Route = createFileRoute("/_app/integrations")({
@@ -101,7 +100,7 @@ function IntegrationsPage() {
               <Wrench size={17} />
             </span>
             <span className="flex min-w-0 flex-1 flex-col">
-              <span className="flex items-center gap-2 text-[14.5px] font-semibold text-text-primary">Avançado: APIs oficiais <ProLock /></span>
+              <span className="flex items-center gap-2 text-[14.5px] font-semibold text-text-primary">Avançado: APIs oficiais</span>
               <span className="text-[13px] text-text-secondary">
                 {connected ? `${integrations?.length} conectado${integrations && integrations.length > 1 ? "s" : ""}` : "WhatsApp API, Instagram Direct e Telegram, com a sua conta de cada plataforma"}
               </span>

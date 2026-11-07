@@ -80,7 +80,7 @@ export function BioBotTab({ page, ensureSaved, journeyFirst, onJourneyFirst, onJ
         <Bot size={16} className="mt-px shrink-0 text-primary" />O bot da sua bio responde com estas perguntas. Ao atualizar, o Nexo cria o fluxo de novo e publica na hora.
       </p>
       <div className="flex flex-wrap items-center gap-2 text-[12.5px] leading-snug text-text-secondary">
-        <span>A IA responde o que não estiver aqui, com base nas suas respostas. Sem limite no Pro.</span>
+        <span>A IA responde o que não estiver aqui, com base nas suas respostas.</span>
         <ProBadge />
       </div>
       {!page.chat && <p className="rounded-2xl bg-warning/14 p-3 text-[13px] leading-snug text-warning-strong">Esta bio ainda não tem bot. Ao atualizar, o Nexo cria um e vincula à página.</p>}
