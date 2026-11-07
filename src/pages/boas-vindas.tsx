@@ -128,6 +128,12 @@ function WelcomePage() {
     if (!sessionPending && !session) navigate({ to: "/login" });
   }, [session, sessionPending, navigate]);
 
+  // Já feito (ex.: entrou por convite numa conta e chegou aqui com dados antigos): volta ao painel.
+  const onboarded = Boolean(me?.user.onboarded);
+  useEffect(() => {
+    if (onboarded && !editar && !saving) navigate({ to: "/", replace: true });
+  }, [onboarded, editar, saving, navigate]);
+
   // Preenche com o que já existe (na edição, ou com o nome vindo do cadastro / Google).
   useEffect(() => {
     if (!me || loaded) return;

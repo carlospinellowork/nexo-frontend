@@ -17,6 +17,7 @@ import { Route as PrivacidadeRouteImport } from './pages/privacidade'
 import { Route as RedefinirSenhaRouteImport } from './pages/redefinir-senha'
 import { Route as TermosRouteImport } from './pages/termos'
 import { Route as AppIndexRouteImport } from './pages/_app/index'
+import { Route as AppAcessoRouteImport } from './pages/_app/acesso'
 import { Route as AppAdminRouteImport } from './pages/_app/admin'
 import { Route as AppAgendaRouteImport } from './pages/_app/agenda'
 import { Route as AppChatBuilderRouteImport } from './pages/_app/chat-builder'
@@ -30,6 +31,7 @@ import { Route as AppMinhaBioRouteImport } from './pages/_app/minha-bio'
 import { Route as AppQrCodesRouteImport } from './pages/_app/qr-codes'
 import { Route as AppResultsRouteImport } from './pages/_app/results'
 import { Route as AppSimulateRouteImport } from './pages/_app/simulate'
+import { Route as ConviteTokenRouteImport } from './pages/convite.$token'
 import { Route as PSlugRouteImport } from './pages/p/$slug'
 import { Route as ReservaTokenRouteImport } from './pages/reserva.$token'
 
@@ -70,6 +72,11 @@ const TermosRoute = TermosRouteImport.update({
 const AppIndexRoute = AppIndexRouteImport.update({
   id: '/',
   path: '/',
+  getParentRoute: () => AppLayoutRoute,
+} as any)
+const AppAcessoRoute = AppAcessoRouteImport.update({
+  id: '/acesso',
+  path: '/acesso',
   getParentRoute: () => AppLayoutRoute,
 } as any)
 const AppAdminRoute = AppAdminRouteImport.update({
@@ -137,6 +144,11 @@ const AppSimulateRoute = AppSimulateRouteImport.update({
   path: '/simulate',
   getParentRoute: () => AppLayoutRoute,
 } as any)
+const ConviteTokenRoute = ConviteTokenRouteImport.update({
+  id: '/convite/$token',
+  path: '/convite/$token',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const PSlugRoute = PSlugRouteImport.update({
   id: '/p/$slug',
   path: '/p/$slug',
@@ -156,6 +168,7 @@ export interface FileRoutesByFullPath {
   '/privacidade': typeof PrivacidadeRoute
   '/redefinir-senha': typeof RedefinirSenhaRoute
   '/termos': typeof TermosRoute
+  '/acesso': typeof AppAcessoRoute
   '/admin': typeof AppAdminRoute
   '/agenda': typeof AppAgendaRoute
   '/chat-builder': typeof AppChatBuilderRoute
@@ -169,6 +182,7 @@ export interface FileRoutesByFullPath {
   '/qr-codes': typeof AppQrCodesRoute
   '/results': typeof AppResultsRoute
   '/simulate': typeof AppSimulateRoute
+  '/convite/$token': typeof ConviteTokenRoute
   '/p/$slug': typeof PSlugRoute
   '/reserva/$token': typeof ReservaTokenRoute
 }
@@ -179,6 +193,7 @@ export interface FileRoutesByTo {
   '/privacidade': typeof PrivacidadeRoute
   '/redefinir-senha': typeof RedefinirSenhaRoute
   '/termos': typeof TermosRoute
+  '/acesso': typeof AppAcessoRoute
   '/admin': typeof AppAdminRoute
   '/agenda': typeof AppAgendaRoute
   '/chat-builder': typeof AppChatBuilderRoute
@@ -192,6 +207,7 @@ export interface FileRoutesByTo {
   '/qr-codes': typeof AppQrCodesRoute
   '/results': typeof AppResultsRoute
   '/simulate': typeof AppSimulateRoute
+  '/convite/$token': typeof ConviteTokenRoute
   '/p/$slug': typeof PSlugRoute
   '/reserva/$token': typeof ReservaTokenRoute
   '/': typeof AppIndexRoute
@@ -205,6 +221,7 @@ export interface FileRoutesById {
   '/privacidade': typeof PrivacidadeRoute
   '/redefinir-senha': typeof RedefinirSenhaRoute
   '/termos': typeof TermosRoute
+  '/_app/acesso': typeof AppAcessoRoute
   '/_app/admin': typeof AppAdminRoute
   '/_app/agenda': typeof AppAgendaRoute
   '/_app/chat-builder': typeof AppChatBuilderRoute
@@ -218,6 +235,7 @@ export interface FileRoutesById {
   '/_app/qr-codes': typeof AppQrCodesRoute
   '/_app/results': typeof AppResultsRoute
   '/_app/simulate': typeof AppSimulateRoute
+  '/convite/$token': typeof ConviteTokenRoute
   '/p/$slug': typeof PSlugRoute
   '/reserva/$token': typeof ReservaTokenRoute
   '/_app/': typeof AppIndexRoute
@@ -232,6 +250,7 @@ export interface FileRouteTypes {
     | '/privacidade'
     | '/redefinir-senha'
     | '/termos'
+    | '/acesso'
     | '/admin'
     | '/agenda'
     | '/chat-builder'
@@ -245,6 +264,7 @@ export interface FileRouteTypes {
     | '/qr-codes'
     | '/results'
     | '/simulate'
+    | '/convite/$token'
     | '/p/$slug'
     | '/reserva/$token'
   fileRoutesByTo: FileRoutesByTo
@@ -255,6 +275,7 @@ export interface FileRouteTypes {
     | '/privacidade'
     | '/redefinir-senha'
     | '/termos'
+    | '/acesso'
     | '/admin'
     | '/agenda'
     | '/chat-builder'
@@ -268,6 +289,7 @@ export interface FileRouteTypes {
     | '/qr-codes'
     | '/results'
     | '/simulate'
+    | '/convite/$token'
     | '/p/$slug'
     | '/reserva/$token'
     | '/'
@@ -280,6 +302,7 @@ export interface FileRouteTypes {
     | '/privacidade'
     | '/redefinir-senha'
     | '/termos'
+    | '/_app/acesso'
     | '/_app/admin'
     | '/_app/agenda'
     | '/_app/chat-builder'
@@ -293,6 +316,7 @@ export interface FileRouteTypes {
     | '/_app/qr-codes'
     | '/_app/results'
     | '/_app/simulate'
+    | '/convite/$token'
     | '/p/$slug'
     | '/reserva/$token'
     | '/_app/'
@@ -306,6 +330,7 @@ export interface RootRouteChildren {
   PrivacidadeRoute: typeof PrivacidadeRoute
   RedefinirSenhaRoute: typeof RedefinirSenhaRoute
   TermosRoute: typeof TermosRoute
+  ConviteTokenRoute: typeof ConviteTokenRoute
   PSlugRoute: typeof PSlugRoute
   ReservaTokenRoute: typeof ReservaTokenRoute
 }
@@ -366,6 +391,13 @@ declare module '@tanstack/react-router' {
       path: '/'
       fullPath: '/'
       preLoaderRoute: typeof AppIndexRouteImport
+      parentRoute: typeof AppLayoutRoute
+    }
+    '/_app/acesso': {
+      id: '/_app/acesso'
+      path: '/acesso'
+      fullPath: '/acesso'
+      preLoaderRoute: typeof AppAcessoRouteImport
       parentRoute: typeof AppLayoutRoute
     }
     '/_app/admin': {
@@ -459,6 +491,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppSimulateRouteImport
       parentRoute: typeof AppLayoutRoute
     }
+    '/convite/$token': {
+      id: '/convite/$token'
+      path: '/convite/$token'
+      fullPath: '/convite/$token'
+      preLoaderRoute: typeof ConviteTokenRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/p/$slug': {
       id: '/p/$slug'
       path: '/p/$slug'
@@ -477,6 +516,7 @@ declare module '@tanstack/react-router' {
 }
 
 interface AppLayoutRouteChildren {
+  AppAcessoRoute: typeof AppAcessoRoute
   AppAdminRoute: typeof AppAdminRoute
   AppAgendaRoute: typeof AppAgendaRoute
   AppChatBuilderRoute: typeof AppChatBuilderRoute
@@ -494,6 +534,7 @@ interface AppLayoutRouteChildren {
 }
 
 const AppLayoutRouteChildren: AppLayoutRouteChildren = {
+  AppAcessoRoute: AppAcessoRoute,
   AppAdminRoute: AppAdminRoute,
   AppAgendaRoute: AppAgendaRoute,
   AppChatBuilderRoute: AppChatBuilderRoute,
@@ -522,6 +563,7 @@ const rootRouteChildren: RootRouteChildren = {
   PrivacidadeRoute: PrivacidadeRoute,
   RedefinirSenhaRoute: RedefinirSenhaRoute,
   TermosRoute: TermosRoute,
+  ConviteTokenRoute: ConviteTokenRoute,
   PSlugRoute: PSlugRoute,
   ReservaTokenRoute: ReservaTokenRoute,
 }

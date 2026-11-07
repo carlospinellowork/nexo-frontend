@@ -8,7 +8,7 @@ import { PushMenuItem } from "../../../features/push/PushPrompt";
 import { InstallMenuItem } from "../../../features/pwa/InstallApp";
 import { WorkspaceSelector } from "../../../features/workspaces/components/WorkspaceSelector";
 import { authClient } from "../../../lib/auth-client";
-import { ChevronDown, Gauge, LogOut, Pencil, UserRound } from "../../icons";
+import { ChevronDown, Gauge, LogOut, Pencil, UserRound, Users } from "../../icons";
 import { useIsMobile } from "../../hooks/useIsMobile";
 import { Popover } from "../ui/Popover";
 import { ThemeSegmented } from "../ui/ThemeToggle";
@@ -39,6 +39,9 @@ export function AccountMenu({ onNavigate }: { onNavigate?: () => void }) {
     <div className="flex flex-col gap-0.5 p-1.5">
       <Link to="/conta" onClick={go} className={row}>
         <UserRound size={17} className="text-primary" /> Minha conta
+      </Link>
+      <Link to="/acesso" onClick={go} className={row}>
+        <Users size={16} className="text-primary" /> Acesso da equipe
       </Link>
       <Link to="/boas-vindas" search={{ editar: true }} onClick={go} className={row}>
         <Pencil size={16} className="text-primary" /> Editar perfil
