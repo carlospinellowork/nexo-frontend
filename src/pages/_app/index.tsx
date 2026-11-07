@@ -16,6 +16,7 @@ import { useGetResults } from "../../api/queries/useGetResults";
 import { useGetWhatsappResults } from "../../api/queries/useGetWhatsappResults";
 import { BioHomeCard } from "../../features/bio/BioHomeCard";
 import { ExampleCompanies } from "../../features/examples/ExampleCompanies";
+import { ReferralCard } from "../../features/growth/ReferralCard";
 import { HomeHero } from "../../features/home/HomeHero";
 import { InstallCard } from "../../features/pwa/InstallApp";
 import { PushCard } from "../../features/push/PushPrompt";
@@ -176,6 +177,10 @@ function HomePage() {
             </ol>
           </motion.section>
         )}
+
+        <motion.div variants={item}>
+          <ReferralCard />
+        </motion.div>
 
         <motion.div variants={item}>
           <ExampleCompanies />

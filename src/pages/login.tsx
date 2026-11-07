@@ -1,3 +1,4 @@
+import { captureSignupSource } from "../features/growth/signupSource";
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { ArrowRight, Lock, Mail, User } from "../shared/icons";
 import { AnimatePresence, motion, useAnimationControls } from "motion/react";
@@ -40,6 +41,9 @@ function LoginPage() {
   const [error, setError] = useState(() => (search.error ? oauthErrorMessage(search.error) : ""));
   const [googleLoading, setGoogleLoading] = useState(false);
   const { data: providers } = useGetAuthProviders();
+
+  // Guarda de onde a pessoa veio (selo da bio, reserva, indicação) para contar depois do cadastro.
+  useEffect(() => captureSignupSource(), []);
 
   useEffect(() => {
     if (session) navigate({ to: "/" });

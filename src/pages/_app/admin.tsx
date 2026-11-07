@@ -61,9 +61,26 @@ function Funnel({ accounts }: { accounts: AdminAccount[] }) {
           );
         })}
       </ol>
+      <div className="flex flex-wrap items-center gap-1.5 border-t border-border-ui pt-3">
+        <span className="mr-1 text-[12.5px] font-semibold text-text-secondary">Como chegaram:</span>
+        {VIAS.map((v) => (
+          <span key={v.key} className="rounded-full bg-text-secondary/10 px-2.5 py-0.5 text-[12.5px] font-semibold tabular-nums text-text-primary">
+            {v.label} {accounts.filter((a) => (a.signupVia ?? null) === v.key).length}
+          </span>
+        ))}
+      </div>
     </section>
   );
 }
+
+/** Crescimento embutido (Etapa 17): de onde veio cada cadastro. */
+const VIAS: { key: AdminAccount["signupVia"]; label: string }[] = [
+  { key: "selo", label: "Selo da bio" },
+  { key: "reserva", label: "Página da reserva" },
+  { key: "indicacao", label: "Indicação" },
+  { key: "site", label: "Site" },
+  { key: null, label: "Sem marca" },
+];
 
 function Step({ ok, label }: { ok: boolean; label: string }) {
   return (

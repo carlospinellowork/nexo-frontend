@@ -18,6 +18,8 @@ export interface AdminAccount {
   leads: number;
   /** Conta do admin ou de demonstração: fica fora do funil. */
   internal: boolean;
+  /** Como chegou ao Nexo (Etapa 17): selo da bio, página de reserva, indicação, site ou null. */
+  signupVia: "selo" | "reserva" | "indicacao" | "site" | null;
   /** Até onde a conta já chegou alguma vez, desde o cadastro. */
   funnel: { bioPublished: boolean; firstVisit: boolean; firstWhatsapp: boolean; firstBooking: boolean };
 }

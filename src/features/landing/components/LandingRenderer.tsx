@@ -638,7 +638,7 @@ function BioRenderer({ title, theme, sections, settings, slug, canAsk, onChat, o
 
         <div className={`mt-auto flex flex-col items-center gap-2 pt-12 ${hasJourney ? "@4xl:col-start-1 @4xl:row-start-2 @4xl:mt-0 @4xl:pt-8" : ""}`}>
           {footer?.companyName && <span className={`text-[12px] font-semibold ${t.muted}`}>{footer.companyName}</span>}
-          {showBadge && <SealPill href={`${SITE_URL}?ref=${encodeURIComponent(slug ?? "")}`} className="my-2" />}
+          {showBadge && <SealPill href={`${SITE_URL}?via=selo&ref=${encodeURIComponent(slug ?? "")}`} className="my-2" />}
           {/* Os visitantes podem deixar dados no chat: link para a política do Nexo (operador). */}
           <a href="/privacidade" target="_blank" rel="noopener" className={`inline-flex min-h-8 items-center px-2 text-[12px] underline-offset-2 hover:underline ${t.muted}`}>
             Privacidade

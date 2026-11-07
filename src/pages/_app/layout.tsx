@@ -4,6 +4,7 @@ import { motion } from "motion/react";
 import { useEffect, useState } from "react";
 import { useGetMe } from "../../api/queries/useGetMe";
 import { useEnsureActiveWorkspace } from "../../features/workspaces/useEnsureActiveWorkspace";
+import { SendSignupSource } from "../../features/growth/SendSignupSource";
 import { authClient } from "../../lib/auth-client";
 import { BottomNav } from "../../shared/components/layout/BottomNav";
 import { Sidebar } from "../../shared/components/layout/Sidebar";
@@ -18,7 +19,7 @@ export const Route = createFileRoute("/_app")({
 /** Fica dentro da parte logada: sem sessão, não há espaços para buscar. */
 function EnsureWorkspace() {
   useEnsureActiveWorkspace();
-  return null;
+  return <SendSignupSource />;
 }
 
 function AppLayout() {

@@ -6,7 +6,9 @@ import { durationLabel, timeIn } from "../features/agenda/types";
 import { Badge } from "../shared/components/ui/Badge";
 import { Button } from "../shared/components/ui/Button";
 import { SealPill } from "../shared/components/ui/NexoSeal";
-import { Calendar, CheckCircle2, Clock, Download, Loader2, X } from "../shared/icons";
+import { Calendar, CheckCircle2, ChevronRight, Clock, Download, Loader2, X } from "../shared/icons";
+
+const SITE_URL: string = import.meta.env.VITE_SITE_URL ?? "https://nexo.app";
 
 export const Route = createFileRoute("/reserva/$token")({
   component: BookingPage,
@@ -144,7 +146,20 @@ function BookingPage() {
         )}
       </main>
       <div className="mt-8 flex flex-col items-center gap-2">
-        <SealPill href={import.meta.env.VITE_SITE_URL ?? "https://nexo.app"} />
+        {/* Crescimento embutido (Etapa 17): quem marcou pelo link conhece o Nexo, e o cadastro conta como vindo da reserva. */}
+        <a
+          href={`${SITE_URL}/?via=reserva`}
+          target="_blank"
+          rel="noopener"
+          className="mb-2 flex w-full max-w-md items-center gap-3 rounded-2xl border border-border-ui bg-panel px-4 py-3 text-left shadow-card transition-colors hover:bg-panel-hover"
+        >
+          <span className="flex min-w-0 flex-1 flex-col">
+            <span className="text-[14px] font-semibold text-text-primary">Tem um negócio? Receba reservas assim também.</span>
+            <span className="text-[12.5px] text-text-secondary">Crie a sua agenda e a sua bio no Nexo, grátis.</span>
+          </span>
+          <ChevronRight size={18} className="shrink-0 text-text-secondary" />
+        </a>
+        <SealPill href={`${SITE_URL}/?via=reserva`} />
         <a href="/privacidade" target="_blank" rel="noopener" className="inline-flex min-h-8 items-center px-2 text-[12px] text-text-secondary underline-offset-2 hover:underline">
           Privacidade
         </a>
