@@ -1,5 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { Link2, Loader2, PartyPopper, Pencil } from "../../shared/icons";
+import { Calendar, Link2, Loader2, MessagesSquare, PartyPopper, Pencil } from "../../shared/icons";
+import { useNavigate } from "@tanstack/react-router";
 import { useState } from "react";
 import { useGetBio } from "../../api/queries/useGetBio";
 import { BioEditor } from "../../features/bio/BioEditor";
@@ -16,12 +17,40 @@ export const Route = createFileRoute("/_app/minha-bio")({
   validateSearch: (search: Record<string, unknown>): { instagram?: boolean } => (search.instagram ? { instagram: true } : {}),
 });
 
+/** O que o kit já montou junto com a bio: a conversa ligada e, se ela marca horário, o convite para conferir a agenda. */
+function KitReady({ page, onAgenda }: { page: LandingPageRecord; onAgenda: () => void }) {
+  const journey = page.settings.bio?.journey;
+  if (!page.settings.journeyFirst || !journey) return null;
+  const books = journey.steps.some((s) => s.kind === "booking");
+  return (
+    <div className="flex flex-col gap-3 rounded-3xl border border-primary/20 bg-primary/8 p-4">
+      <p className="flex items-start gap-2.5 text-[14.5px] leading-snug text-text-primary">
+        <MessagesSquare size={18} className="mt-0.5 shrink-0 text-primary" />
+        <span>
+          <b>Sua bio já abre numa conversa.</b> Ela responde as suas perguntas e leva o cliente {books ? "a marcar um horário" : "até o seu WhatsApp com o pedido pronto"}.
+        </span>
+      </p>
+      {books && (
+        <>
+          <p className="text-[14px] leading-snug text-text-secondary">
+            Se a sua agenda estava vazia, criamos serviços de exemplo, sem preço. Confira os serviços, os dias e horários em que você atende, e se as reservas entram direto ou chegam para você confirmar.
+          </p>
+          <Button variant="outline" icon={Calendar} onClick={onAgenda} className="self-start">
+            Conferir serviços e horários
+          </Button>
+        </>
+      )}
+    </div>
+  );
+}
+
 /** "Minha Bio": com bio, abre o editor; sem bio, a criação guiada. A bio é uma LandingPage com layout "bio". */
 function MinhaBioPage() {
   const { data: page, isLoading, isError } = useGetBio();
   const { instagram } = Route.useSearch();
   const [mode, setMode] = useState<"auto" | "wizard" | "done">("auto");
   const [created, setCreated] = useState<LandingPageRecord | null>(null);
+  const navigate = useNavigate();
 
   if (isLoading) {
     return (
@@ -46,6 +75,7 @@ function MinhaBioPage() {
           <div className="rounded-3xl bg-panel p-5 shadow-card">
             <PutOnInstagram url={bioUrl(created.slug)} />
           </div>
+          <KitReady page={created} onAgenda={() => void navigate({ to: "/agenda" })} />
           <p className="text-center text-[13px] text-text-secondary">Sem tempo agora? O botão <b>Instagram</b> fica no alto da sua bio e no Início.</p>
           <BioShare slug={created.slug} name={created.title} />
           <Button size="lg" variant="outline" icon={Pencil} onClick={() => setMode("auto")} className="w-full">
