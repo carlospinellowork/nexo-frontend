@@ -6,6 +6,8 @@ import { DailyBars } from "../../features/insights/DailyBars";
 import { channelInfo } from "../../features/insights/channels";
 import { Header } from "../../shared/components/layout/Header";
 import { EmptyState } from "../../shared/components/ui/EmptyState";
+import { BioNextStep } from "../../features/bio/BioNextStep";
+import { useBioNextStepText } from "../../features/bio/useBioNextStepText";
 import { Segmented } from "../../shared/components/ui/Segmented";
 
 export const Route = createFileRoute("/_app/results")({
@@ -33,6 +35,7 @@ function Stat({ icon: Icon, label, value, hint }: { icon: typeof Users; label: s
 
 function ResultsPage() {
   const [period, setPeriod] = useState<"7" | "30" | "90">("30");
+  const emptyText = useBioNextStepText("os clientes");
   const { data, isLoading } = useGetResults(Number(period));
   const fmt = (n: number) => n.toLocaleString("pt-BR");
   const channels = Object.entries(data?.byChannel ?? {}).sort((a, b) => b[1] - a[1]);
@@ -42,7 +45,7 @@ function ResultsPage() {
     <div className="flex h-full flex-col">
       <Header
         title="Resultados"
-        subtitle="Como os seus bots estão atendendo"
+        subtitle="Quantos clientes a sua jornada trouxe"
         actions={<Segmented label="Período" size="sm" value={period} onChange={setPeriod} options={[...PERIODS]} />}
       />
       <div className="flex-1 overflow-y-auto">
@@ -51,7 +54,9 @@ function ResultsPage() {
             <Loader2 size={32} className="animate-spin text-primary" />
           </div>
         ) : data.conversations === 0 ? (
-          <EmptyState icon={ChartLine} title="Ainda sem conversas no período" description="Os números aparecem quando clientes conversarem com o bot no site, no WhatsApp, no Instagram ou no Telegram. O simulador não conta." />
+          <EmptyState icon={ChartLine} title="Ainda sem conversas no período" description={`Os números aparecem quando alguém conversar na sua bio. ${emptyText} Os testes no simulador não contam.`}>
+            <BioNextStep />
+          </EmptyState>
         ) : (
           <div className="mx-auto flex w-full max-w-6xl flex-col gap-4 px-3 py-4 md:px-6 md:py-6">
             <div className="grid grid-cols-2 gap-4 lg:grid-cols-4">

@@ -11,6 +11,8 @@ import { Header } from "../../shared/components/layout/Header";
 import { Badge } from "../../shared/components/ui/Badge";
 import { Button, IconButton } from "../../shared/components/ui/Button";
 import { EmptyState } from "../../shared/components/ui/EmptyState";
+import { BioNextStep } from "../../features/bio/BioNextStep";
+import { useBioNextStepText } from "../../features/bio/useBioNextStepText";
 import { inputClass } from "../../shared/components/ui/styles";
 import { toast } from "../../shared/components/ui/toast-store";
 
@@ -71,6 +73,7 @@ function HandoffCard({ handoff }: { handoff: Handoff }) {
 
 function LeadsPage() {
   const [q, setQ] = useState("");
+  const emptyText = useBioNextStepText("os contatos");
   const { data: handoffs } = useGetHandoffs();
   const { data: leads, isLoading } = useGetLeads(q.trim());
   const { mutate: exportLeads, isPending: exporting } = useExportLeads();
@@ -85,7 +88,7 @@ function LeadsPage() {
     <div className="flex h-full flex-col">
       <Header
         title="Leads"
-        subtitle="Quem os seus bots atenderam e deixou um contato"
+        subtitle="Quem chegou pela sua bio e deixou um contato"
         actions={
           <Button
             variant="outline"
@@ -101,24 +104,20 @@ function LeadsPage() {
 
       <div className="flex-1 overflow-y-auto">
         <div className="mx-auto flex w-full max-w-6xl flex-col gap-4 px-3 py-4 md:px-6 md:py-6">
-          <section className="rounded-2xl border border-border-ui/70 bg-panel p-4 shadow-card">
-            <div className="mb-4 flex items-center gap-2">
-              <h2 className="text-[18px] font-bold tracking-tight text-text-primary">Esperando atendimento</h2>
-              {!!handoffs?.length && <Badge tone="warning">{handoffs.length}</Badge>}
-            </div>
-            {!handoffs?.length ? (
-              <p className="flex items-center gap-2 text-[14px] text-text-secondary">
-                <CheckCircle2 size={16} className="text-success" />
-                Nenhuma conversa esperando. Quando o bot chamar a equipe, ela aparece aqui.
-              </p>
-            ) : (
+          {/* Só aparece quando há alguém esperando (canais oficiais, no Avançado); quem usa só a bio não vê. */}
+          {!!handoffs?.length && (
+            <section className="rounded-2xl border border-border-ui/70 bg-panel p-4 shadow-card">
+              <div className="mb-4 flex items-center gap-2">
+                <h2 className="text-[18px] font-bold tracking-tight text-text-primary">Esperando atendimento</h2>
+                <Badge tone="warning">{handoffs.length}</Badge>
+              </div>
               <ul className="grid grid-cols-1 gap-3 lg:grid-cols-2">
                 {handoffs.map((h) => (
                   <HandoffCard key={h.id} handoff={h} />
                 ))}
               </ul>
-            )}
-          </section>
+            </section>
+          )}
 
           <section className="rounded-2xl border border-border-ui/70 bg-panel p-4 shadow-card">
             <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
@@ -137,7 +136,9 @@ function LeadsPage() {
               q ? (
                 <p className="py-10 text-center text-[14px] text-text-secondary">Nenhum lead encontrado para “{q}”.</p>
               ) : (
-                <EmptyState icon={Users} title="Nenhum lead ainda" description="Quando alguém deixar telefone ou e-mail numa conversa (ou falar com você pelo WhatsApp), aparece aqui." />
+                <EmptyState icon={Users} title="Nenhum contato ainda" description={`Quem reservar ou deixar o WhatsApp na sua bio aparece aqui. ${emptyText}`}>
+                  <BioNextStep />
+                </EmptyState>
               )
             ) : (
               <div className="overflow-x-auto">
