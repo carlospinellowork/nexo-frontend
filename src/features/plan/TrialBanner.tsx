@@ -1,12 +1,15 @@
 import { useState } from "react";
 import { ChevronRight, FlaskConical } from "../../shared/icons";
 import { PlanSheet } from "./PlanSheet";
+import { useGetMe } from "../../api/queries/useGetMe";
 import { TRIAL } from "./plan";
 
 /** Faixa do Início: avisa que é a versão de teste e que tudo está liberado. */
 export function TrialBanner() {
   const [open, setOpen] = useState(false);
-  if (!TRIAL) return null;
+  const { data: me } = useGetMe();
+  // Some quando o servidor liga a cobrança (NEXO_BILLING=on).
+  if (!TRIAL || me?.workspace.billing) return null;
   return (
     <>
       <button type="button" onClick={() => setOpen(true)} className="flex w-full items-center gap-3 rounded-2xl border border-primary/20 bg-primary/8 px-3.5 py-2.5 text-left transition-colors hover:bg-primary/12">

@@ -21,7 +21,8 @@ export interface BusinessProfile {
 
 export interface Me {
   user: { id: string; name: string | null; email: string; avatarColor: AvatarColor | null; avatarImage: string | null; onboarded: boolean; isAdmin?: boolean };
-  workspace: { id: string; name: string; role: "OWNER" | "ADMIN" | "MEMBER"; profile: BusinessProfile };
+  /** `plan` e `billing` desde a Etapa 16: com a cobrança desligada, tudo liberado (fase de testes). */
+  workspace: { id: string; name: string; role: "OWNER" | "ADMIN" | "MEMBER"; profile: BusinessProfile; plan?: "free" | "pro" | "team"; planFounder?: boolean; billing?: boolean };
 }
 
 export interface UpdateMe {

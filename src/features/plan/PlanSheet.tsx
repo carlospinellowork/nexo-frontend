@@ -1,6 +1,7 @@
 import { Button } from "../../shared/components/ui/Button";
 import { Sheet } from "../../shared/components/ui/Sheet";
 import { Check, Lock } from "../../shared/icons";
+import { useGetMe } from "../../api/queries/useGetMe";
 import { FREE_PLAN, PAID_PLANS, type PlanInfo, TRIAL } from "./plan";
 
 function Soon() {
@@ -26,11 +27,19 @@ function PlanHeader({ plan, locked }: { plan: PlanInfo; locked?: boolean }) {
 }
 
 /** Os três planos, iguais aos do site. Na fase de testes, avisa que tudo está liberado. */
+const PLAN_NAME = { free: "Grátis", pro: "Pro", team: "Equipe" } as const;
+
 export function PlanSheet({ open, onClose }: { open: boolean; onClose: () => void }) {
+  const { data: me } = useGetMe();
+  const current = me?.workspace.plan ?? "free";
   return (
     <Sheet open={open} title={TRIAL ? "Versão de teste" : "Planos"} onClose={onClose} width="sm" footer={<Button size="lg" className="w-full" onClick={onClose}>Entendi</Button>}>
       <div className="flex flex-col gap-5">
-        {TRIAL && (
+        <p className="text-[14px] text-text-secondary">
+          Seu plano: <b className="text-text-primary">{PLAN_NAME[current]}</b>
+          {me?.workspace.planFounder && " · preço de fundador"}
+        </p>
+        {TRIAL && !me?.workspace.billing && (
           <p className="rounded-2xl bg-primary/10 px-4 py-3 text-[14.5px] leading-snug text-text-primary">
             O Nexo está em testes: <b>tudo está liberado</b>, inclusive o Pro. Quando a cobrança começar, quem já usa ganha o preço de fundador. Conte o que achou em <b>Dar opinião</b>.
           </p>
