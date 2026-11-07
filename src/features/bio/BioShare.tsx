@@ -7,6 +7,7 @@ import { TONES } from "../../shared/components/ui/tones";
 import { toast } from "../../shared/components/ui/toast-store";
 
 import { bioUrl } from "./bioUrl";
+import { PromoKitButton } from "./PromoKit";
 import { PutOnInstagram } from "./PutOnInstagram";
 import { SocialGuide } from "./SocialGuide";
 import { NETWORK_IDS, NETWORKS, type SocialNetwork } from "./socialNetworks";
@@ -88,6 +89,7 @@ export function BioShare({ slug, name, showSteps = true }: { slug: string; name:
             Baixar QR Code (PNG)
           </Button>
         )}
+        <PromoKitButton className="w-full" />
         {!showSteps && (
           <div className="w-full border-t border-border-ui pt-4">
             <PutOnInstagram url={url} />
