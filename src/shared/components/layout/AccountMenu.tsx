@@ -55,7 +55,7 @@ export function AccountMenu({ onNavigate }: { onNavigate?: () => void }) {
       <FeedbackButton />
       <InstallMenuItem onDone={onNavigate} />
       <div className="flex flex-col gap-1.5 px-1 py-1.5">
-        <span className="px-1 text-[12px] font-semibold text-text-secondary">Empresa</span>
+        <span className="px-1 text-[12px] font-semibold text-text-secondary">Negócio</span>
         <WorkspaceSelector />
       </div>
       <div className="flex flex-col gap-1.5 px-1 pb-1">

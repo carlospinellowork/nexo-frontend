@@ -201,7 +201,7 @@ function LandingBuilderPage() {
 
   if (!id || isError) {
     return (
-      <EmptyState icon={Globe} title="Página não encontrada" description="Ela pode ter sido excluída ou pertence a outro workspace.">
+      <EmptyState icon={Globe} title="Página não encontrada" description="Ela pode ter sido excluída ou é de outro negócio.">
         <Button icon={ArrowLeft} onClick={() => navigate({ to: "/landing-pages" })}>
           Voltar para as páginas
         </Button>

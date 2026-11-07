@@ -9,7 +9,7 @@ import { PromptDialog } from "../../../shared/components/ui/PromptDialog";
 import { toast } from "../../../shared/components/ui/toast-store";
 import { useWorkspaceStore } from "../store/workspace-store";
 
-const ROLE_LABEL = { OWNER: "Dono", ADMIN: "Admin", MEMBER: "Membro" } as const;
+const ROLE_LABEL = { OWNER: "Dono", ADMIN: "Administrador", MEMBER: "Atendente" } as const;
 
 export function WorkspaceSelector() {
   const queryClient = useQueryClient();
@@ -31,13 +31,28 @@ export function WorkspaceSelector() {
       const created = await createWorkspace(name);
       setCreating(false);
       select(created.id);
-      toast.success(`Workspace "${created.name}" criado.`);
+      toast.success(`Negócio "${created.name}" criado.`);
     } catch (err) {
       toast.error(apiErrorMessage(err));
     }
   };
 
   const active = workspaces?.find((w) => w.id === activeWorkspaceId);
+  const prompt = (
+    <PromptDialog open={creating} title="Outro negócio" label="Nome do negócio" placeholder="Ex.: Clínica Sorriso" loading={isCreating} onConfirm={handleCreate} onClose={() => setCreating(false)} />
+  );
+
+  // Quase todo mundo tem um negócio só: nada de seletor, só o atalho para um segundo (do plano Pro quando a cobrança ligar).
+  if (!isLoading && (workspaces?.length ?? 0) <= 1) {
+    return (
+      <>
+        <button type="button" onClick={() => setCreating(true)} className="flex min-h-11 w-full items-center gap-2.5 rounded-xl px-3 text-left text-[13.5px] font-medium text-text-secondary transition-colors hover:bg-panel-hover hover:text-text-primary md:min-h-9">
+          <Plus size={16} /> Adicionar outro negócio
+        </button>
+        {prompt}
+      </>
+    );
+  }
 
   return (
     <div className="relative">
@@ -51,7 +66,7 @@ export function WorkspaceSelector() {
         </span>
         <span className="flex min-w-0 flex-1 flex-col">
           <span className="truncate text-[13px] font-semibold text-text-primary">{isLoading ? "Carregando..." : active?.name ?? "Nenhum"}</span>
-          <span className="text-[11.5px] text-text-secondary">{active ? ROLE_LABEL[active.role] : "Workspace"}</span>
+          <span className="text-[11.5px] text-text-secondary">{active ? ROLE_LABEL[active.role] : "Negócio"}</span>
         </span>
         <ChevronsUpDown size={16} className="shrink-0 text-text-secondary" />
       </button>
@@ -86,21 +101,13 @@ export function WorkspaceSelector() {
               className="flex w-full items-center gap-2.5 border-t border-border-ui px-4 py-3 text-[14px] font-semibold text-primary-strong transition-colors hover:bg-primary/8"
             >
               <Plus size={16} />
-              Novo workspace
+              Adicionar outro negócio
             </button>
           </motion.div>
         )}
       </AnimatePresence>
 
-      <PromptDialog
-        open={creating}
-        title="Novo workspace"
-        label="Nome da empresa ou cliente"
-        placeholder="Ex.: Clínica Sorriso"
-        loading={isCreating}
-        onConfirm={handleCreate}
-        onClose={() => setCreating(false)}
-      />
+      {prompt}
     </div>
   );
 }

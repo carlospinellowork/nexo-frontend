@@ -118,7 +118,7 @@ function DetailBody({ qr, onEdit, onDeleted, canManage }: { qr: QrCode; onEdit: 
             <div className="flex aspect-square flex-col items-center justify-center gap-2 p-4 text-center text-neutral-600">
               <Lock size={28} />
               <span className="text-[14px] font-semibold leading-snug">Só Admin vê este QR, porque ele leva a senha da rede.</span>
-              <span className="text-[13px] leading-snug">Peça a um Admin do workspace para baixar ou imprimir.</span>
+              <span className="text-[13px] leading-snug">Peça a quem administra o negócio para baixar ou imprimir.</span>
             </div>
           ) : contentQuery.isError ? (
             <div className="flex aspect-square flex-col items-center justify-center gap-2 p-4 text-center text-neutral-600">

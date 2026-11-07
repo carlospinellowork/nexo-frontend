@@ -257,7 +257,7 @@ function EmptyQr({ canManage, onCreate }: { canManage: boolean; onCreate: () => 
             Criar QR Code
           </Button>
         ) : (
-          <p className="text-[14px] text-text-secondary">Peça a um Admin do workspace para criar o primeiro QR Code.</p>
+          <p className="text-[14px] text-text-secondary">Peça a quem administra o negócio para criar o primeiro QR Code.</p>
         )}
         <p className="text-[13px] text-text-secondary">WhatsApp, avaliação no Google, Instagram, Minha Bio, página, link ou Wi-Fi.</p>
       </motion.div>
