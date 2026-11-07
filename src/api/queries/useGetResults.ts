@@ -18,6 +18,8 @@ export interface Results {
   journeys: { pageId: string; title: string; started: number; finished: number; whatsapp: number }[];
   /** Clientes por origem: visitas à bio, conversas, idas ao WhatsApp e reservas, por de onde a pessoa veio. */
   byOrigin: OriginRow[];
+  /** Reservas e previsto de cada pessoa da equipe no período; vazio sem equipe. */
+  byStaff?: { name: string; bookings: number; revenueCents: number }[];
 }
 
 export interface OriginRow {

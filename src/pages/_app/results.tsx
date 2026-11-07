@@ -61,6 +61,23 @@ function ResultsPage() {
         ) : (
           <div className="mx-auto flex w-full max-w-6xl flex-col gap-4 px-3 py-4 md:px-6 md:py-6">
             <OriginTable rows={data.byOrigin ?? []} />
+            {(data.byStaff ?? []).length > 0 && (
+              <section className="rounded-2xl border border-border-ui/70 bg-panel p-4 shadow-card">
+                <h2 className="text-[16px] font-bold tracking-tight text-text-primary">Reservas por pessoa</h2>
+                <p className="mb-4 text-[13px] text-text-secondary">Atendimentos do período, sem os cancelados. O previsto soma os preços dos serviços.</p>
+                <ul className="grid grid-cols-1 gap-2 md:grid-cols-2 xl:grid-cols-3">
+                  {data.byStaff!.map((p) => (
+                    <li key={p.name} className="flex items-center gap-3 rounded-2xl bg-panel-2 px-3 py-2.5">
+                      <span className="min-w-0 flex-1 truncate text-[14px] font-semibold text-text-primary">{p.name}</span>
+                      <span className="flex flex-col items-end">
+                        <span className="font-display text-[18px] font-bold tabular-nums text-text-primary">{fmt(p.bookings)}</span>
+                        <span className="text-[12px] text-text-secondary">{p.revenueCents ? (p.revenueCents / 100).toLocaleString("pt-BR", { style: "currency", currency: "BRL" }) : "sem preço"}</span>
+                      </span>
+                    </li>
+                  ))}
+                </ul>
+              </section>
+            )}
             <div className="grid grid-cols-2 gap-4 lg:grid-cols-4">
               <Stat icon={MessagesSquare} label="Conversas" value={fmt(data.conversations)} />
               <Stat icon={Users} label="Leads novos" value={fmt(data.leads)} hint="deixaram telefone ou e-mail" />
