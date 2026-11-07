@@ -16,6 +16,10 @@ export interface AdminAccount {
   qrReads7: number;
   conversations7: number;
   leads: number;
+  /** Conta do admin ou de demonstração: fica fora do funil. */
+  internal: boolean;
+  /** Até onde a conta já chegou alguma vez, desde o cadastro. */
+  funnel: { bioPublished: boolean; firstVisit: boolean; firstWhatsapp: boolean; firstBooking: boolean };
 }
 
 export interface AdminFeedback {

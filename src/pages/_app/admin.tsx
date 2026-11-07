@@ -25,13 +25,45 @@ const ago = (iso: string | null) => {
   return `há ${Math.round(h / 24)} d`;
 };
 
-/** As etapas que importam na fase de testes, na ordem. */
+/** Funil desde o cadastro, na ordem da jornada (Etapa 12.7). Cada etapa conta as contas que já chegaram a ela alguma vez. */
 const STEPS: { key: string; label: string; done: (a: AdminAccount) => boolean }[] = [
-  { key: "onboarded", label: "Conheceu", done: (a) => a.onboarded },
-  { key: "bio", label: "Bio no ar", done: (a) => a.bioPublished },
-  { key: "clicks", label: "Cliques", done: (a) => a.clicks7 > 0 },
-  { key: "whatsapp", label: "WhatsApp", done: (a) => a.whatsappClicks7 > 0 },
+  { key: "bio", label: "Bio no ar", done: (a) => a.funnel.bioPublished },
+  { key: "visit", label: "Primeira visita", done: (a) => a.funnel.firstVisit },
+  { key: "whatsapp", label: "Ida ao WhatsApp", done: (a) => a.funnel.firstWhatsapp },
+  { key: "booking", label: "Reserva pela bio", done: (a) => a.funnel.firstBooking },
 ];
+
+/** Barras do funil: quantas contas de fora chegaram a cada etapa e quantas pararam na anterior. */
+function Funnel({ accounts }: { accounts: AdminAccount[] }) {
+  const rows = [{ label: "Cadastro", count: accounts.length }, ...STEPS.map((s) => ({ label: s.label, count: accounts.filter(s.done).length }))];
+  const total = Math.max(1, accounts.length);
+  return (
+    <section className="flex flex-col gap-3 rounded-2xl border border-border-ui/70 bg-panel p-4 shadow-card">
+      <div className="flex flex-wrap items-baseline justify-between gap-2">
+        <h2 className="text-[16px] font-bold text-text-primary">Funil desde o cadastro</h2>
+        <span className="text-[12.5px] text-text-secondary">Contas de fora; admin e demonstração não entram</span>
+      </div>
+      <ol className="flex flex-col gap-2.5">
+        {rows.map((r, i) => {
+          const lost = i > 0 ? rows[i - 1].count - r.count : 0;
+          return (
+            <li key={r.label} className="grid grid-cols-[120px_minmax(0,1fr)_auto] items-center gap-3 md:grid-cols-[170px_minmax(0,1fr)_200px]">
+              <span className="text-[13.5px] font-semibold text-text-primary">{r.label}</span>
+              <span className="h-7 overflow-hidden rounded-lg bg-text-secondary/10">
+                <span className="block h-full rounded-lg bg-primary transition-[width] duration-500" style={{ width: `${(r.count / total) * 100}%`, minWidth: r.count ? 8 : 0 }} />
+              </span>
+              <span className="flex items-baseline justify-end gap-2 tabular-nums">
+                <span className="font-display text-[18px] font-bold text-text-primary">{r.count}</span>
+                <span className="text-[12.5px] text-text-secondary">{Math.round((r.count / total) * 100)}%</span>
+                {lost > 0 && <span className="hidden text-[12px] text-danger-strong md:inline">{lost} pararam antes</span>}
+              </span>
+            </li>
+          );
+        })}
+      </ol>
+    </section>
+  );
+}
 
 function Step({ ok, label }: { ok: boolean; label: string }) {
   return (
@@ -114,8 +146,7 @@ function AdminPage() {
   if (!isAdmin) return <EmptyState icon={ShieldOff} title="Página não encontrada" description="Esta área não está disponível para a sua conta." />;
 
   const accounts = data?.accounts ?? [];
-  const pct = (n: number) => (accounts.length ? `${Math.round((n / accounts.length) * 100)}%` : "0%");
-  const funnel = STEPS.map((s) => ({ label: s.label, count: accounts.filter(s.done).length }));
+  const external = accounts.filter((a) => !a.internal);
 
   return (
     <div className="flex h-full flex-col overflow-y-auto">
@@ -127,27 +158,19 @@ function AdminPage() {
           </div>
         ) : (
           <>
-            <section className="grid grid-cols-2 gap-2.5 md:grid-cols-5">
-              <div className="rounded-2xl border border-border-ui/70 bg-panel p-3.5 shadow-card">
-                <span className="font-display text-[26px] font-bold tabular-nums">{accounts.length}</span>
-                <p className="text-[12.5px] text-text-secondary">contas</p>
-              </div>
-              {funnel.map((f) => (
-                <div key={f.label} className="rounded-2xl border border-border-ui/70 bg-panel p-3.5 shadow-card">
-                  <span className="font-display text-[26px] font-bold tabular-nums">{pct(f.count)}</span>
-                  <p className="text-[12.5px] text-text-secondary">
-                    {f.label} ({f.count})
-                  </p>
-                </div>
-              ))}
-            </section>
-            <p className="px-1 text-[12.5px] text-text-secondary">Cliques, WhatsApp, QR e conversas: últimos 7 dias. Conversas do simulador não contam.</p>
+            <Funnel accounts={external} />
+            <p className="px-1 text-[12.5px] text-text-secondary">
+              Nas contas abaixo, cliques, WhatsApp, QR e conversas são dos últimos 7 dias. Conversas do simulador não contam. Reservas apagadas depois de 90 dias saem do funil.
+            </p>
 
             <section className="flex flex-col gap-2">
               {accounts.map((a) => (
                 <article key={a.email} className="flex flex-col gap-2.5 rounded-2xl border border-border-ui/70 bg-panel p-3.5 shadow-card md:flex-row md:items-center md:gap-4">
                   <div className="flex min-w-0 flex-col md:w-64">
-                    <span className="truncate text-[14px] font-semibold text-text-primary">{a.name || a.email}</span>
+                    <span className="flex items-center gap-1.5 truncate text-[14px] font-semibold text-text-primary">
+                      {a.name || a.email}
+                      {a.internal && <span className="rounded-full bg-text-secondary/12 px-1.5 text-[11px] font-semibold text-text-secondary">interna</span>}
+                    </span>
                     <span className="truncate text-[12.5px] text-text-secondary">
                       {a.email} · {a.workspace}
                     </span>
