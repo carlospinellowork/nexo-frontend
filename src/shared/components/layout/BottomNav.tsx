@@ -13,7 +13,7 @@ const ITEMS: { to: string; label: string; icon: IconComponent }[] = [
 
 /**
  * Navegação do celular: barra fixa embaixo, ao alcance do polegar. "Mais" abre o menu completo
- * (Páginas, QR Codes, Fluxos, Canais...). Some no computador, onde fica o menu lateral.
+ * (QR Codes, Resultados e o grupo Avançado). Some no computador, onde fica o menu lateral.
  */
 export function BottomNav({ onMore, moreActive }: { onMore: () => void; moreActive: boolean }) {
   const pathname = useRouterState({ select: (s) => s.location.pathname });

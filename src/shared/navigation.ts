@@ -13,29 +13,35 @@ export interface NavItem {
 export interface NavGroup {
   /** Sem rótulo: itens soltos no topo do menu. */
   label?: string;
+  /** Grupo recolhido por padrão; abre sozinho quando a tela atual é dele. */
+  collapsible?: boolean;
   items: NavItem[];
 }
 
-/** Menu do painel, agrupado pelo que a pessoa quer fazer. O que é detalhe de uma área fica nas abas dela (layout/ToolTabs). */
+/**
+ * Menu do painel na ordem da jornada do cliente (decisão de 07/11/2026): a bio e a agenda, depois os clientes que chegaram.
+ * Ferramentas para montar jornadas sob medida ficam em "Avançado", recolhido. Detalhe de uma área fica nas abas dela (layout/ToolTabs).
+ */
 export const NAV_GROUPS: NavGroup[] = [
   { items: [{ to: "/", title: "Início", icon: House, tone: "violet" }] },
   {
-    label: "Presença",
+    label: "Sua jornada",
     items: [
       { to: "/minha-bio", title: "Minha Bio", icon: Link2, tone: "rose" },
+      { to: "/agenda", title: "Agenda", icon: Calendar, tone: "violet" },
       { to: "/qr-codes", title: "QR Codes", icon: QrCode, tone: "lagoon" },
     ],
   },
   {
-    label: "Atendimento",
+    label: "Seus clientes",
     items: [
-      { to: "/agenda", title: "Agenda", icon: Calendar, tone: "violet" },
       { to: "/leads", title: "Leads", icon: Users, tone: "green" },
+      { to: "/results", title: "Resultados", icon: ChartLine, tone: "amber" },
     ],
   },
-  { label: "Acompanhar", items: [{ to: "/results", title: "Resultados", icon: ChartLine, tone: "amber" }] },
   {
-    label: "Criar",
+    label: "Avançado",
+    collapsible: true,
     items: [
       { to: "/landing-pages", title: "Páginas", icon: Globe, tone: "orange", also: ["/landing-builder", "/chat-builder", "/simulate"] },
       { to: "/flow-builder", title: "Fluxos", icon: GitGraph, tone: "ocean", also: ["/integrations"] },
