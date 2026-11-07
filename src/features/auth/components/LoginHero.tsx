@@ -1,4 +1,4 @@
-import { CalendarCheck, Globe, type IconComponent, MessageCircle, Sparkles, UserPlus } from "../../../shared/icons";
+import { BellRing, CalendarCheck, type IconComponent, MessageCircle, QrCode, WhatsApp } from "../../../shared/icons";
 import { AnimatePresence, motion, useReducedMotion } from "motion/react";
 import { useEffect, useState } from "react";
 import { Logo } from "../../../shared/components/ui/Logo";
@@ -11,13 +11,13 @@ interface LiveEvent {
   tone: "primary" | "accent";
 }
 
-// O que o Nexo faz, mostrado como notificações ao vivo.
+// A jornada do cliente, mostrada como notificações ao vivo (só o que o Nexo faz de verdade).
 const EVENTS: LiveEvent[] = [
-  { icon: CalendarCheck, title: "Consulta agendada", detail: "pelo bot no WhatsApp", tone: "primary" },
-  { icon: Globe, title: "Página publicada", detail: "criada conversando com a IA", tone: "accent" },
-  { icon: UserPlus, title: "Novo contato", detail: "vindo do Instagram Direct", tone: "primary" },
-  { icon: Sparkles, title: "Dúvida respondida", detail: "pelo agente de IA, às 23h", tone: "accent" },
-  { icon: MessageCircle, title: "Atendimento transferido", detail: "para a recepção, sem fila", tone: "primary" },
+  { icon: CalendarCheck, title: "Horário marcado", detail: "pela conversa da sua bio", tone: "primary" },
+  { icon: WhatsApp, title: "Cliente no seu WhatsApp", detail: "com a mensagem pronta", tone: "accent" },
+  { icon: MessageCircle, title: "Dúvida respondida", detail: "na sua bio, às 23h", tone: "primary" },
+  { icon: QrCode, title: "QR do balcão lido", detail: "e a pessoa caiu na sua bio", tone: "accent" },
+  { icon: BellRing, title: "Aviso no seu celular", detail: "a cada cliente novo", tone: "primary" },
 ];
 
 const HEADLINE = "Sua empresa no digital, num lugar só.".split(" ");
@@ -97,7 +97,7 @@ export function LoginHero() {
           transition={{ delay: 0.8, duration: 0.6 }}
           className="text-[17px] leading-relaxed text-white/80"
         >
-          Bots com IA no WhatsApp e no Instagram, páginas que vendem e todos os seus contatos juntos.
+          Sua bio conversa com quem chega, marca o horário na sua agenda e leva o cliente ao seu WhatsApp com a mensagem pronta.
         </motion.p>
       </div>
     </section>
