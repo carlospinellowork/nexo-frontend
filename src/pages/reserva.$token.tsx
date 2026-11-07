@@ -17,6 +17,8 @@ export const Route = createFileRoute("/reserva/$token")({
 interface PublicBooking {
   business: string;
   serviceName: string;
+  /** Com quem é (equipe); vazio sem equipe. */
+  staffName?: string | null;
   customerName: string;
   startsAt: string;
   endsAt: string;
@@ -106,6 +108,7 @@ function BookingPage() {
                 {STATUS[booking.status]}
               </div>
               <h1 className={`font-display text-[26px] font-bold leading-tight tracking-tight lg:text-[32px] ${active ? "" : "line-through opacity-60"}`}>{booking.serviceName}</h1>
+              {booking.staffName && <p className="-mt-1 text-[15px] font-semibold text-text-secondary">com {booking.staffName}</p>}
               <p className="flex items-center gap-2 text-[16px] font-semibold first-letter:uppercase">
                 <Calendar size={18} className="shrink-0 text-primary" />
                 <span className="first-letter:uppercase">{day}</span>

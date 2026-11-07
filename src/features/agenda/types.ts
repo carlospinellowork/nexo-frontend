@@ -33,10 +33,20 @@ export interface AgendaBlock {
   reason: string | null;
 }
 
+/** Pessoa da equipe (Etapa 18). Sem `hours`, segue o horário da agenda; sem serviços, faz todos. */
+export interface AgendaStaffMember {
+  id: string;
+  name: string;
+  hours: WorkingInterval[] | null;
+  active: boolean;
+  serviceIds: string[];
+}
+
 export interface AgendaData {
   config: AgendaConfig;
   services: AgendaServiceItem[];
   blocks: AgendaBlock[];
+  staff: AgendaStaffMember[];
 }
 
 export interface Booking {
@@ -49,6 +59,9 @@ export interface Booking {
   customerName: string;
   customerPhone: string;
   note: string | null;
+  /** Com quem é (equipe); vazio sem equipe. */
+  staffId?: string | null;
+  staffName?: string | null;
 }
 
 export const dayIn = (timeZone: string, instant: Date = new Date()) => instant.toLocaleDateString("sv-SE", { timeZone });

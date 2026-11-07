@@ -5,6 +5,7 @@ import { DesktopAgenda } from "../../features/agenda/DesktopAgenda";
 import { HoursView } from "../../features/agenda/HoursView";
 import { MobileAgenda } from "../../features/agenda/MobileAgenda";
 import { ServicesView } from "../../features/agenda/ServicesView";
+import { StaffView } from "../../features/agenda/StaffView";
 import { type CustomerNotice, MoveBookingSheet, NewBookingSheet, NotifyCustomerSheet } from "../../features/agenda/BookingSheets";
 import { type Booking, dayIn } from "../../features/agenda/types";
 import { Header } from "../../shared/components/layout/Header";
@@ -25,13 +26,14 @@ const TABS = [
   { value: "dia", label: "Agenda" },
   { value: "servicos", label: "Serviços" },
   { value: "horarios", label: "Horários" },
+  { value: "equipe", label: "Equipe" },
 ] as const;
 
 function AgendaPage() {
   const { dia } = Route.useSearch();
   const { data: agenda, isLoading } = useGetAgenda();
   const role = useWorkspaceRole();
-  const [tab, setTab] = useState<"dia" | "servicos" | "horarios">("dia");
+  const [tab, setTab] = useState<"dia" | "servicos" | "horarios" | "equipe">("dia");
   const [picked, setPicked] = useState<string | null>(null);
   const canEdit = role.canManage;
   const desktop = useIsDesktop();
@@ -106,6 +108,7 @@ function AgendaPage() {
             )}
             {tab === "servicos" && <ServicesView services={agenda.services} canEdit={canEdit} />}
             {tab === "horarios" && <HoursView key={agenda.config.workspaceId} agenda={agenda} canEdit={canEdit} />}
+            {tab === "equipe" && <StaffView agenda={agenda} canEdit={canEdit} />}
           </div>
         )}
       </div>

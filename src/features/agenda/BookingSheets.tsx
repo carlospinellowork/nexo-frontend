@@ -25,12 +25,16 @@ export function NewBookingSheet({ agenda, date, time, onClose }: { agenda: Agend
   const [name, setName] = useState("");
   const [phone, setPhone] = useState("");
   const [note, setNote] = useState("");
+  // Com equipe: quem faz o serviço escolhido (sem serviços marcados, a pessoa faz todos).
+  const team = agenda.staff.filter((m) => m.active && (!m.serviceIds.length || m.serviceIds.includes(serviceId)));
+  const [staffId, setStaffId] = useState("");
+  const chosenStaff = team.some((m) => m.id === staffId) ? staffId : (team[0]?.id ?? "");
   const { mutateAsync, isPending } = useCreateBooking();
 
   const submit = async (e: FormEvent) => {
     e.preventDefault();
     try {
-      await mutateAsync({ serviceId, date: day, time: hour, customerName: name.trim(), customerPhone: phone.trim() || undefined, note: note.trim() || undefined });
+      await mutateAsync({ serviceId, date: day, time: hour, customerName: name.trim(), customerPhone: phone.trim() || undefined, note: note.trim() || undefined, ...(chosenStaff ? { staffId: chosenStaff } : {}) });
       toast.success("Reserva marcada.");
       onClose();
     } catch (err) {
@@ -56,6 +60,12 @@ export function NewBookingSheet({ agenda, date, time, onClose }: { agenda: Agend
           Serviço
           <Select value={serviceId} onChange={setServiceId} options={services.map((sv) => ({ value: sv.id, label: sv.name, hint: [durationLabel(sv.durationMinutes), sv.priceCents != null ? money(sv.priceCents) : ""].filter(Boolean).join(" · ") }))} />
         </label>
+        {team.length > 0 && (
+          <label className={field}>
+            Com quem
+            <Select value={chosenStaff} onChange={setStaffId} options={team.map((m) => ({ value: m.id, label: m.name }))} />
+          </label>
+        )}
         <div className="grid grid-cols-2 gap-2">
           <label className={field}>
             Dia

@@ -1,5 +1,5 @@
 import { AnimatePresence, motion, useReducedMotion } from "motion/react";
-import { useMemo } from "react";
+import { useMemo, useState } from "react";
 import { apiErrorMessage } from "../../api/instance";
 import { useBookingAction } from "../../api/mutations/useAgendaMutations";
 import { useGetBookings } from "../../api/queries/useGetBookings";
@@ -51,7 +51,8 @@ function PersonRow({ booking, timeZone, open, onToggle, onMove, onCancelled }: {
         <span className="flex min-w-0 flex-1 flex-col">
           <span className={`truncate text-[14.5px] font-semibold text-text-primary ${cancelled ? "line-through" : ""}`}>{booking.customerName}</span>
           <span className="truncate text-[13px] text-text-secondary">
-            {booking.serviceName} · {durationLabel(minutes)}
+            {booking.serviceName}
+            {booking.staffName && ` com ${booking.staffName}`} · {durationLabel(minutes)}
             {booking.priceCents != null && ` · ${money(booking.priceCents)}`}
           </span>
         </span>
@@ -141,7 +142,10 @@ export function DayPanel({ agenda, date, direction, activeId, onActive, onSetup,
   const today = dayIn(timeZone);
   const { data, isPlaceholderData, isLoading } = useGetBookings(date);
   // Enquanto o dia novo carrega, nunca mostra as pessoas do dia anterior.
-  const bookings = isPlaceholderData ? undefined : data;
+  // Com equipe, dá para ver o dia de uma pessoa só.
+  const team = agenda.staff.filter((m) => m.active);
+  const [person, setPerson] = useState<string | null>(null);
+  const bookings = isPlaceholderData ? undefined : person ? data?.filter((b) => b.staffId === person) : data;
   const day = useMemo(() => buildDay(date, bookings ?? [], agenda, today), [date, bookings, agenda, today]);
   const blocked = blocks.filter((b) => dayIn(timeZone, new Date(b.startsAt)) <= date && date < dayIn(timeZone, new Date(b.endsAt)));
   const closed = !agenda.config.hours.some((h) => h.day === weekdayOf(date));
@@ -171,6 +175,22 @@ export function DayPanel({ agenda, date, direction, activeId, onActive, onSetup,
                   <motion.span initial={reduce ? false : { width: 0 }} animate={{ width: `${occupation}%` }} transition={{ type: "spring", stiffness: 120, damping: 22, delay: reduce ? 0 : 0.1 }} className="block h-full rounded-full bg-primary" />
                 </span>
                 <span className="text-[12px] font-semibold tabular-nums text-text-secondary">{occupation}% ocupado</span>
+              </div>
+            )}
+            {team.length >= 2 && (
+              <div role="radiogroup" aria-label="Ver o dia de" className="-mx-1 flex gap-1.5 overflow-x-auto px-1 [scrollbar-width:none]">
+                {[{ id: null, name: "Todos" }, ...team].map((m) => (
+                  <button
+                    key={m.id ?? "todos"}
+                    type="button"
+                    role="radio"
+                    aria-checked={person === m.id}
+                    onClick={() => setPerson(m.id)}
+                    className={`h-9 shrink-0 rounded-full px-3 text-[13px] font-semibold transition-colors md:h-8 ${person === m.id ? "bg-primary text-white" : "bg-panel-2 text-text-secondary hover:bg-panel-hover hover:text-text-primary"}`}
+                  >
+                    {m.name}
+                  </button>
+                ))}
               </div>
             )}
             {services.length > 0 && (

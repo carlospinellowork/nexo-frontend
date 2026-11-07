@@ -3,16 +3,15 @@ import { apiErrorMessage } from "../../api/instance";
 import { useCreateAgendaBlock, useDeleteAgendaBlock, useUpdateAgenda } from "../../api/mutations/useAgendaMutations";
 import { Button } from "../../shared/components/ui/Button";
 import { Sheet } from "../../shared/components/ui/Sheet";
-import { DatePicker, TimePicker } from "../../shared/components/ui/DatePicker";
+import { DatePicker } from "../../shared/components/ui/DatePicker";
 import { Select } from "../../shared/components/ui/Select";
 import { inputClass } from "../../shared/components/ui/styles";
 import { Switch } from "../../shared/components/ui/Switch";
 import { toast } from "../../shared/components/ui/toast-store";
-import { Plus, Save, Trash2, X } from "../../shared/icons";
+import { Plus, Save, Trash2 } from "../../shared/icons";
 import { type AgendaData, dayIn, shiftDay, shortDay, type WorkingInterval } from "./types";
+import { WeekHoursEditor } from "./WeekHours";
 
-const DAYS = ["Domingo", "Segunda", "Terça", "Quarta", "Quinta", "Sexta", "Sábado"];
-const ORDER = [1, 2, 3, 4, 5, 6, 0];
 const STEPS = [
   { value: 15, label: "A cada 15 minutos" },
   { value: 30, label: "A cada 30 minutos" },
@@ -25,22 +24,6 @@ const NOTICES = [
   { value: 1440, label: "1 dia antes" },
   { value: 2880, label: "2 dias antes" },
 ];
-
-/** Divide o período em dois, com uma pausa: das 12h às 13h se couber; senão, 30 minutos no meio. */
-function withBreak(interval: WorkingInterval): WorkingInterval[] {
-  const minutes = (t: string) => Number(t.slice(0, 2)) * 60 + Number(t.slice(3, 5));
-  const clock = (m: number) => `${String(Math.floor(m / 60)).padStart(2, "0")}:${String(m % 60).padStart(2, "0")}`;
-  const start = minutes(interval.start);
-  const end = minutes(interval.end);
-  const lunch = start < 720 && end > 780;
-  const pauseStart = lunch ? 720 : Math.floor((start + end) / 60) * 30;
-  const pauseEnd = lunch ? 780 : pauseStart + 30;
-  if (pauseStart <= start || pauseEnd >= end) return [interval];
-  return [
-    { ...interval, end: clock(pauseStart) },
-    { ...interval, start: clock(pauseEnd) },
-  ];
-}
 
 function BlockSheet({ today, onClose }: { today: string; onClose: () => void }) {
   const [from, setFrom] = useState(today);
@@ -120,45 +103,7 @@ export function HoursView({ agenda, canEdit }: { agenda: AgendaData; canEdit: bo
     <div className="flex flex-col gap-4 lg:grid lg:grid-cols-[minmax(0,1.25fr)_minmax(0,1fr)] lg:items-start">
       <section className="flex flex-col gap-2 rounded-2xl border border-border-ui/70 bg-panel p-3 shadow-card lg:p-4">
         <h2 className="text-[16px] font-bold tracking-tight text-text-primary">Horário de atendimento</h2>
-        {ORDER.map((day) => {
-          const intervals = hours.filter((h) => h.day === day);
-          return (
-            <div key={day} className="flex flex-col gap-1.5 border-t border-border-ui/60 py-2 first-of-type:border-0">
-              <div className="flex min-h-9 items-center gap-2">
-                <span className="flex-1 text-[14px] font-semibold text-text-primary">{DAYS[day]}</span>
-                {!intervals.length && <span className="text-[13px] text-text-secondary">Fechado</span>}
-                {canEdit && <Switch checked={intervals.length > 0} label={`Atender ${DAYS[day]}`} onChange={(on) => edit(on ? [...hours, { day, start: "09:00", end: "18:00" }] : hours.filter((h) => h.day !== day))} />}
-              </div>
-              {intervals.map((interval, i) => {
-                const change = (patch: Partial<WorkingInterval>) => edit(hours.map((h) => (h === interval ? { ...h, ...patch } : h)));
-                return (
-                  <div key={`${day}-${i}`} className="flex items-center gap-1.5">
-                    <TimePicker label={`${DAYS[day]}: início`} disabled={!canEdit} className="flex-1" value={interval.start} onChange={(start) => change({ start })} />
-                    <span className="text-[13px] text-text-secondary">até</span>
-                    <TimePicker label={`${DAYS[day]}: fim`} disabled={!canEdit} className="flex-1" value={interval.end === "24:00" ? "23:59" : interval.end} onChange={(end) => change({ end })} />
-                    {canEdit && intervals.length > 1 && (
-                      <button type="button" aria-label="Remover este horário" onClick={() => edit(hours.filter((h) => h !== interval))} className="flex h-11 w-9 shrink-0 items-center justify-center rounded-lg text-text-secondary hover:bg-danger/12 hover:text-danger">
-                        <X size={16} />
-                      </button>
-                    )}
-                  </div>
-                );
-              })}
-              {canEdit && intervals.length === 1 && (
-                <button
-                  type="button"
-                  onClick={() => {
-                    const first = intervals[0];
-                    edit([...hours.filter((h) => h !== first), ...withBreak(first)]);
-                  }}
-                  className="flex min-h-9 items-center gap-1 self-start text-[13px] font-semibold text-primary-strong"
-                >
-                  <Plus size={13} /> Adicionar pausa
-                </button>
-              )}
-            </div>
-          );
-        })}
+        <WeekHoursEditor hours={hours} onChange={edit} disabled={!canEdit} />
         {canEdit && (
           <Button icon={Save} className="h-11" onClick={() => void saveHours()} loading={isPending} disabled={!dirty}>
             Salvar horário
