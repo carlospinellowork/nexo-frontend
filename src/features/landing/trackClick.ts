@@ -1,4 +1,5 @@
 import { API_ORIGIN } from "../../api/instance";
+import { visitOrigin } from "./origin";
 
 /** Conta o clique em um item da página pública. Falhar em silêncio: nunca atrapalha o visitante. */
 export function trackClick(slug: string, itemId: string) {
@@ -6,7 +7,7 @@ export function trackClick(slug: string, itemId: string) {
     void fetch(`${API_ORIGIN}/api/public/landing-pages/${encodeURIComponent(slug)}/clicks`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ itemId }),
+      body: JSON.stringify({ itemId, origin: visitOrigin(slug) }),
       keepalive: true,
     }).catch(() => undefined);
   } catch {

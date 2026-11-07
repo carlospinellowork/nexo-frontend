@@ -5,6 +5,7 @@ import { useGetPublicLandingPage } from "../../../api/queries/useGetPublicLandin
 import { LandingRenderer } from "../components/LandingRenderer";
 import { publicChatTransport, publicJourneyTransport } from "../journey/transports";
 import { useJourney } from "../journey/useJourney";
+import { trackVisit } from "../origin";
 import { trackClick } from "../trackClick";
 
 declare global {
@@ -63,6 +64,12 @@ export function PublicLandingPage({ slug }: { slug: string }) {
     setQuestion(null);
     void ask(question);
   }, [question, inPage, journeyStatus, ask]);
+
+  // Conta a visita com a origem (Instagram, Google, QR...), uma vez por página aberta.
+  const loaded = Boolean(page);
+  useEffect(() => {
+    if (loaded) trackVisit(slug);
+  }, [loaded, slug]);
 
   useEffect(() => {
     if (!page) return;

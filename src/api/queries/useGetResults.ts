@@ -16,6 +16,16 @@ export interface Results {
   dropOff: { chat: string; nodeId: string; label: string; count: number }[];
   /** Por bio em modo jornada: quem respondeu, quem chegou ao fim e quem tocou no WhatsApp. */
   journeys: { pageId: string; title: string; started: number; finished: number; whatsapp: number }[];
+  /** Clientes por origem: visitas à bio, conversas, idas ao WhatsApp e reservas, por de onde a pessoa veio. */
+  byOrigin: OriginRow[];
+}
+
+export interface OriginRow {
+  origin: string;
+  visits: number;
+  conversations: number;
+  whatsapp: number;
+  bookings: number;
 }
 
 export const useGetResults = (days: number) => {

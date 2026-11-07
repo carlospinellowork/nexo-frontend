@@ -9,6 +9,7 @@ import type { LandingPageRecord } from "../landing/contract";
 import { FONTS } from "../landing/look/fonts";
 import { resolveLook } from "../landing/look/resolve";
 import { getTheme } from "../landing/look/themes";
+import { withOrigin } from "../landing/origin";
 import { bioUrl } from "./bioUrl";
 
 /*
@@ -112,7 +113,8 @@ async function draw(page: LandingPageRecord, format: Format): Promise<string> {
   const url = bioUrl(page.slug);
   const qrSize = story ? 560 : 340;
   const qr = new Image();
-  qr.src = await QRCode.toDataURL(url, { margin: 1, width: qrSize, errorCorrectionLevel: "M" });
+  // Quem vê o story ou o post está no Instagram: o QR leva marcado como Instagram.
+  qr.src = await QRCode.toDataURL(withOrigin(url, "instagram"), { margin: 1, width: qrSize, errorCorrectionLevel: "M" });
   await qr.decode();
   const card = qrSize + 64;
   ctx.fillStyle = "#FFFFFF";

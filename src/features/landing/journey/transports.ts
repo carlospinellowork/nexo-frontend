@@ -1,3 +1,4 @@
+import { visitOrigin } from "../origin";
 import { api, API_ORIGIN } from "../../../api/instance";
 import type { SimulatorResult } from "../../../api/mutations/useSimulator";
 import type { JourneyTransport, JourneyTurn } from "./useJourney";
@@ -52,10 +53,13 @@ function publicTransport(key: string, start: () => Promise<JourneyTurn>): Journe
 }
 
 /** Bio que abre direto na jornada. */
-export const publicJourneyTransport = (slug: string) => publicTransport(`nexo-journey:${slug}`, () => publicCall<JourneyTurn>(`/public/landing-pages/${encodeURIComponent(slug)}/journey`, { method: "POST" }));
+export const publicJourneyTransport = (slug: string) =>
+  publicTransport(`nexo-journey:${slug}`, () =>
+    publicCall<JourneyTurn>(`/public/landing-pages/${encodeURIComponent(slug)}/journey`, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ origin: visitOrigin(slug) }) }),
+  );
 
 /** Bio que abre nos links: a conversa começa quando a pessoa toca em falar com o assistente, na própria página. */
-export const publicChatTransport = (slug: string, chatId: string) => publicTransport(`nexo-chat:${slug}`, () => publicCall<JourneyTurn>("/sessions", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ chatId }) }));
+export const publicChatTransport = (slug: string, chatId: string) => publicTransport(`nexo-chat:${slug}`, () => publicCall<JourneyTurn>("/sessions", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ chatId, origin: visitOrigin(slug) }) }));
 
 /** Prévia do editor: o motor real com o rascunho do fluxo, sem contar nos Resultados. */
 export function previewJourneyTransport(chatId: string): JourneyTransport {

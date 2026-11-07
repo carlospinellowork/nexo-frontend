@@ -3,6 +3,7 @@ import { ChartLine, CheckCircle2, Headset, Loader2, MessagesSquare, TriangleAler
 import { useState } from "react";
 import { useGetResults } from "../../api/queries/useGetResults";
 import { DailyBars } from "../../features/insights/DailyBars";
+import { OriginTable } from "../../features/insights/OriginTable";
 import { channelInfo } from "../../features/insights/channels";
 import { Header } from "../../shared/components/layout/Header";
 import { EmptyState } from "../../shared/components/ui/EmptyState";
@@ -53,12 +54,13 @@ function ResultsPage() {
           <div className="flex h-64 items-center justify-center">
             <Loader2 size={32} className="animate-spin text-primary" />
           </div>
-        ) : data.conversations === 0 ? (
+        ) : data.conversations === 0 && !(data.byOrigin ?? []).length ? (
           <EmptyState icon={ChartLine} title="Ainda sem conversas no período" description={`Os números aparecem quando alguém conversar na sua bio. ${emptyText} Os testes no simulador não contam.`}>
             <BioNextStep />
           </EmptyState>
         ) : (
           <div className="mx-auto flex w-full max-w-6xl flex-col gap-4 px-3 py-4 md:px-6 md:py-6">
+            <OriginTable rows={data.byOrigin ?? []} />
             <div className="grid grid-cols-2 gap-4 lg:grid-cols-4">
               <Stat icon={MessagesSquare} label="Conversas" value={fmt(data.conversations)} />
               <Stat icon={Users} label="Leads novos" value={fmt(data.leads)} hint="deixaram telefone ou e-mail" />

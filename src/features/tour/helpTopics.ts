@@ -45,6 +45,8 @@ export const HELP_GROUPS: HelpGroup[] = [
   {
     title: "Divulgar e acompanhar",
     topics: [
+      { q: "Como coloco a bio no Google?", a: "No Perfil da Empresa do Google, toque em Editar perfil e cole o link da bio em Links de reserva (ou em Site). Use o link para Google, em Minha Bio, na parte de compartilhar: assim Resultados mostra quantos clientes vieram de lá.", to: "/minha-bio", toLabel: "Abrir Minha Bio" },
+      { q: "Como sei de onde vieram os clientes?", a: "Em Resultados, o quadro Clientes por origem mostra visitas, conversas, idas ao WhatsApp e reservas de cada canal. Use um link para cada lugar (Instagram, Google, WhatsApp, anúncio). Toda segunda, quem liga os avisos recebe o resumo da semana.", to: "/results", toLabel: "Abrir Resultados" },
       { q: "Como faço um QR Code para o balcão?", a: "Em QR Codes, crie um para a sua bio e baixe em PNG, SVG ou no cartão para imprimir. Dá para trocar o destino depois sem reimprimir.", to: "/qr-codes", toLabel: "Abrir QR Codes" },
       { q: "Como sou avisado de cada cliente?", a: "No Início, toque em Ligar no aviso Ser avisado na hora. No iPhone, primeiro adicione o Nexo à Tela de Início pelo Safari." },
       { q: "Onde vejo quem entrou em contato?", a: "Em Leads ficam os contatos que chegaram pela bio. Dá para buscar e exportar uma planilha.", to: "/leads", toLabel: "Abrir Leads" },

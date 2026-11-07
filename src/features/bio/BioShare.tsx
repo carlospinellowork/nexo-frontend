@@ -7,6 +7,8 @@ import { TONES } from "../../shared/components/ui/tones";
 import { toast } from "../../shared/components/ui/toast-store";
 
 import { bioUrl } from "./bioUrl";
+import { withOrigin } from "../landing/origin";
+import { ChannelLinks } from "./ChannelLinks";
 import { PromoKitButton } from "./PromoKit";
 import { PutOnInstagram } from "./PutOnInstagram";
 import { SocialGuide } from "./SocialGuide";
@@ -27,7 +29,8 @@ export function BioShare({ slug, name, showSteps = true }: { slug: string; name:
 
   useEffect(() => {
     let alive = true;
-    void QRCode.toDataURL(url, { margin: 2, width: 1024, errorCorrectionLevel: "M" }).then((data) => {
+    // O QR baixado aqui vai para o balcão: marcado como QR Code em Resultados.
+    void QRCode.toDataURL(withOrigin(url, "qr"), { margin: 2, width: 1024, errorCorrectionLevel: "M" }).then((data) => {
       if (alive) setQr(data);
     });
     return () => {
@@ -90,6 +93,7 @@ export function BioShare({ slug, name, showSteps = true }: { slug: string; name:
           </Button>
         )}
         <PromoKitButton className="w-full" />
+        <ChannelLinks url={url} />
         {!showSteps && (
           <div className="w-full border-t border-border-ui pt-4">
             <PutOnInstagram url={url} />

@@ -2,6 +2,7 @@ import { useState } from "react";
 import { Button } from "../../shared/components/ui/Button";
 import { Sheet } from "../../shared/components/ui/Sheet";
 import { Check, ChevronRight, Instagram } from "../../shared/icons";
+import { withOrigin } from "../landing/origin";
 import { SocialGuide } from "./SocialGuide";
 
 const INSTAGRAM_EDIT = "https://www.instagram.com/accounts/edit/";
@@ -17,7 +18,8 @@ export function PutOnInstagram({ url }: { url: string }) {
 
   // Copia antes de abrir, ainda dentro do toque: o navegador só deixa copiar durante o gesto da pessoa.
   const go = () => {
-    void navigator.clipboard?.writeText(url).catch(() => {});
+    // Marcado como Instagram: Resultados mostra quantos clientes vieram de lá.
+    void navigator.clipboard?.writeText(withOrigin(url, "instagram")).catch(() => {});
     setDone(true);
   };
 
