@@ -3,6 +3,8 @@ import { persist } from "zustand/middleware";
 
 export type TourKey =
   | "home"
+  | "bio"
+  | "agenda"
   | "flows"
   | "landing"
   | "landing_builder"

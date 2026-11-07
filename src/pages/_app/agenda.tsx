@@ -1,5 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useGetAgenda } from "../../api/queries/useGetAgenda";
 import { DesktopAgenda } from "../../features/agenda/DesktopAgenda";
 import { HoursView } from "../../features/agenda/HoursView";
@@ -12,6 +12,8 @@ import { Segmented } from "../../shared/components/ui/Segmented";
 import { useIsDesktop } from "../../shared/hooks/useIsDesktop";
 import { useWorkspaceRole } from "../../shared/hooks/useWorkspaceRole";
 import { Loader2 } from "../../shared/icons";
+import { HelpButton } from "../../features/tour/HelpButton";
+import { startTour } from "../../features/tour/driver-service";
 
 export const Route = createFileRoute("/_app/agenda")({
   // O aviso no celular abre direto no dia da reserva.
@@ -40,10 +42,30 @@ function AgendaPage() {
   const notifyMoved = (booking: Booking) => booking.customerPhone && setNotice({ booking, kind: "moved" });
   const notifyCancelled = (booking: Booking) => booking.customerPhone && setNotice({ booking, kind: "cancelled" });
   const date = picked ?? dia ?? (agenda ? dayIn(agenda.config.timeZone) : "");
+  // Tour da primeira vez, quando a agenda já carregou.
+  const loaded = Boolean(agenda);
+  useEffect(() => {
+    if (!loaded) return;
+    const timer = setTimeout(() => startTour("agenda"), 700);
+    return () => clearTimeout(timer);
+  }, [loaded]);
 
   return (
     <div className="flex h-full flex-col">
-      <Header title="Agenda" subtitle="Quem vem, quando e o que você atende" actions={desktop ? <Segmented label="Parte da agenda" size="sm" value={tab} onChange={setTab} options={[...TABS]} /> : undefined} />
+      <Header
+        title="Agenda"
+        subtitle="Quem vem, quando e o que você atende"
+        actions={
+          <div className="flex items-center gap-2">
+            {desktop && (
+              <div id="tour-agenda-tabs">
+                <Segmented label="Parte da agenda" size="sm" value={tab} onChange={setTab} options={[...TABS]} />
+              </div>
+            )}
+            <HelpButton tourKey="agenda" screenTitle="Agenda" />
+          </div>
+        }
+      />
       <div className={`min-h-0 flex-1 ${desktop && tab === "dia" ? "overflow-hidden" : "overflow-y-auto"}`}>
         {isLoading || !agenda ? (
           <div className="flex h-64 items-center justify-center">
@@ -51,13 +73,37 @@ function AgendaPage() {
           </div>
         ) : (
           <div className={`mx-auto flex w-full flex-col gap-3 ${desktop ? (tab === "dia" ? "h-full max-w-none px-5 py-4" : "max-w-5xl px-6 py-5") : "max-w-xl px-3 py-4"}`}>
-            {!desktop && <Segmented label="Parte da agenda" fullWidth value={tab} onChange={setTab} options={[...TABS]} />}
-            {tab === "dia" &&
-              (desktop ? (
-                <DesktopAgenda agenda={agenda} date={date} onDate={setPicked} onSetup={() => setTab("servicos")} onNew={(d, time) => setCreating({ date: d, time })} onMove={setMoving} onMoved={notifyMoved} onCancelled={notifyCancelled} />
-              ) : (
-                <MobileAgenda agenda={agenda} date={date} onDate={setPicked} onSetup={() => setTab("servicos")} onNew={(d, time) => setCreating({ date: d, time })} onMove={setMoving} onCancelled={notifyCancelled} />
-              ))}
+            {!desktop && (
+              <div id="tour-agenda-tabs">
+                <Segmented label="Parte da agenda" fullWidth value={tab} onChange={setTab} options={[...TABS]} />
+              </div>
+            )}
+            {tab === "dia" && (
+              <div id="tour-agenda-days" className={desktop ? "h-full min-h-0" : ""}>
+                {desktop ? (
+                  <DesktopAgenda
+                    agenda={agenda}
+                    date={date}
+                    onDate={setPicked}
+                    onSetup={() => setTab("servicos")}
+                    onNew={(d, time) => setCreating({ date: d, time })}
+                    onMove={setMoving}
+                    onMoved={notifyMoved}
+                    onCancelled={notifyCancelled}
+                  />
+                ) : (
+                  <MobileAgenda
+                    agenda={agenda}
+                    date={date}
+                    onDate={setPicked}
+                    onSetup={() => setTab("servicos")}
+                    onNew={(d, time) => setCreating({ date: d, time })}
+                    onMove={setMoving}
+                    onCancelled={notifyCancelled}
+                  />
+                )}
+              </div>
+            )}
             {tab === "servicos" && <ServicesView services={agenda.services} canEdit={canEdit} />}
             {tab === "horarios" && <HoursView key={agenda.config.workspaceId} agenda={agenda} canEdit={canEdit} />}
           </div>

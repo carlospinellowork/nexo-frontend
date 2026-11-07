@@ -1,7 +1,11 @@
 import { driver, type DriveStep } from "driver.js";
 import "driver.js/dist/driver.css";
 import {
+  Calendar,
+  CalendarCheck,
   Eye,
+  Instagram,
+  Pencil,
   FlaskConical,
   Globe,
   House,
@@ -132,6 +136,60 @@ export const TOUR_STEPS: Record<TourKey, TourStep[]> = {
     },
   ],
 
+  bio: [
+    {
+      element: "#tour-bio-tabs",
+      icon: Pencil,
+      title: "Monte a sua bio",
+      description: "Itens: links, Pix, produtos e fotos. Bot: a conversa que leva o cliente até a reserva ou o seu WhatsApp. Visual: tema e cores.",
+      side: "bottom",
+      align: "start",
+    },
+    {
+      element: "#tour-bio-preview",
+      icon: Eye,
+      title: "Como o cliente vê",
+      description: "A prévia mostra a bio e a conversa como o cliente vai ver. Toque num item da prévia para editar.",
+      side: "left",
+      align: "center",
+    },
+    {
+      element: "#tour-bio-publish",
+      icon: Rocket,
+      title: "Publique",
+      description: "As mudanças vão para o ar quando você publica. Salvar guarda sem mostrar ao cliente.",
+      side: "bottom",
+      align: "end",
+    },
+    {
+      element: "#tour-bio-instagram",
+      icon: Instagram,
+      title: "Coloque no Instagram",
+      description: "Um toque copia o link e abre o Instagram. É por esse link que os clientes chegam.",
+      side: "bottom",
+      align: "end",
+    },
+  ],
+
+  agenda: [
+    {
+      element: "#tour-agenda-tabs",
+      icon: CalendarCheck,
+      title: "Serviços e horários",
+      description: "Cadastre o que você atende, quanto tempo leva e quando você trabalha. O cliente só vê os horários livres.",
+      side: "bottom",
+      align: "end",
+    },
+    {
+      element: "#tour-agenda-days",
+      icon: Calendar,
+      title: "Quem vem e quando",
+      description: "As reservas da bio aparecem aqui sozinhas, e você recebe um aviso no celular. Toque num horário para marcar à mão.",
+      side: "top",
+      align: "center",
+    },
+  ],
+
   home: [
     {
       element: "#tour-home-stats",
@@ -195,7 +253,11 @@ export function startTour(tourKey: TourKey, force = false) {
 
   // Só os passos cujos elementos estão na tela agora.
   const steps: DriveStep[] = TOUR_STEPS[tourKey]
-    .filter((s) => document.querySelector(s.element))
+    .filter((s) => {
+      const el = document.querySelector(s.element);
+      // Só o que está visível agora (no celular, a prévia da bio fica escondida atrás de uma aba).
+      return el instanceof HTMLElement && el.getClientRects().length > 0;
+    })
     .map((s) => ({
       element: s.element,
       popover: { title: iconTitle(s.icon, s.title), description: s.description, side: s.side, align: s.align },

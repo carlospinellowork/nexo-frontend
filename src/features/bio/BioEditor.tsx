@@ -23,6 +23,8 @@ import { BioSheet } from "./BioSheet";
 import { BioShare } from "./BioShare";
 import { bioUrl } from "./bioUrl";
 import { PutOnInstagramSheet } from "./PutOnInstagram";
+import { HelpButton } from "../tour/HelpButton";
+import { startTour } from "../tour/driver-service";
 import { NEW_ITEM_OPTIONS, type NewItemKey } from "./presets";
 import { ImageField } from "../uploads/ImageField";
 
@@ -144,6 +146,12 @@ export function BioEditor({ page, openInstagram = false }: { page: LandingPageRe
   const [igOpen, setIgOpen] = useState(openInstagram && Boolean(page.publishedAt));
   const [igTitle, setIgTitle] = useState("Colocar no Instagram");
   const [pane, setPane] = useState<"edit" | "preview">("edit");
+  // Tour da primeira vez, depois de a tela assentar. Não começa por cima do "Colocar no Instagram" aberto pelo Início.
+  useEffect(() => {
+    if (openInstagram) return;
+    const timer = setTimeout(() => startTour("bio"), 700);
+    return () => clearTimeout(timer);
+  }, [openInstagram]);
   const [selection, setSelection] = useState<Selection>(null);
   const [adding, setAdding] = useState(false);
   const [addingSocial, setAddingSocial] = useState(false);
@@ -269,6 +277,7 @@ export function BioEditor({ page, openInstagram = false }: { page: LandingPageRe
           <div className="flex items-center gap-2">
             <h1 className="truncate text-[18px] font-bold tracking-tight text-text-primary">Minha Bio</h1>
             {status}
+            <HelpButton tourKey="bio" screenTitle="Minha Bio" />
           </div>
           <span className="truncate font-mono text-[12px] text-text-secondary">/p/{page.slug}</span>
         </div>
@@ -280,14 +289,14 @@ export function BioEditor({ page, openInstagram = false }: { page: LandingPageRe
             </a>
           )}
           {page.publishedAt && (
-            <Button variant="gold" icon={Instagram} onClick={() => { setIgTitle("Colocar no Instagram"); setIgOpen(true); }} aria-label="Colocar no Instagram" className="h-11 shrink-0">
+            <Button id="tour-bio-instagram" variant="gold" icon={Instagram} onClick={() => { setIgTitle("Colocar no Instagram"); setIgOpen(true); }} aria-label="Colocar no Instagram" className="h-11 shrink-0">
               Instagram
             </Button>
           )}
           <Button variant="outline" icon={Save} onClick={() => void ensureSaved(true)} loading={saving && !publishing} disabled={!dirty} aria-label="Salvar" className="ml-auto h-11 md:ml-0">
             <span className="hidden min-[430px]:inline">Salvar</span>
           </Button>
-          <Button icon={Rocket} onClick={() => void publish()} loading={publishing} disabled={!dirty && !page.hasUnpublishedChanges} className="h-11">
+          <Button id="tour-bio-publish" icon={Rocket} onClick={() => void publish()} loading={publishing} disabled={!dirty && !page.hasUnpublishedChanges} className="h-11">
             Publicar
           </Button>
         </div>
@@ -304,7 +313,7 @@ export function BioEditor({ page, openInstagram = false }: { page: LandingPageRe
 
       <div className="flex min-h-0 flex-1">
         <aside className={`${pane === "edit" ? "flex" : "hidden"} w-full min-w-0 shrink-0 flex-col border-r border-border-ui bg-panel md:flex md:w-[400px]`}>
-          <div className="grid grid-cols-3 gap-1 border-b border-border-ui p-2" role="tablist" aria-label="Painel da bio">
+          <div id="tour-bio-tabs" className="grid grid-cols-3 gap-1 border-b border-border-ui p-2" role="tablist" aria-label="Painel da bio">
             {tabs.map((t) => (
               <button key={t.value} type="button" role="tab" aria-selected={tab === t.value} onClick={() => setTab(t.value)} className={`flex h-11 items-center justify-center gap-1.5 rounded-xl text-[14px] font-semibold ${tab === t.value ? "bg-primary/12 text-primary-strong" : "text-text-secondary hover:bg-panel-hover"}`}>
                 <t.icon size={16} />
@@ -442,7 +451,7 @@ export function BioEditor({ page, openInstagram = false }: { page: LandingPageRe
           </div>
         </aside>
 
-        <div className={`${pane === "preview" ? "flex" : "hidden"} min-w-0 flex-1 items-center justify-center bg-bg-start p-3 md:flex md:p-6`}>
+        <div id="tour-bio-preview" className={`${pane === "preview" ? "flex" : "hidden"} min-w-0 flex-1 items-center justify-center bg-bg-start p-3 md:flex md:p-6`}>
           <PhoneFrame statusTone={themeIsDark(draft.theme, draft.settings.look) ? "light" : "dark"} statusBg={themeBg(draft.theme, draft.settings.look)} label="Prévia da bio">
               <LandingRenderer
                 title={draft.title}
